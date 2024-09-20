@@ -25,3 +25,5 @@ services:
       - ./data:/data/db
 
 # docker-compose up --build
+
+# "proxy": "http://localhost:5000",

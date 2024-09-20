@@ -4,9 +4,9 @@ services:
   backend:
     build: ./backend
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/mydatabase
+      - MONGO_URI=mongodb+srv://saiedupulapati4:jmzLsxDWeHqA6noc@cluster0.whqrr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
     depends_on:
       - mongodb
 
@@ -25,5 +25,3 @@ services:
       - ./data:/data/db
 
 # docker-compose up --build
-
-# "proxy": "http://localhost:5000",

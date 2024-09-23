@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Box, Typography, Paper, Avatar, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import { Button, Box, Typography, Paper, Avatar, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { green } from '@mui/material/colors';
 import NotesIcon from '@mui/icons-material/Notes';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
@@ -28,36 +28,63 @@ const theme = createTheme({
 function App() {
   const [page, setPage] = useState('soccer');
   const [section, setSection] = useState('main');
+  const [premierLeagueGames, setPremierLeagueGames] = useState([]); // State for storing fetched game results
+  const [NBAGames, setNBAGames] = useState([]);
+  const [laLigaGames, setLaLigaGames] = useState([]);
+  const [euroleagueGames, setEuroleagueGames] = useState([]);
+  // Premier League
+  useEffect(() => {
+    fetch('http://localhost:5001/api/premier_league')  // Assuming your backend exposes this API for games
+      .then(response => response.json())
+      .then(data => {
+        setPremierLeagueGames(data);  // Store game data in the state
+      })
+      .catch(err => console.log(err));
+  }, []);
 
-  // Soccer Matches Data
-  const soccerMatches = [
-    { team1: 'Team 1', team2: 'Team 2', score1: 2, score2: 3 },
-    { team1: 'Team 3', team2: 'Team 4', score1: 1, score2: 1 },
-    { team1: 'Team 5', team2: 'Team 6', score1: 0, score2: 2 },
-    // Add more soccer matches here
-  ];
+  // La Liga
+  useEffect(() => {
+    fetch('http://localhost:5001/api/la_liga')  // Assuming your backend exposes this API for games
+      .then(response => response.json())
+      .then(data => {
+        setLaLigaGames(data);  // Store game data in the state
+      })
+      .catch(err => console.log(err));
+  }, []);
 
-  // Basketball Matches Data
-  const basketballMatches = [
-    { team1: 'Team A', team2: 'Team B', score1: 98, score2: 103 },
-    { team1: 'Team C', team2: 'Team D', score1: 110, score2: 112 },
-    { team1: 'Team E', team2: 'Team F', score1: 95, score2: 90 },
-    // Add more basketball matches here
-  ];
+  // NBA
+  useEffect(() => {
+    fetch('http://localhost:5001/api/nba')  // Assuming your backend exposes this API for games
+      .then(response => response.json())
+      .then(data => {
+        setNBAGames(data);  // Store game data in the state
+      })
+      .catch(err => console.log(err));
+  }, []);
 
-  const renderMatch = (match, index) => {
-    const winner = match.score1 > match.score2 ? match.team1 : match.team2;
+  // Euroleague
+  useEffect(() => {
+    fetch('http://localhost:5001/api/euroleague')  // Assuming your backend exposes this API for games
+      .then(response => response.json())
+      .then(data => {
+        setEuroleagueGames(data);  // Store game data in the state
+      })
+      .catch(err => console.log(err));
+  }, []);
+
+  const renderMatch = (game, index) => {
+    const winner = game.scores[0] > game.scores[1] ? game.teams[0] : game.teams[1];
     return (
       <Paper key={index} elevation={3} sx={{ p: 2, m: 1, minWidth: '250px' }}>
         <Typography variant="h6">Match {index + 1}</Typography>
 
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography>{match.team1}</Typography>
+          <Typography>{game.teams[0]}</Typography>
           <Box display="flex" alignItems="center">
-            <Typography>{match.score1}</Typography>
+            <Typography>{game.scores[0]}</Typography>
             <Avatar
               sx={{
-                bgcolor: match.team1 === winner ? green[500] : 'transparent',
+                bgcolor: game.teams[0] === winner ? green[500] : 'transparent',
                 width: 12,
                 height: 12,
                 ml: 1,
@@ -67,12 +94,12 @@ function App() {
         </Box>
 
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography>{match.team2}</Typography>
+          <Typography>{game.teams[1]}</Typography>
           <Box display="flex" alignItems="center">
-            <Typography>{match.score2}</Typography>
+            <Typography>{game.scores[1]}</Typography>
             <Avatar
               sx={{
-                bgcolor: match.team2 === winner ? green[500] : 'transparent',
+                bgcolor: game.teams[1] === winner ? green[500] : 'transparent',
                 width: 12,
                 height: 12,
                 ml: 1,
@@ -82,8 +109,6 @@ function App() {
         </Box>
       </Paper>
     );
-
-
   };
 
   const sidebarItems = [
@@ -91,13 +116,6 @@ function App() {
     { text: 'Notes', icon: <NotesIcon />, section: 'notes' },
     { text: 'Calories', icon: <RestaurantIcon />, section: 'calories' },
   ];
-
-  useEffect(() => {
-    fetch('http://localhost:5001/')
-      .then(response => response.text())
-      .then(data => console.log("Backend response:", data))
-      .catch(err => console.log(err));
-  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -116,19 +134,10 @@ function App() {
             },
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              p: 2,
-            }}
-          >
-            {/* Add logo image at the top */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', p: 2 }}>
             <img src={LogoImage} alt="Logo" style={{ width: '100px' }} />
           </Box>
           <List>
-            {/* Sidebar Pages */}
             {sidebarItems.map((item, index) => (
               <ListItem button key={index} onClick={() => setSection(item.section)}>
                 <ListItemIcon sx={{ color: '#86dc3d' }}>{item.icon}</ListItemIcon>
@@ -138,7 +147,6 @@ function App() {
           </List>
           <Divider />
           <List sx={{ mt: 'auto' }}>
-            {/* Settings and About Us at the bottom */}
             <ListItem button>
               <ListItemIcon sx={{ color: '#86dc3d' }}><SettingsIcon /></ListItemIcon>
               <ListItemText primary="Settings" />
@@ -175,7 +183,7 @@ function App() {
               {/* Soccer/Basketball Matches */}
               {page === 'soccer' && (
                 <Box mt={4}>
-                  <Typography variant="h4">Soccer Matches</Typography>
+                  <Typography variant="h4">Premier League</Typography>
                   <Box
                     sx={{
                       display: 'flex',
@@ -184,13 +192,30 @@ function App() {
                       '&::-webkit-scrollbar': { display: 'none' },
                     }}
                   >
-                    {soccerMatches.map((match, index) => renderMatch(match, index))}
+                    {premierLeagueGames.map((game, index) => renderMatch(game, index))} {/* Render fetched game results */}
                   </Box>
                 </Box>
               )}
+
+              {page === 'soccer' && (
+                <Box mt={4}>
+                  <Typography variant="h4">La Liga</Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      overflowX: 'auto',
+                      p: 1,
+                      '&::-webkit-scrollbar': { display: 'none' },
+                    }}
+                  >
+                    {laLigaGames.map((game, index) => renderMatch(game, index))} {/* Render fetched game results */}
+                  </Box>
+                </Box>
+              )}
+
               {page === 'basketball' && (
                 <Box mt={4}>
-                  <Typography variant="h4">Basketball Matches</Typography>
+                  <Typography variant="h4">NBA</Typography>
                   <Box
                     sx={{
                       display: 'flex',
@@ -199,10 +224,27 @@ function App() {
                       '&::-webkit-scrollbar': { display: 'none' },
                     }}
                   >
-                    {basketballMatches.map((match, index) => renderMatch(match, index))}
+                    {NBAGames.map((game, index) => renderMatch(game, index))} {/* Render fetched game results */}
                   </Box>
                 </Box>
               )}
+
+              {page === 'basketball' && (
+                <Box mt={4}>
+                  <Typography variant="h4">Euroleague</Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      overflowX: 'auto',
+                      p: 1,
+                      '&::-webkit-scrollbar': { display: 'none' },
+                    }}
+                  >
+                    {euroleagueGames.map((game, index) => renderMatch(game, index))} {/* Render fetched game results */}
+                  </Box>
+                </Box>
+              )}
+
             </Box>
           )}
 

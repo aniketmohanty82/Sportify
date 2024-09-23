@@ -22,6 +22,34 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log(err));
 
+// Add meal log routes
+//const mealLogs = require('./routes/mealLogs');
+const router = express.Router();
+const MealLog = require('./models/MealLog');
+app.post('/api/meals/logmeal', async (req, res) => {
+    try {
+      const mealLog = new MealLog(req.body);
+      await mealLog.save();
+      res.status(201).json({ message: "Meal logged successfully", data: mealLog });
+    } catch (error) {
+      console.error("Error logging the meal", error);
+      res.status(500).json({ message: "Error logging the meal", error });
+    }
+  });
+
+module.exports = router;
+
+app.get('/api/meals', async (req, res) => {
+    try {
+      const mealLogs = await MealLog.find(); // Fetch all meal logs from the database
+      console.log("Meal logs retrieved:", mealLogs); // Log to the console
+      res.status(200).json(mealLogs); // Send the meal logs back to the client
+    } catch (error) {
+      console.error("Error fetching meal logs:", error);
+      res.status(500).json({ message: "Error fetching meal logs", error });
+    }
+  });
+
 // Routes
 app.get('/', (req, res) => {
     res.send('Hello from the backend');

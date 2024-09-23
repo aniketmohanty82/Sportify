@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Box, Typography, Paper, Avatar, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import { green } from '@mui/material/colors';
 import NotesIcon from '@mui/icons-material/Notes';
@@ -91,6 +91,13 @@ function App() {
     { text: 'Notes', icon: <NotesIcon />, section: 'notes' },
     { text: 'Calories', icon: <RestaurantIcon />, section: 'calories' },
   ];
+
+  useEffect(() => {
+    fetch('http://localhost:5001/')
+      .then(response => response.text())
+      .then(data => console.log("Backend response:", data))
+      .catch(err => console.log(err));
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>

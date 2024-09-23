@@ -23,6 +23,7 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 
 // Routes
 app.get('/', (req, res) => {
+    console.log("we're inside this bitch\n")
     res.send('Hello from the backend');
 });
 

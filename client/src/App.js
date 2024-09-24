@@ -1,16 +1,22 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Tracker from './pages/Tracker';
-import Home from './Home'
+import Home from './Home';
+import TrackerPage from './pages/Tracker';
+import Navbar from './components/Navbar'; // Import Navbar
 
 const App = () => {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/tracker" element={<Tracker />} />
-        {/* Add other routes here */}
-      </Routes>
+      <div style={{ display: 'flex' }}>
+        <Navbar />
+        <div style={{ flex: 1, padding: '20px' }}> {/* This will take the remaining space */}
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/tracker" element={<TrackerPage />} />
+            {/* Add more routes here */}
+          </Routes>
+        </div>
+      </div>
     </Router>
   );
 };

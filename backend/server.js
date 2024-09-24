@@ -50,7 +50,7 @@ app.get('/api/users', async (req, res) => {
 
 app.get('/api/premier_league', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=google+sports+premier+league+games+played+list&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
+        const response = await fetch('https://serpapi.com/search.json?q=google+sports+premier+league+games+played&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
         const data = await response.json();
         // Extracting games
         const games = data.sports_results.games;
@@ -70,9 +70,9 @@ app.get('/api/premier_league', async (req, res) => {
     }
 });
 
-app.get('/api/la_liga', async (req, res) => {
+app.get('/api/bundesliga', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=google+sports+la+liga+games+last+week&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
+        const response = await fetch('https://serpapi.com/search.json?q=google+sports+bundesliga+games+played+list&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
         const data = await response.json();
         // Extracting games
         const games = data.sports_results.games;

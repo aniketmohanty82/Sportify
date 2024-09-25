@@ -83,6 +83,9 @@ app.get('/', (req, res) => {
     res.send('Hello from the backend');
 });
 
+const usersRouter = require('./routes/users');
+app.use('/users', usersRouter);
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

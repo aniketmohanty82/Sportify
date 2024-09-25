@@ -31,7 +31,8 @@ const AppContent = () => {
           <Route path="/" element={<Home />} />
           <Route path="/tracker" element={<TrackerPage />} />
           <Route path="/login" element={<LogIn />} />
-          <Route path="/register" element={<Registration />}/>
+          <Route path="/register" element={<Registration/>}/>
+          {/* Add more routes here */}
         </Routes>
       </div>
     </div>

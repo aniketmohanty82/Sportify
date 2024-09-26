@@ -8,10 +8,10 @@ const jwt = require('jsonwebtoken');
 // Register New User
 router.post('/register', async (req, res) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, username, email, password } = req.body;
 
     // Validate input
-    if (!firstName || !lastName || !email || !password) {
+    if (!firstName || !lastName || !username || !email || !password) {
       return res.status(400).json({ message: 'Please enter all fields' });
     }
 
@@ -20,10 +20,14 @@ router.post('/register', async (req, res) => {
     if (userExists)
       return res.status(400).json({ message: 'Email already registered' });
 
+    const usernameExists = await User.findOne({ username });
+    if (usernameExists)
+      return res.status(400).json({ message: 'Username already in use.' })
     // Create new user
     const newUser = new User({
       firstName,
       lastName,
+      username,
       email,
       password,
     });

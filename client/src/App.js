@@ -2,11 +2,12 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import Home from './Home';
+import Home from './pages/Home';
 import TrackerPage from './pages/Tracker';
 import Navbar from './components/Navbar';
 import LogIn from './pages/LogIn';
 import Registration from './pages/Registration';
+import Sports from './pages/Sports';
 import ProtectedRoute from './components/ProtectedRoute'; // Import the ProtectedRoute component
 
 const App = () => {
@@ -38,6 +39,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <TrackerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sports"
+            element={
+              <ProtectedRoute>
+                <Sports />
               </ProtectedRoute>
             }
           />

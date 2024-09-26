@@ -1,9 +1,9 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import fetch from 'node-fetch'
-
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const fetch = require('node-fetch')
+const auth = require('./middleware/auth'); // Import the auth middleware
 
 dotenv.config();
 
@@ -15,33 +15,21 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-// Need to make MongoDB account and add the URL as a env var:
-/// like this: MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/<dbname>?retryWrites=true&w=majority
-// MONGO_URI = 'mongodb+srv://saiedupulapati4:jmzLsxDWeHqA6noc@cluster0.whqrr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://saiedupulapati4:jmzLsxDWeHqA6noc@cluster0.whqrr.mongodb.net/mydatabase?retryWrites=true&w=majority&appName=Cluster0';
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(conn => console.log(`MongoDB connected: ${conn.connection.name}`))  // Logs the connected database name
+    .catch(err => console.log(err));
 
-const database_MONGO_URI = 'mongodb+srv://saiedupulapati4:jmzLsxDWeHqA6noc@cluster0.whqrr.mongodb.net/mydatabase?retryWrites=true&w=majority&appName=Cluster0'
-mongoose.connect(database_MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then((conn) => {
-        console.log('MongoDB connected: ${conn.connection.name}');  // This will log the connected database name
-    })
-    .catch((err) => console.log(err));
-
-
+// Routes for fetching sports data
 app.get('/api/premier_league', async (req, res) => {
     try {
         const response = await fetch('https://serpapi.com/search.json?q=google+sports+premier+league+games+played&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
         const data = await response.json();
-        // Extracting games
         const games = data.sports_results.games;
-
-        // Extracting team names and scores from each game
         const parsedGames = games.map(game => ({
             teams: game.teams.map(team => team.name),
             scores: game.teams.map(team => team.score)
         }));
-
-        // Send parsed data as response
-        console.log(parsedGames)
         res.json(parsedGames);
     } catch (err) {
         console.error(err);
@@ -53,17 +41,11 @@ app.get('/api/bundesliga', async (req, res) => {
     try {
         const response = await fetch('https://serpapi.com/search.json?q=google+sports+bundesliga+games+played+list&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
         const data = await response.json();
-        // Extracting games
         const games = data.sports_results.games;
-
-        // Extracting team names and scores from each game
         const parsedGames = games.map(game => ({
             teams: game.teams.map(team => team.name),
             scores: game.teams.map(team => team.score)
         }));
-
-        // Send parsed data as response
-        console.log(parsedGames)
         res.json(parsedGames);
     } catch (err) {
         console.error(err);
@@ -71,22 +53,15 @@ app.get('/api/bundesliga', async (req, res) => {
     }
 });
 
-
 app.get('/api/nba', async (req, res) => {
     try {
         const response = await fetch('https://serpapi.com/search.json?q=nba+2023%2F2024+games&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
         const data = await response.json();
-        // Extracting games
         const games = data.sports_results.games;
-
-        // Extracting team names and scores from each game
         const parsedGames = games.map(game => ({
             teams: game.teams.map(team => team.name),
             scores: game.teams.map(team => team.score)
         }));
-
-        // Send parsed data as response
-        console.log(parsedGames)
         res.json(parsedGames);
     } catch (err) {
         console.error(err);
@@ -98,17 +73,11 @@ app.get('/api/euroleague', async (req, res) => {
     try {
         const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+2023%2F2024&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
         const data = await response.json();
-        // Extracting games
         const games = data.sports_results.games;
-
-        // Extracting team names and scores from each game
         const parsedGames = games.map(game => ({
             teams: game.teams.map(team => team.name),
             scores: game.teams.map(team => team.score)
         }));
-
-        // Send parsed data as response
-        console.log(parsedGames)
         res.json(parsedGames);
     } catch (err) {
         console.error(err);
@@ -116,8 +85,72 @@ app.get('/api/euroleague', async (req, res) => {
     }
 });
 
-//q=euroleague+games+2023%2F2024
+// Meal logging routes
+const MealLog = require('./models/MealLog');
 
-app.listen(5001, () => {
-    console.log('Server is running on port 5001');
+app.post('/api/meals/logmeal', async (req, res) => {
+    try {
+        const mealLog = new MealLog(req.body);
+        await mealLog.save();
+        res.status(201).json({ message: "Meal logged successfully", data: mealLog });
+    } catch (error) {
+        console.error("Error logging the meal", error);
+        res.status(500).json({ message: "Error logging the meal", error });
+    }
+});
+
+app.get('/api/meals', async (req, res) => {
+    try {
+        const mealLogs = await MealLog.find();
+        res.status(200).json(mealLogs);
+    } catch (error) {
+        console.error("Error fetching meal logs", error);
+        res.status(500).json({ message: "Error fetching meal logs", error });
+    }
+});
+
+app.put('/api/meals/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updatedMealLog = await MealLog.findByIdAndUpdate(id, req.body, { new: true });
+        if (!updatedMealLog) {
+            return res.status(404).json({ message: "Meal log not found" });
+        }
+        res.status(200).json({ message: "Meal log updated successfully", data: updatedMealLog });
+    } catch (error) {
+        console.error("Error updating meal log", error);
+        res.status(500).json({ message: "Error updating meal log", error });
+    }
+});
+
+app.delete('/api/meals/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedMealLog = await MealLog.findByIdAndDelete(id);
+        if (!deletedMealLog) {
+            return res.status(404).json({ message: "Meal log not found" });
+        }
+        res.status(200).json({ message: "Meal log deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting meal log", error);
+        res.status(500).json({ message: "Error deleting meal log", error });
+    }
+});
+
+// User routes and protected routes
+const usersRouter = require('./routes/users');
+app.use('/users', usersRouter);
+
+app.get('/tracker', auth, (req, res) => {
+    res.json({ message: 'Welcome to the protected tracker route' });
+});
+
+// Root route
+app.get('/', (req, res) => {
+    res.send('Hello from the backend');
+});
+
+// Start server
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });

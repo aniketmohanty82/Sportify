@@ -23,7 +23,7 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 // Routes for fetching sports data
 app.get('/api/premier_league', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=google+sports+premier+league+games+played&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
+        const response = await fetch('https://serpapi.com/search.json?q=premier+league+games+played+so+far&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
         const data = await response.json();
         const games = data.sports_results.games;
         const parsedGames = games.map(game => ({

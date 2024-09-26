@@ -19,6 +19,7 @@ function Registration() {
   const [email, setEmail]         = useState('');
   const [password, setPassword]   = useState('');
   const [message, setMessage]     = useState('');
+  const [username, setUsername]   = useState('');
 
   useEffect(() => {
     import('mdb-react-ui-kit/dist/css/mdb.min.css');
@@ -31,6 +32,7 @@ function Registration() {
       const res = await axios.post('http://localhost:5001/users/register', {
         firstName,
         lastName,
+        username,
         email,
         password,
       });
@@ -97,6 +99,14 @@ function Registration() {
                   />
                 </MDBCol>
               </MDBRow>
+
+              <MDBInput
+                wrapperClass="mb-4"
+                label="Username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
 
               <MDBInput
                 wrapperClass="mb-4"

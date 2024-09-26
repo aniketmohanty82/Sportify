@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const auth = require('./middleware/auth'); // Import the auth middleware
 
 dotenv.config();
 
@@ -85,6 +86,12 @@ app.get('/', (req, res) => {
 
 const usersRouter = require('./routes/users');
 app.use('/users', usersRouter);
+
+// Protected tracker route
+app.get('/tracker', auth, (req, res) => {
+    // Your logic for the tracker route
+    res.json({ message: 'Welcome to the protected tracker route' });
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

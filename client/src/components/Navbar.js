@@ -1,9 +1,21 @@
+// Navbar.js
+
 import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { FaHome, FaTasks, FaChartPie, FaCog, FaSignOutAlt, FaRunning } from 'react-icons/fa';
-import '../Navbar.css'; // Import your CSS styles
+import '../Navbar.css';
 
 const Navbar = () => {
+  const navigate = useNavigate(); // Initialize navigate
+
+  const handleLogout = () => {
+    // Remove the token from localStorage
+    localStorage.removeItem('token');
+    // Optionally, clear other user data or reset state
+    // Redirect to login page
+    navigate('/login');
+  };
+
   return (
     <div className="navbar">
       {/* User info */}
@@ -40,10 +52,10 @@ const Navbar = () => {
           <FaCog className="navbar__icon" />
           Settings
         </Link>
-        <Link to="/logout" className="navbar__link">
+        <button onClick={handleLogout} className="navbar__link navbar__logout-button">
           <FaSignOutAlt className="navbar__icon" />
           Log out
-        </Link>
+        </button>
       </div>
     </div>
   );

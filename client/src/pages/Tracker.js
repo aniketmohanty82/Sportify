@@ -1,17 +1,21 @@
+// TrackerPage.js
+
 import React, { useState, useEffect } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
-import MealLogForm from '../components/MealLogForm'; // Import the MealLogForm component
-import ConfirmDeleteModal from '../components/ConfirmDeleteModal'; // Import the ConfirmDeleteModal component
-import EditMealModal from '../components/EditMealModal'; // Import the EditMealModal component
-import '../App.css'; // Import the CSS file for other styling
-import '../MealLogs.css'; // Import the new MealLogs CSS file
+import MealLogForm from '../components/MealLogForm';
+import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
+import EditMealModal from '../components/EditMealModal';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import '../App.css';
+import '../MealLogs.css';
 
 const TrackerPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [mealLogs, setMealLogs] = useState([]);
-  const [currentMeal, setCurrentMeal] = useState(null); // To store the meal to be edited or deleted
+  const [currentMeal, setCurrentMeal] = useState(null);
+  const navigate = useNavigate(); // Initialize navigate
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -19,47 +23,48 @@ const TrackerPage = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setCurrentMeal(null); // Clear the current meal when closing the modal
+    setCurrentMeal(null);
   };
 
   const handleOpenEditModal = (meal) => {
     setCurrentMeal(meal);
-    //console.log(currentMeal)
     setIsEditModalOpen(true);
   };
 
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
-    setCurrentMeal(null); // Clear the current meal when closing the edit modal
+    setCurrentMeal(null);
   };
 
   const handleOpenDeleteModal = (meal) => {
     setCurrentMeal(meal);
-    //console.log(meal)
-    //console.log(currentMeal)
     setIsDeleteModalOpen(true);
   };
 
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
-    setCurrentMeal(null); // Clear the current meal when closing the delete modal
+    setCurrentMeal(null);
   };
 
   const handleFormSubmit = async (data) => {
     console.log('Meal logged:', data);
-    // Send data to backend
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5001/api/meals/logmeal', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-auth-token': token, // Include the token in the headers
         },
         body: JSON.stringify(data),
       });
 
       if (response.ok) {
-        await fetchMealLogs(); // Wait for the fetch to complete
-        handleCloseModal(); // Close the modal after successful submission
+        await fetchMealLogs();
+        handleCloseModal();
+      } else if (response.status === 401) {
+        // Unauthorized, redirect to login
+        navigate('/login');
       } else {
         console.error('Failed to log meal');
       }
@@ -70,19 +75,22 @@ const TrackerPage = () => {
 
   const handleEditSubmit = async (data) => {
     console.log('Meal edited:', data);
-    // Send data to backend for editing
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:5001/api/meals/${currentMeal._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'x-auth-token': token, // Include the token
         },
         body: JSON.stringify(data),
       });
 
       if (response.ok) {
-        await fetchMealLogs(); // Wait for the fetch to complete
-        handleCloseEditModal(); // Close the modal after successful edit
+        await fetchMealLogs();
+        handleCloseEditModal();
+      } else if (response.status === 401) {
+        navigate('/login');
       } else {
         console.error('Failed to edit meal');
       }
@@ -92,15 +100,21 @@ const TrackerPage = () => {
   };
 
   const handleDeleteMeal = async () => {
-    console.log(currentMeal._id)
+    console.log(currentMeal._id);
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:5001/api/meals/${currentMeal._id}`, {
         method: 'DELETE',
+        headers: {
+          'x-auth-token': token, // Include the token
+        },
       });
 
       if (response.ok) {
-        await fetchMealLogs(); // Refresh the meal logs
-        handleCloseDeleteModal(); // Close the delete confirmation modal
+        await fetchMealLogs();
+        handleCloseDeleteModal();
+      } else if (response.status === 401) {
+        navigate('/login');
       } else {
         console.error('Failed to delete meal');
       }
@@ -111,21 +125,33 @@ const TrackerPage = () => {
 
   const fetchMealLogs = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/meals');
-      const data = await response.json();
-      setMealLogs(data); // Update the state with fetched meal logs
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5001/api/meals', {
+        headers: {
+          'x-auth-token': token, // Include the token
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMealLogs(data);
+      } else if (response.status === 401) {
+        // Unauthorized, redirect to login
+        navigate('/login');
+      } else {
+        console.error('Failed to fetch meal logs');
+      }
     } catch (error) {
       console.error('Error fetching meal logs:', error);
     }
   };
 
   useEffect(() => {
-    fetchMealLogs(); // Fetch meal logs when the component mounts
+    fetchMealLogs();
   }, []);
 
-   // Log currentMeal when it changes
-   useEffect(() => {
-    console.log("Current meal:", currentMeal);
+  // Log currentMeal when it changes
+  useEffect(() => {
+    console.log('Current meal:', currentMeal);
   }, [currentMeal]);
 
   return (
@@ -135,13 +161,12 @@ const TrackerPage = () => {
         className="group cursor-pointer outline-none hover:rotate-90 duration-300"
         onClick={handleOpenModal}
       >
-        <AiOutlinePlus size={50} className="stroke-zinc-400 fill-none group-hover:fill-zinc-800 group-active:stroke-zinc-200 group-active:fill-zinc-600 group-active:duration-0 duration-300" />
+        <AiOutlinePlus
+          size={50}
+          className="stroke-zinc-400 fill-none group-hover:fill-zinc-800 group-active:stroke-zinc-200 group-active:fill-zinc-600 group-active:duration-0 duration-300"
+        />
       </button>
-      <MealLogForm 
-        isOpen={isModalOpen} 
-        onClose={handleCloseModal} 
-        onSubmit={handleFormSubmit} 
-      />
+      <MealLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} />
       <EditMealModal
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}

@@ -9,6 +9,10 @@ const mealLogSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  date: {
+    type: Date,
+    required: true,
+  },
   nutrients: {
     type: Number,
     required: true,

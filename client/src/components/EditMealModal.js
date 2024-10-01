@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
-const EditMealModal = ({ isOpen, onClose, onSubmit, meal }) => {
-  const [formData, setFormData] = useState({ foodItem: '', mealCategory: '', calories: 0 });
+const EditMealModal = ({ isOpen, onClose, meal, onDelete }) => {
+  const [formData, setFormData] = useState({ foodItem: '', portionSize: '', mealCategory: '', nutrients: 0 });
 
   useEffect(() => {
     if (meal) {
       setFormData({
         foodItem: meal.foodItem,
+        portionSize: meal.portionSize,
         mealCategory: meal.mealCategory,
         nutrients: meal.nutrients,
       });
@@ -25,7 +26,8 @@ const EditMealModal = ({ isOpen, onClose, onSubmit, meal }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    // Handle save changes
+    console.log('Saving changes:', formData);
   };
 
   return (
@@ -33,32 +35,59 @@ const EditMealModal = ({ isOpen, onClose, onSubmit, meal }) => {
       <div className="modal-content">
         <h2>Edit Meal</h2>
         <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="foodItem"
-            value={formData.foodItem}
-            onChange={handleChange}
-            placeholder="Food Item"
-            required
-          />
-          <input
-            type="text"
-            name="mealCategory"
-            value={formData.mealCategory}
-            onChange={handleChange}
-            placeholder="Meal Category"
-            required
-          />
-          <input
-            type="number"
-            name="calories"
-            value={formData.nutrients}
-            onChange={handleChange}
-            placeholder="Calories"
-            required
-          />
-          <button type="submit">Save Changes</button>
-          <button type="button" onClick={onClose}>Cancel</button>
+          <div>
+            <label htmlFor="foodItem">Food Item:</label>
+            <input
+              type="text"
+              id="foodItem"
+              name="foodItem"
+              value={formData.foodItem}
+              placeholder="Food Item"
+              required
+              disabled
+            />
+          </div>
+          <div>
+            <label htmlFor="portionSize">Portion Size:</label>
+            <input
+              type="text"
+              id="portionSize"
+              name="portionSize"
+              value={formData.portionSize}
+              onChange={handleChange}
+              placeholder="Portion Size"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="mealCategory">Meal Category:</label>
+            <input
+              type="text"
+              id="mealCategory"
+              name="mealCategory"
+              value={formData.mealCategory}
+              placeholder="Meal Category"
+              required
+              disabled
+            />
+          </div>
+          <div>
+            <label htmlFor="calories">Calories:</label>
+            <input
+              type="number"
+              id="calories"
+              name="calories"
+              value={formData.nutrients}
+              placeholder="Calories"
+              required
+              disabled
+            />
+          </div>
+          <div className="button-group">
+            <button type="submit">Save Changes</button>
+            <button type="button" onClick={onClose}>Cancel</button>
+            <button type="button" onClick={onDelete}>Delete Meal</button>
+          </div>
         </form>
       </div>
     </div>

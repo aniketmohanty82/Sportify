@@ -53,6 +53,7 @@ const MealLogForm = ({ onSubmit, isOpen, onClose }) => {
           foodItem,
           portionSize,
           mealCategory,
+          date: new Date(),
           nutrients: data.items[0].calories, // Add the nutrients to the submitted data
         });
 
@@ -171,6 +172,7 @@ const MealLogForm = ({ onSubmit, isOpen, onClose }) => {
             <option value="breakfast">Breakfast</option>
             <option value="lunch">Lunch</option>
             <option value="dinner">Dinner</option>
+            <option value="dinner">Snacks</option>
           </Select>
           <button type="submit" className="btn">Log Meal</button>
         </form>

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import MealLogForm from '../components/MealLogForm';
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 import EditMealModal from '../components/EditMealModal';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 import '../App.css';
 import '../MealLogs.css';
 
@@ -10,16 +11,19 @@ const TrackerPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [mealLogs, setMealLogs] = useState([]);
   const [currentMeal, setCurrentMeal] = useState(null);
+  const navigate = useNavigate(); // Initialize navigate
+
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Sample meal logs
-  const [mealLogs, setMealLogs] = useState([
-    { foodItem: 'Oatmeal', portionSize: '1 cup', nutrients: 150, mealCategory: 'Breakfast' },
-    { foodItem: 'Chicken Salad', portionSize: '200g', nutrients: 300, mealCategory: 'Lunch' },
-    { foodItem: 'Grilled Salmon', portionSize: '150g', nutrients: 350, mealCategory: 'Dinner' },
-    { foodItem: 'Apple', portionSize: '1 medium', nutrients: 95, mealCategory: 'Snacks' }
-  ]);
+  // // Sample meal logs
+  // const [mealLogs, setMealLogs] = useState([
+  //   { foodItem: 'Oatmeal', portionSize: '1 cup', nutrients: 150, mealCategory: 'Breakfast' },
+  //   { foodItem: 'Chicken Salad', portionSize: '200g', nutrients: 300, mealCategory: 'Lunch' },
+  //   { foodItem: 'Grilled Salmon', portionSize: '150g', nutrients: 350, mealCategory: 'Dinner' },
+  //   { foodItem: 'Apple', portionSize: '1 medium', nutrients: 95, mealCategory: 'Snacks' }
+  // ]);
 
   const categories = ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
 
@@ -60,23 +64,112 @@ const TrackerPage = () => {
     }, 5000); // Clear message after 5 seconds
   };
 
-  const handleFormSubmit = (data) => {
-    setMealLogs([...mealLogs, data]);
-    showSuccessMessage('Meal added successfully!'); // Success message
-    handleCloseModal();
+  const handleFormSubmit = async (data) => {
+    console.log('Meal logged:', data);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5001/api/meals/logmeal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token, // Include the token in the headers
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        await fetchMealLogs();
+        showSuccessMessage('Meal added successfully!'); // Success message
+        handleCloseModal();
+      } else if (response.status === 401) {
+        // Unauthorized, redirect to login
+        navigate('/login');
+      } else {
+        console.error('Failed to log meal');
+      }
+    } catch (error) {
+      console.error('Error logging meal:', error);
+    }
   };
 
-  const handleEditSubmit = (updatedMeal) => {
-    setMealLogs(mealLogs.map((meal) => (meal === currentMeal ? updatedMeal : meal)));
-    showSuccessMessage('Meal edited successfully!'); // Success message
-    handleCloseEditModal();
+  const handleEditSubmit = async (data) => {
+    console.log('Meal edited:', data);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5001/api/meals/${currentMeal._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token, // Include the token
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        await fetchMealLogs();
+        showSuccessMessage('Meal edited successfully!'); // Success message
+        handleCloseEditModal();
+      } else if (response.status === 401) {
+        navigate('/login');
+      } else {
+        console.error('Failed to edit meal');
+      }
+    } catch (error) {
+      console.error('Error editing meal:', error);
+    }
   };
 
-  const handleDeleteMeal = () => {
-    setMealLogs(mealLogs.filter((meal) => meal !== currentMeal));
-    showSuccessMessage('Meal deleted successfully!'); // Success message
-    handleCloseDeleteModal();
+  const handleDeleteMeal = async () => {
+    console.log(currentMeal._id);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5001/api/meals/${currentMeal._id}`, {
+        method: 'DELETE',
+        headers: {
+          'x-auth-token': token, // Include the token
+        },
+      });
+
+      if (response.ok) {
+        await fetchMealLogs();
+        showSuccessMessage('Meal deleted successfully!'); // Success message
+        handleCloseDeleteModal();
+      } else if (response.status === 401) {
+        navigate('/login');
+      } else {
+        console.error('Failed to delete meal');
+      }
+    } catch (error) {
+      console.error('Error deleting meal:', error);
+    }
   };
+
+  const fetchMealLogs = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5001/api/meals', {
+        headers: {
+          'x-auth-token': token, // Include the token
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMealLogs(data);
+      } else if (response.status === 401) {
+        // Unauthorized, redirect to login
+        navigate('/login');
+      } else {
+        console.error('Failed to fetch meal logs');
+      }
+    } catch (error) {
+      console.error('Error fetching meal logs:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMealLogs();
+  }, []);
+
 
   const getMealsByCategory = (category) => {
     return mealLogs.filter((log) => log.mealCategory === category);

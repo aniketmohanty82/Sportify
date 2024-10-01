@@ -101,7 +101,19 @@ app.post('/api/meals/logmeal', async (req, res) => {
 
 app.get('/api/meals', async (req, res) => {
     try {
-        const mealLogs = await MealLog.find();
+        // Get the current date in YYYY-MM-DD format
+        const currentDate = new Date();
+        const startOfDay = new Date(currentDate.setHours(0, 0, 0, 0)); // Set the time to the start of the day
+        const endOfDay = new Date(currentDate.setHours(23, 59, 59, 999)); // Set the time to the end of the day
+
+        // Find meals logged on the current date
+        const mealLogs = await MealLog.find({
+            date: {
+                $gte: startOfDay,  // Greater than or equal to start of day
+                $lt: endOfDay      // Less than end of day
+            }
+        });
+
         res.status(200).json(mealLogs);
     } catch (error) {
         console.error("Error fetching meal logs", error);

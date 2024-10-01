@@ -193,6 +193,35 @@
   background-color: #f0f0f0;
 }
 
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 300px; /* Adjust width as necessary */
+}
+
+.success-message {
+  background-color: #dff0d8; /* Light green background */
+  color: #3c763d; /* Dark green text */
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #d6e9c6; /* Light green border */
+  border-radius: 4px;
+}
+
 
 @keyframes App-logo-spin {
   from {

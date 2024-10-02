@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-cool-form';
 import '../MealLogForm.css'; // Import the CSS file for styling
 
@@ -28,8 +28,8 @@ const MealLogForm = ({ onSubmit, isOpen, onClose }) => {
     onSubmit: async (values) => {
       const { foodItem, portionSize, mealCategory } = values;
 
-      if (!selectedFoodId) {
-        alert('Please select a food item.');
+      if (!foodItem) {
+        alert('Please enter a food item.');
         return;
       }
 
@@ -66,70 +66,10 @@ const MealLogForm = ({ onSubmit, isOpen, onClose }) => {
     },
   });
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [foodList, setFoodList] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedFood, setSelectedFood] = useState('');
-  const [selectedFoodId, setSelectedFoodId] = useState(null); // Store food FDC ID
-
-  const dropdownRef = useRef();
-
-  useEffect(() => {
-    const fetchFoodList = async () => {
-      if (searchQuery.trim() === '') return; // Don't search if input is empty
-
-      try {
-        const response = await fetch(`https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(searchQuery)}&dataType=Branded,Foundation,Survey%20%28FNDDS%29,SR%20Legacy&pageSize=10&pageNumber=1&sortBy=dataType.keyword&sortOrder=asc&api_key=stCXO9gkvyjGi6ocwnjMtekGMHgVX3yx2B4p2JfR`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Error fetching food list: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setFoodList(data.foods || []); // Ensure the result is an array
-        setShowDropdown(true); // Show the dropdown when search results are available
-      } catch (error) {
-        console.error('Error fetching food list:', error);
-      }
-    };
-
-    fetchFoodList();
-  }, [searchQuery]);
-
-  const handleFoodSelection = (food) => {
-    setShowDropdown(false);
-    setSelectedFood(food.description); // Set the selected food
-    setSelectedFoodId(food.fdcId); // Save the selected food's FDC ID
-    setSearchQuery(food.description); // Set the input field to the selected food
-  };
-
-  const handleOutsideClick = (e) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-      setShowDropdown(false);
-    }
-  };
-
-  useEffect(() => {
-    // Add event listener for clicks outside of the dropdown
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
-  }, []);
-
   useEffect(() => {
     if (!isOpen) {
       // Reset the component state when closed
       reset();
-      setSearchQuery('');
-      setSelectedFood('');
-      setShowDropdown(false);
-      setSelectedFoodId(null);
     }
   }, [isOpen, reset]);
 
@@ -144,35 +84,21 @@ const MealLogForm = ({ onSubmit, isOpen, onClose }) => {
             label="Food Item"
             id="foodItem"
             name="foodItem"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setSelectedFood('');
-              setShowDropdown(true);
-            }}
-            placeholder="Search for food..."
+            placeholder="Enter food item..."
           />
-          {showDropdown && foodList.length > 0 && (
-            <ul className="dropdown" ref={dropdownRef}>
-              {foodList.map((food) => (
-                <li key={food.fdcId} onClick={() => handleFoodSelection(food)}>
-                  {food.description}
-                </li>
-              ))}
-            </ul>
-          )}
           <Field
             label="Portion Size"
             id="portionSize"
             name="portionSize"
             type="number"
+            placeholder="Enter portion size..."
           />
           <Select label="Meal Category" id="mealCategory" name="mealCategory">
             <option value="">Select Meal Category</option>
-            <option value="breakfast">Breakfast</option>
-            <option value="lunch">Lunch</option>
-            <option value="dinner">Dinner</option>
-            <option value="dinner">Snacks</option>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Dinner">Dinner</option>
+            <option value="Snack">Snacks</option>
           </Select>
           <button type="submit" className="btn">Log Meal</button>
         </form>
@@ -182,22 +108,3 @@ const MealLogForm = ({ onSubmit, isOpen, onClose }) => {
 };
 
 export default MealLogForm;
-
-  // try {
-    //   // Call the USDA API with the selected FDC ID and the nutrients
-    //   const response = await fetch(`https://api.nal.usda.gov/fdc/v1/food/${selectedFoodId}?api_key=stCXO9gkvyjGi6ocwnjMtekGMHgVX3yx2B4p2JfR`, {
-    //     method: 'GET',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //   });
-
-
-  // const queryStr = `${portionSize} ${selectedFood}`;
-  // try {
-  //   const response = await fetch(`https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(queryStr)}`, {
-  //     method: 'GET',
-  //     headers: {
-  //       'X-Api-Key': 'vKu/m4vOMPsNGv8lJHj/EQ==W2JzV2z7C4B7R2tU', // Replace with your actual API key
-  //     },
-  //   });

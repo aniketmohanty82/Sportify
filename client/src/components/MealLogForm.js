@@ -49,7 +49,7 @@ const MealLogForm = ({ onSubmit, isOpen, onClose }) => {
         const data = await response.json();
         console.log(data); // Log nutrient data for now
 
-        onSubmit({
+        onSubmit({ // TODO ANISHA
           foodItem,
           portionSize,
           mealCategory,

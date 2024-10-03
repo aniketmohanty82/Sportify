@@ -23,7 +23,7 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 // Routes for fetching sports data
 app.get('/api/premier_league', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=premier+league+games+played+so+far&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
+        const response = await fetch('https://serpapi.com/search.json?q=premier+league+games+played+so+far&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
         const data = await response.json();
         const games = data.sports_results.games;
         const parsedGames = games.map(game => ({
@@ -37,9 +37,64 @@ app.get('/api/premier_league', async (req, res) => {
     }
 });
 
+
+// test
+app.get('/api/test', async (req, res) => {
+    try {
+        const response = await fetch('https://serpapi.com/search.json?q=uefa+champions+league+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const data = await response.json();
+        const liveGames = data.sports_results.games.filter(game => game.status && game.status.includes("Live"))
+            .map(game => ({
+                teams: game.teams.map(team => team.name),
+                scores: game.teams.map(team => team.score),
+                minute: game.status.match(/\d+/)[0],  // Extract minute from the status string
+                status: game.status
+            }));
+
+        // Check if live games exist and return them
+        if (liveGames.length > 0) {
+            res.json(liveGames);
+        } else {
+            res.json({ message: "No live games right now" });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
+//uefa champions league games today
+
+// premier league games on today
+app.get('/api/premier_league_live', async (req, res) => {
+    try {
+        const response = await fetch('https://serpapi.com/search.json?q=premier+league+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const data = await response.json();
+
+        if (data.sports_results && data.sports_results.game_spotlight) {
+            const game = data.sports_results.game_spotlight;
+            if (game.status === 'Live') {
+                const parsedGame = {
+                    teams: game.teams.map(team => team.name),
+                    scores: game.teams.map(team => team.score),
+                    in_game_time: game.in_game_time.minute,
+                };
+                res.json(parsedGame);
+            } else {
+                res.json({ message: "No live games are being played right now" });
+            }
+        } else {
+            res.json({ message: "No teams are playing right now" });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
 app.get('/api/bundesliga', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=google+sports+bundesliga+games+played+list&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
+        const response = await fetch('https://serpapi.com/search.json?q=google+sports+bundesliga+games+played+list&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
         const data = await response.json();
         const games = data.sports_results.games;
         const parsedGames = games.map(game => ({
@@ -55,7 +110,7 @@ app.get('/api/bundesliga', async (req, res) => {
 
 app.get('/api/nba', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=nba+2023%2F2024+games&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
+        const response = await fetch('https://serpapi.com/search.json?q=nba+2023%2F2024+games&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
         const data = await response.json();
         const games = data.sports_results.games;
         const parsedGames = games.map(game => ({
@@ -71,7 +126,7 @@ app.get('/api/nba', async (req, res) => {
 
 app.get('/api/euroleague', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+2023%2F2024&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
+        const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+2023%2F2024&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
         const data = await response.json();
         const games = data.sports_results.games;
         const parsedGames = games.map(game => ({
@@ -79,6 +134,29 @@ app.get('/api/euroleague', async (req, res) => {
             scores: game.teams.map(team => team.score)
         }));
         res.json(parsedGames);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
+app.get('/api/wnba', async (req, res) => {
+    try {
+        const response = await fetch('https://serpapi.com/search.json?q=wnba+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const data = await response.json();
+
+        if (data.sports_results.game_spotlight && data.sports_results.game_spotlight.status === 'Live') {
+            const game = data.sports_results.game_spotlight;
+            const parsedGame = {
+                teams: game.teams.map(team => team.name),
+                scores: game.teams.map(team => team.score),
+                in_game_time: game.in_game_time.minute,
+            };
+            console.log(parsedGame)
+            res.json(parsedGame);
+        } else {
+            res.json({ message: "No teams are playing right now" });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send('Server error');

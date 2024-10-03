@@ -1,10 +1,12 @@
 /* Navbar.css */
 .navbar {
     display: flex;
+    position: sticky;
+    top: 0; /* Ensures the navbar sticks at the top */
     flex-direction: column;
     justify-content: space-between;
     width: 150px;
-    height: 93vh;
+    height: 100vh;
     background-color: #1c1c1c;
     /* background-color: #02e3b8; */
     color: white;

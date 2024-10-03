@@ -51,7 +51,8 @@ const EditMealModal = ({ isOpen, onClose, meal, onDelete, onSubmit }) => {
           <div>
             <label htmlFor="portionSize">Portion Size:</label>
             <input
-              type="text"
+              type="number"
+              min="0"
               id="portionSize"
               name="portionSize"
               value={formData.portionSize}
@@ -75,14 +76,13 @@ const EditMealModal = ({ isOpen, onClose, meal, onDelete, onSubmit }) => {
           <div>
             <label htmlFor="calories">Calories:</label>
             <input
-              type="number"
+              type="text"
               id="calories"
-              name="nutrients" // anisha's change
+              name="nutrients"
               value={formData.nutrients}
-              onChange={handleChange} // Allow user to edit nutrients
               placeholder="Calories"
               required
-              //disabled
+              disabled
             />
           </div>
           <div className="button-group">

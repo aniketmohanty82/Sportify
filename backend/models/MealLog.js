@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const mealLogSchema = new mongoose.Schema({
+const mealLogSchema = new mongoose.Schema({ // TODO ANISHA
   foodItem: {
     type: String,
     required: true,

@@ -18,17 +18,19 @@ const TrackerPage = () => {
   const [mealLogs, setMealLogs] = useState([]);
   const [currentMeal, setCurrentMeal] = useState(null);
   const navigate = useNavigate(); // Initialize navigate
-
   const [successMessage, setSuccessMessage] = useState('');
+  const [totalCalories, setTotalCalories] = useState(0);
 
    // Daily calorie goal
    const dailyCalorieGoal = 2000;
 
    // Calculate total calories from logged meals
-   const totalCalories = 1000;
+   totalCalories = 1000;
  
    // Function to calculate percentage of the daily goal
    const caloriePercentage = (totalCalories / dailyCalorieGoal) * 100;
+
+
 
   // // Sample meal logs
   // const [mealLogs, setMealLogs] = useState([
@@ -77,6 +79,18 @@ const TrackerPage = () => {
     }, 5000); // Clear message after 5 seconds
   };
 
+  // Function to calculate the total calories for the day - user story #9
+  const calculateTotalCalories = () => {
+    const today = new Date().toISOString().split('T')[0];  // Get today's date in YYYY-MM-DD format
+    const todayMeals = mealLogs.filter(log => {
+      const logDate = new Date(log.date).toISOString().split('T')[0]; // Compare log date with today
+      return logDate === today;
+    });
+
+    const total = todayMeals.reduce((acc, meal) => acc + meal.nutrients, 0);  // Sum calories
+    setTotalCalories(total.toFixed(2));  // Update the state
+  };
+
   const handleFormSubmit = async (data) => {
     console.log('Meal logged:', data);
     try {
@@ -92,6 +106,7 @@ const TrackerPage = () => {
 
       if (response.ok) {
         await fetchMealLogs();
+        calculateTotalCalories(); //recalculate total calories
         showSuccessMessage('Meal added successfully!'); // Success message
         handleCloseModal();
       } else if (response.status === 401) {
@@ -120,6 +135,7 @@ const TrackerPage = () => {
 
       if (response.ok) {
         await fetchMealLogs();
+        calculateTotalCalories(); //recalculate total calories
         showSuccessMessage('Meal edited successfully!'); // Success message
         handleCloseEditModal();
       } else if (response.status === 401) {
@@ -145,6 +161,7 @@ const TrackerPage = () => {
 
       if (response.ok) {
         await fetchMealLogs();
+        calculateTotalCalories(); //recalculate total calories
         showSuccessMessage('Meal deleted successfully!'); // Success message
         handleCloseDeleteModal();
       } else if (response.status === 401) {
@@ -182,6 +199,10 @@ const TrackerPage = () => {
   useEffect(() => {
     fetchMealLogs();
   }, []);
+
+  useEffect(() => {
+    calculateTotalCalories();  // Recalculate whenever mealLogs are updated
+  }, [mealLogs]);
 
 
   const getMealsByCategory = (category) => {
@@ -309,12 +330,13 @@ const TrackerPage = () => {
         />
         <span style={{ marginLeft: '8px', fontSize: '16px' }}>Add a meal</span> {/* Add text next to the plus icon */}
       </button>
+
       <MealLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} />
       <EditMealModal
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
-        onSubmit={handleEditSubmit}
-        onDelete={() => handleOpenDeleteModal(currentMeal)}
+        onSubmit={handleEditSubmit} // Pass handleEditSubmit as the onSubmit handler
+        onDelete={() => handleOpenDeleteModal(currentMeal)} // This line is important
         meal={currentMeal}
       />
       <ConfirmDeleteModal
@@ -385,6 +407,11 @@ const TrackerPage = () => {
       </tbody>
     </table>
     <CaloriesChart calorieData={lastSevenDaysCalories} />
+
+      {/* Total Calorie Intake Display */}
+      <div className="total-calories-container">
+        <h2>Total Calories for Today: {totalCalories} calories</h2> 
+      </div>
     </div>
   );  
 };

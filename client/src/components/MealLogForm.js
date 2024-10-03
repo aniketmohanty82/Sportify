@@ -5,14 +5,14 @@ import '../MealLogForm.css'; // Import the CSS file for styling
 const Field = ({ label, id, ...rest }) => (
   <div className="form-field">
     <label htmlFor={id}>{label}</label>
-    <input id={id} {...rest} />
+    <input id={id} className="input" {...rest} />
   </div>
 );
 
 const Select = ({ label, id, children, ...rest }) => (
   <div className="form-field">
     <label htmlFor={id}>{label}</label>
-    <select id={id} {...rest}>
+    <select id={id} className="select" {...rest}>
       {children}
     </select>
   </div>

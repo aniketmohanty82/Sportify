@@ -300,115 +300,176 @@ const TrackerPage = () => {
     return Math.min((nutrientAmount / maxAmount) * 100, 100); // Ensure the progress doesn't exceed 100%
   };
 
-  // UI starts here
   return (
     <div className="tracker-page">
-      {/* Nutrient and Calorie Progress Section */}
-      <div className="nutrient-calorie-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', paddingBottom: '20px' }}>
-      {/* Circular Progress Bar (Left) */}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', width: '50%', paddingRight: '20px' }}>
-        <div style={{ width: 150, height: 150 }}>
-          <CircularProgressbar
-            value={caloriePercentage}
-            text={`${Math.round(caloriePercentage)}%`}
-            styles={buildStyles({
-              textSize: '16px',
-              pathColor: `rgba(62, 152, 199, ${caloriePercentage / 100})`,
-              textColor: '#000',
-              trailColor: '#d6d6d6',
-            })}
+      {successMessage && (
+        <div className="success-message">
+          <p>{successMessage}</p>
+        </div>
+      )}
+
+      {/* Top row with date and add button */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        marginBottom: '15px', 
+        padding: '10px 20px', 
+        borderRadius: '15px', 
+        backgroundColor: '#f9f9f9', 
+        boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+      }}>
+        {/* Current Date Display */}
+        <h2 style={{ 
+          fontSize: '24px', 
+          color: '#333', 
+          fontFamily: 'Open Sans, sans-serif',
+        }}>
+          {new Date().toLocaleDateString()}
+        </h2>
+  
+        {/* Add New Meal Button */}
+        <button
+          title="Add New"
+          className="group flex items-center cursor-pointer outline-none hover:shadow-lg duration-300 transition-transform transform hover:scale-105"
+          onClick={handleOpenModal}
+          style={{
+            backgroundColor: '#1aa64b', 
+            color: '#fff', 
+            padding: '10px 15px', 
+            borderRadius: '10px', 
+            border: 'none', 
+            fontSize: '16px', 
+            fontWeight: 'bold', 
+          }}
+        >
+          <AiOutlinePlus
+            size={24} 
+            className="stroke-zinc-400 fill-none group-hover:fill-zinc-800 group-active:stroke-zinc-200 group-active:fill-zinc-600 group-active:duration-0 duration-300"
           />
-          <p style={{ textAlign: 'center', marginTop: '10px' }}>
-            {totalCalories} / {dailyCalorieGoal} Calories
-          </p>
-        </div>
+          <span style={{ marginLeft: '8px' }}>Add a meal</span>
+        </button>
       </div>
-
-        {/* Nutrient Progress Bars (Right) */}
-        <div className="nutrient-progress-bars" style={{ width: '50%' }}>
-        <div className="progress-bar-wrapper">
-            <label>Protein</label>
-            <div className="progress">
-              <div
-                className="progress-bar bg-success"
-                role="progressbar"
-                style={{ width: `${calculateNutrientProgress(totalProtein, 100)}%` }}
-                aria-valuenow="30"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              >
-                {totalProtein}g
-              </div>
+  
+      {/* Calorie Tracking Section */}
+      <div style={{ 
+        padding: '20px', 
+        borderRadius: '15px', 
+        backgroundColor: '#f9f9f9', 
+        boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+        marginBottom: '50px',
+      }}>
+        <h2 style={{ marginBottom: '15px' }}>Calorie Tracking</h2>
+        <div className="nutrient-calorie-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          {/* Circular Progress Bar (Left) */}
+          <div style={{ width: '50%', paddingRight: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: 150, height: 150 }}>
+              <CircularProgressbar
+                value={caloriePercentage}
+                text={`${Math.round(caloriePercentage)}%`}
+                styles={buildStyles({
+                  textSize: '16px',
+                  pathColor: `rgba(26, 166, 75, ${caloriePercentage / 100})`,
+                  textColor: '#000',
+                  trailColor: '#d6d6d6',
+                })}
+              />
+              <p style={{ textAlign: 'center', marginTop: '10px' }}>
+                {totalCalories} / {dailyCalorieGoal} Calories
+              </p>
             </div>
           </div>
-  
-          <div className="progress-bar-wrapper">
-            <label>Fats</label>
-            <div className="progress">
-              <div
-                className="progress-bar bg-warning"
-                role="progressbar"
-                style={{ width: `${calculateNutrientProgress(totalFats, 70)}%` }}
-                aria-valuenow="20"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              >
-                {totalFats}g
-              </div>
-            </div>
-          </div>
-  
-          <div className="progress-bar-wrapper">
-            <label>Carbs</label>
-            <div className="progress">
-              <div
-                className="progress-bar bg-info"
-                role="progressbar"
-                style={{ width: `${calculateNutrientProgress(totalCarbs, 250)}%` }}
-                aria-valuenow="50"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              >
-                {totalCarbs}g
-              </div>
-            </div>
-          </div>
-  
-          <div className="progress-bar-wrapper">
-            <label>Fibers</label>
-            <div className="progress">
-              <div
-                className="progress-bar bg-danger"
-                role="progressbar"
-                style={{ width: `${calculateNutrientProgress(totalFiber, 30)}%` }}
-                aria-valuenow="10"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              >
-                {totalFiber}g
-              </div>
-            </div>
+          <div style={{ width: '50%' }}>
+            <CaloriesChart calorieData={lastSevenDaysCalories} />  
           </div>
         </div>
       </div>
-      <button
-        title="Add New"
-        className="group flex items-center cursor-pointer outline-none hover:rotate-90 duration-300"
-        onClick={handleOpenModal}
-      >
-        <AiOutlinePlus
-          size={30} // Make the plus icon smaller
-          className="stroke-zinc-400 fill-none group-hover:fill-zinc-800 group-active:stroke-zinc-200 group-active:fill-zinc-600 group-active:duration-0 duration-300"
-        />
-        <span style={{ marginLeft: '8px', fontSize: '16px' }}>Add a meal</span> {/* Add text next to the plus icon */}
-      </button>
-
-      <MealLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} onError={handleCloseModal2}/>
+  
+      {/* Meal Log Tables for Breakfast, Lunch, Dinner, Snacks */}
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap', // Allow the meal logs to wrap if there isn't enough space
+        justifyContent: 'space-between',
+        padding: '20px', 
+        borderRadius: '15px', 
+        backgroundColor: '#f9f9f9', 
+        boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+        marginBottom: '20px',
+      }}>
+        <h2 style={{ width: '100%', marginBottom: '15px' }}>Meal Logs</h2>
+        {categories.map((category) => {
+          const categoryCalories = calculateCategoryCalories(category);
+          return (
+            <div className="meal-category" key={category} style={{ flex: '1 1 20%', margin: '10px' }}>
+              <h3 className="category-header">{category}: <span className="calories-text">{categoryCalories} Calories</span></h3>
+              <table className="meal-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    <th>Food Item</th>
+                    <th>Portion Size</th>
+                    <th>Calories</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {getMealsByCategory(category).length > 0 ? (
+                    getMealsByCategory(category).map((log, index) => (
+                      <tr key={index} onClick={() => handleRowClick(log)} className="meal-row">
+                        <td>{log.foodItem}</td>
+                        <td>{log.portionSize}</td>
+                        <td>{log.nutrients} calories</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3">No meals logged</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
+      </div>
+  
+      {/* Dynamic Table for Nutrient Progress Bars */}
+      <div style={{
+        padding: '20px', 
+        borderRadius: '15px', 
+        backgroundColor: '#f9f9f9', 
+        boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+        marginBottom: '20px',
+      }}>
+        <h2 style={{ marginBottom: '15px' }}>Nutrient Progress Bars</h2>
+        <div className="nutrient-progress-bars" style={{ display: 'flex', justifyContent: 'space-between' }}>
+          {[
+            { label: 'Protein', value: totalProtein, goal: 100, color: 'bg-success' },
+            { label: 'Fats', value: totalFats, goal: 70, color: 'bg-warning' },
+            { label: 'Carbs', value: totalCarbs, goal: 250, color: 'bg-info' },
+            { label: 'Fibers', value: totalFiber, goal: 30, color: 'bg-danger' },
+          ].map(({ label, value, goal, color }) => (
+            <div className="progress-bar-wrapper" key={label} style={{ flex: '1 1 22%', margin: '10px' }}>
+              <label>{label}</label>
+              <div className="progress">
+                <div
+                  className={`progress-bar ${color}`}
+                  role="progressbar"
+                  style={{ width: `${calculateNutrientProgress(value, goal)}%` }}
+                >
+                  {value}g
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+  
+      {/* Modals and Success Message */}
+      <MealLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} />
       <EditMealModal
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
-        onSubmit={handleEditSubmit} // Pass handleEditSubmit as the onSubmit handler
-        onDelete={() => handleOpenDeleteModal(currentMeal)} // This line is important
+        onSubmit={handleEditSubmit}
+        onDelete={() => handleOpenDeleteModal(currentMeal)}
         meal={currentMeal}
       />
       <ConfirmDeleteModal
@@ -417,56 +478,9 @@ const TrackerPage = () => {
         onConfirm={handleDeleteMeal}
         mealName={currentMeal?.foodItem}
       />
-  
-      {successMessage && (
-        <div className="success-message">
-          <p>{successMessage}</p>
-        </div>
-      )}
-
-      {/* Current Date Display */}
-      <h2 style={{ marginTop: '20px' }}>{new Date().toLocaleDateString()}</h2>
-    <h2>Today's Meals</h2>
-  <div className="meal-logs-container">
-    {categories.map((category) => {
-    const categoryCalories = calculateCategoryCalories(category); // Calculate calories for each category
-
-    return (
-        <div className="meal-category" key={category}>
-          <h3 className="category-header">{category}: <span className="calories-text">{categoryCalories} Calories</span></h3> {/* Show category and calories */}
-          <table className="meal-table">
-            <thead>
-              <tr>
-                <th>Food Item</th>
-                <th>Portion Size</th>
-                <th>Calories</th>
-              </tr>
-            </thead>
-            <tbody>
-              {getMealsByCategory(category).length > 0 ? (
-                getMealsByCategory(category).map((log, index) => (
-                  <tr key={index} onClick={() => handleRowClick(log)} className="meal-row">
-                    <td>{log.foodItem}</td>
-                    <td>{log.portionSize}</td>
-                    <td>{log.nutrients} calories</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3">No meals logged</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      );
-  })}
-  </div>
-        {/* Dynamic Table for Calorie Counts of the Last Seven Days */}
-        <h2 style={{ marginTop: '40px' }}>Calorie Counts for the Last 7 Days</h2>
-      <CaloriesChart calorieData={lastSevenDaysCalories} />
-      </div>
+    </div>
   );
+  
 };
 
 export default TrackerPage;

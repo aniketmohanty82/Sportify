@@ -18,7 +18,7 @@ const Select = ({ label, id, children, ...rest }) => (
   </div>
 );
 
-const MealLogForm = ({ onSubmit, isOpen, onClose }) => {
+const MealLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
   const { form, reset } = useForm({
     defaultValues: {
       foodItem: '',
@@ -30,6 +30,16 @@ const MealLogForm = ({ onSubmit, isOpen, onClose }) => {
 
       if (!foodItem) {
         alert('Please enter a food item.');
+        return;
+      }
+
+      if (portionSize <= 0) {
+        alert('Please enter the portion size.');
+        return;
+      }
+
+      if (!mealCategory) {
+        alert('Please choose the meal category.');
         return;
       }
 
@@ -67,6 +77,8 @@ const MealLogForm = ({ onSubmit, isOpen, onClose }) => {
         onClose(); // Close the modal after submission
       } catch (error) {
         console.error('Error fetching nutrient data:', error);
+        reset();
+        onError(); 
       }
     },
   });
@@ -96,6 +108,7 @@ const MealLogForm = ({ onSubmit, isOpen, onClose }) => {
             id="portionSize"
             name="portionSize"
             type="number"
+            min="0" // Prevents negative values
             placeholder="Enter portion size..."
           />
           <Select label="Meal Category" id="mealCategory" name="mealCategory">
@@ -103,7 +116,7 @@ const MealLogForm = ({ onSubmit, isOpen, onClose }) => {
             <option value="Breakfast">Breakfast</option>
             <option value="Lunch">Lunch</option>
             <option value="Dinner">Dinner</option>
-            <option value="Snack">Snacks</option>
+            <option value="Snacks">Snacks</option>
           </Select>
           <button type="submit" className="btn">Log Meal</button>
         </form>

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const mealLogSchema = new mongoose.Schema({ // TODO ANISHA
+const mealLogSchema = new mongoose.Schema({
   foodItem: {
     type: String,
     required: true,
@@ -19,6 +19,26 @@ const mealLogSchema = new mongoose.Schema({ // TODO ANISHA
   },
   portionSize: {
     type: String,
+    required: true,
+  },
+  protein: {
+    type: Number,
+    required: true,
+  },
+  carbs: {
+    type: Number,
+    required: true,
+  },
+  fats: {
+    type: Number,
+    required: true,
+  },
+  fiber: {
+    type: Number,
+    required: true,
+  },
+  sodium: {
+    type: Number,
     required: true,
   },
 }, { timestamps: true });

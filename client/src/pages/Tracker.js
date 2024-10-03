@@ -15,31 +15,28 @@ const TrackerPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [mealLogs, setMealLogs] = useState([]);
+
   const [currentMeal, setCurrentMeal] = useState(null);
+
   const navigate = useNavigate(); // Initialize navigate
+
   const [successMessage, setSuccessMessage] = useState('');
+
+  const [mealLogs, setMealLogs] = useState([]);
   const [totalCalories, setTotalCalories] = useState(0);
+  const [totalProtein, setTotalProtein] = useState(0);
+  const [totalFats, setTotalFats] = useState(0);
+  const [totalCarbs, setTotalCarbs] = useState(0);
+  const [totalFiber, setTotalFiber] = useState(0);
+  const [lastSevenDaysCalories, setLastSevenDaysCalories] = useState([]);
 
-   // Daily calorie goal
-   const dailyCalorieGoal = 2000;
+  const [loading, setLoading] = useState(true);
 
-  //  // Calculate total calories from logged meals
-  //  setTotalCalories(1000);
+  // Daily calorie goal
+  const dailyCalorieGoal = 2000;
  
-  //  // Function to calculate percentage of the daily goal
-   const caloriePercentage = (totalCalories / dailyCalorieGoal) * 100;
-  // const caloriePercentage = 0;
-
-
-
-  // // Sample meal logs
-  // const [mealLogs, setMealLogs] = useState([
-  //   { foodItem: 'Oatmeal', portionSize: '1 cup', nutrients: 150, mealCategory: 'Breakfast' },
-  //   { foodItem: 'Chicken Salad', portionSize: '200g', nutrients: 300, mealCategory: 'Lunch' },
-  //   { foodItem: 'Grilled Salmon', portionSize: '150g', nutrients: 350, mealCategory: 'Dinner' },
-  //   { foodItem: 'Apple', portionSize: '1 medium', nutrients: 95, mealCategory: 'Snacks' }
-  // ]);
+  // Function to calculate percentage of the daily goal
+  const caloriePercentage = Math.min((totalCalories / dailyCalorieGoal) * 100, 100);
 
   const categories = ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
 
@@ -50,11 +47,6 @@ const TrackerPage = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCurrentMeal(null);
-  };
-
-  const handleOpenEditModal = (meal) => {
-    setCurrentMeal(meal);
-    setIsEditModalOpen(true);
   };
 
   const handleCloseEditModal = () => {
@@ -82,15 +74,26 @@ const TrackerPage = () => {
 
   // Function to calculate the total calories for the day - user story #9
   const calculateTotalCalories = () => {
-    const today = new Date().toISOString().split('T')[0];  // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split('T')[0];
     const todayMeals = mealLogs.filter(log => {
-      const logDate = new Date(log.date).toISOString().split('T')[0]; // Compare log date with today
+      if (!log.date) return false; // Ensure log date is defined
+      const logDate = new Date(log.date).toISOString().split('T')[0];
       return logDate === today;
     });
+  
+    const totalCalories = todayMeals.reduce((acc, meal) => acc + (meal.nutrients || 0), 0);
+    const totalProtein = todayMeals.reduce((acc, meal) => acc + (meal.protein || 0), 0);
+    const totalFats = todayMeals.reduce((acc, meal) => acc + (meal.fats || 0), 0);
+    const totalCarbs = todayMeals.reduce((acc, meal) => acc + (meal.carbs || 0), 0);
+    const totalFiber = todayMeals.reduce((acc, meal) => acc + (meal.fiber || 0), 0);
 
-    const total = todayMeals.reduce((acc, meal) => acc + meal.nutrients, 0);  // Sum calories
-    setTotalCalories(total.toFixed(2));  // Update the state
-  };
+
+    setTotalCalories(Math.round(totalCalories));
+    setTotalProtein(Math.round(totalProtein));
+    setTotalFats(Math.round(totalFats));
+    setTotalCarbs(Math.round(totalCarbs));
+    setTotalFiber(Math.round(totalFiber));
+  }; 
 
   const handleFormSubmit = async (data) => {
     console.log('Meal logged:', data);
@@ -176,6 +179,7 @@ const TrackerPage = () => {
   };
 
   const fetchMealLogs = async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5001/api/meals', {
@@ -194,16 +198,55 @@ const TrackerPage = () => {
       }
     } catch (error) {
       console.error('Error fetching meal logs:', error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  const getLastSevenDaysCalories = () => {
+
+    const today = new Date();
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 6); // Get the date 6 days before today
+
+    // Initialize an array to store calorie counts for the last 7 days
+    const caloriesByDate = [];
+
+    for (let i = 0; i < 7; i++) {
+      const currentDay = new Date(sevenDaysAgo);
+      currentDay.setDate(sevenDaysAgo.getDate() + i);
+
+      // Format the date for comparison (YYYY-MM-DD)
+      const formattedDate = currentDay.toISOString().split('T')[0];
+
+      // Filter meal logs for the current day
+      const dailyMeals = mealLogs.filter(log => {
+        const logDate = new Date(log.date).toISOString().split('T')[0];
+        return logDate === formattedDate;
+      });
+
+      // Sum the calories for that day
+      const totalCalories = dailyMeals.reduce((total, meal) => total + meal.nutrients, 0);
+
+      // Push the result into the array
+      caloriesByDate.push({
+        date: formattedDate,
+        calories: totalCalories,
+      });
+    }
+
+    setLastSevenDaysCalories(caloriesByDate);
+  };
+
 
   useEffect(() => {
     fetchMealLogs();
   }, []);
 
   useEffect(() => {
-    calculateTotalCalories();  // Recalculate whenever mealLogs are updated
-  }, [mealLogs]);
+    calculateTotalCalories();
+    getLastSevenDaysCalories();
+  }, [mealLogs]); // Recalculate when mealLogs change
 
 
   const getMealsByCategory = (category) => {
@@ -219,17 +262,7 @@ const TrackerPage = () => {
     return Math.min((nutrientAmount / maxAmount) * 100, 100); // Ensure the progress doesn't exceed 100%
   };
 
-  const lastSevenDaysCalories = [
-    { date: '2024-09-26', calories: 2000 },
-    { date: '2024-09-27', calories: 1800 },
-    { date: '2024-09-28', calories: 2100 },
-    { date: '2024-09-29', calories: 1900 },
-    { date: '2024-09-30', calories: 2200 },
-    { date: '2024-10-01', calories: 2000 },
-    { date: '2024-10-02', calories: 2100 },
-  ];
-  
-
+  // UI starts here
   return (
     <div className="tracker-page">
       {/* Nutrient and Calorie Progress Section */}
@@ -261,12 +294,12 @@ const TrackerPage = () => {
               <div
                 className="progress-bar bg-success"
                 role="progressbar"
-                style={{ width: `${calculateNutrientProgress(30, 100)}%` }}
+                style={{ width: `${calculateNutrientProgress(totalProtein, 100)}%` }}
                 aria-valuenow="30"
                 aria-valuemin="0"
                 aria-valuemax="100"
               >
-                30g
+                {totalProtein}g
               </div>
             </div>
           </div>
@@ -277,12 +310,12 @@ const TrackerPage = () => {
               <div
                 className="progress-bar bg-warning"
                 role="progressbar"
-                style={{ width: `${calculateNutrientProgress(20, 70)}%` }}
+                style={{ width: `${calculateNutrientProgress(totalFats, 70)}%` }}
                 aria-valuenow="20"
                 aria-valuemin="0"
                 aria-valuemax="100"
               >
-                20g
+                {totalFats}g
               </div>
             </div>
           </div>
@@ -293,12 +326,12 @@ const TrackerPage = () => {
               <div
                 className="progress-bar bg-info"
                 role="progressbar"
-                style={{ width: `${calculateNutrientProgress(50, 250)}%` }}
+                style={{ width: `${calculateNutrientProgress(totalCarbs, 250)}%` }}
                 aria-valuenow="50"
                 aria-valuemin="0"
                 aria-valuemax="100"
               >
-                50g
+                {totalCarbs}g
               </div>
             </div>
           </div>
@@ -309,12 +342,12 @@ const TrackerPage = () => {
               <div
                 className="progress-bar bg-danger"
                 role="progressbar"
-                style={{ width: `${calculateNutrientProgress(10, 30)}%` }}
+                style={{ width: `${calculateNutrientProgress(totalFiber, 30)}%` }}
                 aria-valuenow="10"
                 aria-valuemin="0"
                 aria-valuemax="100"
               >
-                10g
+                {totalFiber}g
               </div>
             </div>
           </div>
@@ -353,68 +386,45 @@ const TrackerPage = () => {
         </div>
       )}
 
-       {/* Current Date Display */}
-    <h2 style={{ marginTop: '20px' }}>{new Date().toLocaleDateString()}</h2>
-  
+      {/* Current Date Display */}
+      <h2 style={{ marginTop: '20px' }}>{new Date().toLocaleDateString()}</h2>
       <h2>Today's Meals</h2>
-      <div className="meal-logs-container">
-        {categories.map((category) => (
-          <div className="meal-category" key={category}>
-            <h3>{category}</h3>
-            <table className="meal-table">
-              <thead>
-                <tr>
-                  <th>Food Item</th>
-                  <th>Portion Size</th>
-                  <th>Calories</th>
-                </tr>
-              </thead>
-              <tbody>
-                {getMealsByCategory(category).length > 0 ? (
-                  getMealsByCategory(category).map((log, index) => (
-                    <tr key={index} onClick={() => handleRowClick(log)} className="meal-row">
-                      <td>{log.foodItem}</td>
-                      <td>{log.portionSize}</td>
-                      <td>{log.nutrients} calories</td>
-                    </tr>
-                  ))
-                ) : (
+        <div className="meal-logs-container">
+          {categories.map((category) => (
+            <div className="meal-category" key={category}>
+              <h3>{category}</h3>
+              <table className="meal-table">
+                <thead>
                   <tr>
-                    <td colSpan="3">No meals logged</td>
+                    <th>Food Item</th>
+                    <th>Portion Size</th>
+                    <th>Calories</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        ))}
+                </thead>
+                <tbody>
+                  {getMealsByCategory(category).length > 0 ? (
+                    getMealsByCategory(category).map((log, index) => (
+                      <tr key={index} onClick={() => handleRowClick(log)} className="meal-row">
+                        <td>{log.foodItem}</td>
+                        <td>{log.portionSize}</td>
+                        <td>{log.nutrients} calories</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3">No meals logged</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
+        {/* Dynamic Table for Calorie Counts of the Last Seven Days */}
+        <h2 style={{ marginTop: '40px' }}>Calorie Counts for the Last 7 Days</h2>
+      <CaloriesChart calorieData={lastSevenDaysCalories} />
       </div>
-      {/* Static Table for Calorie Counts of the Last Seven Days */}
-    <h2 style={{ marginTop: '40px' }}>Calorie Counts for the Last 7 Days</h2>
-    <table className="calorie-counts-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-      <thead>
-        <tr>
-          <th style={{ border: '1px solid #ddd', padding: '8px' }}>Date</th>
-          <th style={{ border: '1px solid #ddd', padding: '8px' }}>Calories</th>
-        </tr>
-      </thead>
-      <tbody>
-        {/* Assuming you have an array of calorie data for the last 7 days */}
-        {lastSevenDaysCalories.map((data, index) => (
-          <tr key={index}>
-            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{data.date}</td>
-            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{data.calories}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-    <CaloriesChart calorieData={lastSevenDaysCalories} />
-
-      {/* Total Calorie Intake Display */}
-      <div className="total-calories-container">
-        <h2>Total Calories for Today: {totalCalories} calories</h2> 
-      </div>
-    </div>
-  );  
+  );
 };
 
 export default TrackerPage;

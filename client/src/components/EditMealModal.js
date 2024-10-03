@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const EditMealModal = ({ isOpen, onClose, meal, onDelete }) => {
+const EditMealModal = ({ isOpen, onClose, meal, onDelete, onSubmit }) => {
   const [formData, setFormData] = useState({ foodItem: '', portionSize: '', mealCategory: '', nutrients: 0 });
 
   useEffect(() => {
@@ -27,7 +27,8 @@ const EditMealModal = ({ isOpen, onClose, meal, onDelete }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle save changes
-    console.log('Saving changes:', formData);
+    onSubmit(formData);
+    //console.log('Saving changes:', formData);
   };
 
   return (
@@ -76,11 +77,12 @@ const EditMealModal = ({ isOpen, onClose, meal, onDelete }) => {
             <input
               type="number"
               id="calories"
-              name="calories"
+              name="nutrients" // anisha's change
               value={formData.nutrients}
+              onChange={handleChange} // Allow user to edit nutrients
               placeholder="Calories"
               required
-              disabled
+              //disabled
             />
           </div>
           <div className="button-group">

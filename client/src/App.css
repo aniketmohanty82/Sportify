@@ -215,12 +215,23 @@
 
 .success-message {
   background-color: #dff0d8; /* Light green background */
-  color: #3c763d; /* Dark green text */
+  color: #7c7777;
   padding: 10px;
   margin: 10px 0;
   border: 1px solid #d6e9c6; /* Light green border */
   border-radius: 4px;
 }
+
+.category-header {
+  font-size: 1.2rem; /* Adjust as needed */
+  margin-bottom: 10px; /* Space between the header and table */
+}
+
+.calories-text {
+  font-size: 0.9rem; /* Smaller font size for the calorie count */
+  color: #666; /* Optional: Change color to differentiate */
+}
+
 
 
 @keyframes App-logo-spin {

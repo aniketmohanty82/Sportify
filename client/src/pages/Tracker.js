@@ -24,11 +24,12 @@ const TrackerPage = () => {
    // Daily calorie goal
    const dailyCalorieGoal = 2000;
 
-   // Calculate total calories from logged meals
-   totalCalories = 1000;
+  //  // Calculate total calories from logged meals
+  //  setTotalCalories(1000);
  
-   // Function to calculate percentage of the daily goal
+  //  // Function to calculate percentage of the daily goal
    const caloriePercentage = (totalCalories / dailyCalorieGoal) * 100;
+  // const caloriePercentage = 0;
 
 
 

@@ -52,6 +52,8 @@ function Sports() {
       .catch(err => console.log(err));
   }, []);
 
+  const username = localStorage.getItem('userName') || 'Guest';
+
   const renderMatch = (game, index) => {
     const winner = game.scores[0] > game.scores[1] ? game.teams[0] : game.teams[1];
     return (
@@ -127,8 +129,10 @@ function Sports() {
           }}
         >
           {/* Centralized Header */}
-          <Typography variant="h3" mb={2}>Hello Aniket! Welcome to your Sports Dashboard!</Typography>
-          <Typography variant="h6" mb={4}>Keep up with all your favorite sports using the toggle below.</Typography>
+          <Typography variant="h3" mb={2}>
+      Hello {username}! Welcome to your Sports Dashboard!
+    </Typography>
+              <Typography variant="h6" mb={4}>Keep up with all your favorite sports using the toggle below.</Typography>
 
           {section === 'main' && (
             <Box>

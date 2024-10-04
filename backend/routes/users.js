@@ -22,7 +22,8 @@ router.post('/register', async (req, res) => {
 
     const usernameExists = await User.findOne({ username });
     if (usernameExists)
-      return res.status(400).json({ message: 'Username already in use.' })
+      return res.status(400).json({ message: 'Username already in use.' });
+
     // Create new user
     const newUser = new User({
       firstName,
@@ -36,9 +37,10 @@ router.post('/register', async (req, res) => {
     const savedUser = await newUser.save();
     res.status(201).json({
       message: 'User registered successfully',
-      user: { id: savedUser._id, email: savedUser.email },
+      user: { id: savedUser._id, email: savedUser.email, username: savedUser.username },
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -70,7 +72,7 @@ router.post('/login', async (req, res) => {
       },
     };
 
-    // Sign token
+    // Sign token with expiration time
     jwt.sign(
       payload,
       process.env.JWT_SECRET || 'your_jwt_secret', // Ensure you have JWT_SECRET in your .env
@@ -84,6 +86,7 @@ router.post('/login', async (req, res) => {
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
+            userName: user.username,
           },
         });
       }

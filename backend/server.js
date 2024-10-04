@@ -99,7 +99,7 @@ app.post('/api/meals/logmeal', async (req, res) => {
     }
 });
 
-app.get('/api/meals', async (req, res) => {
+app.get('/api/meals', auth, async (req, res) => {
     try {
         // Get the current date in YYYY-MM-DD format
         const currentDate = new Date();
@@ -108,6 +108,7 @@ app.get('/api/meals', async (req, res) => {
 
         // Find meals logged on the current date
         const mealLogs = await MealLog.find({
+            userId: req.user.id,  // Filter by the current user's ID
             date: {
                 $gte: startOfDay,  // Greater than or equal to start of day
                 $lt: endOfDay      // Less than end of day

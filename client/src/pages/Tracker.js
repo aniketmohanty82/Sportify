@@ -17,6 +17,8 @@ const TrackerPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [currentMeal, setCurrentMeal] = useState(null);
+  const [deletedMeal, setDeletedMeal] = useState(null); // Track the deleted meal
+  const [showUndo, setShowUndo] = useState(false); // Control the visibility of the undo button
 
   const navigate = useNavigate(); // Initialize navigate
 
@@ -202,16 +204,25 @@ const TrackerPage = () => {
       const response = await fetch(`http://localhost:5001/api/meals/${currentMeal._id}`, {
         method: 'DELETE',
         headers: {
-          'x-auth-token': token, // Include the token
+          'x-auth-token': token,
         },
       });
 
       if (response.ok) {
+        // Store the deleted meal
+        setDeletedMeal(currentMeal);
         await fetchMealLogs();
-        calculateTotalCalories(); //recalculate total calories
+        calculateTotalCalories();
         calculateCategoryCalories();
         showSuccessMessage('Meal deleted successfully!'); // Success message
         handleCloseDeleteModal();
+
+        // Show undo option
+        setShowUndo(true);
+        setTimeout(() => {
+          setShowUndo(false);
+          setDeletedMeal(null); // Clear the deleted meal after timeout
+        }, 5000); // Show for 5 seconds
       } else if (response.status === 401) {
         navigate('/login');
       } else {
@@ -219,6 +230,38 @@ const TrackerPage = () => {
       }
     } catch (error) {
       console.error('Error deleting meal:', error);
+    }
+  };
+
+  const handleUndoDelete = async () => {
+    if (deletedMeal) {
+      // Restore the deleted meal by sending it back to your API or updating local state
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5001/api/meals/logmeal', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token,
+          },
+          body: JSON.stringify(deletedMeal), // Use the deleted meal data
+        });
+
+        if (response.ok) {
+          await fetchMealLogs();
+          calculateTotalCalories(); // Recalculate total calories
+          calculateCategoryCalories();
+          showSuccessMessage('Meal restored successfully!'); // Success message
+          setShowUndo(false);
+          setDeletedMeal(null); // Clear the deleted meal
+        } else if (response.status === 401) {
+          navigate('/login');
+        } else {
+          console.error('Failed to restore meal');
+        }
+      } catch (error) {
+        console.error('Error restoring meal:', error);
+      }
     }
   };
 
@@ -312,6 +355,12 @@ const TrackerPage = () => {
       {successMessage && (
         <div className="success-message">
           <p>{successMessage}</p>
+        </div>
+      )}
+
+{showUndo && (
+        <div className="undo-container">
+          <p>Meal deleted. <button onClick={handleUndoDelete}>Undo</button></p>
         </div>
       )}
 

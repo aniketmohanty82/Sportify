@@ -232,6 +232,39 @@
   color: #666; /* Optional: Change color to differentiate */
 }
 
+.undo-container {
+  background-color: #f8d7da; /* Light red background */
+  border: 1px solid #f5c6cb; /* Red border */
+  color: #721c24; /* Darker red text color */
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0; /* Add some spacing around the undo container */
+}
+
+.undo-container p {
+  margin: 0; /* Remove default margin */
+  font-weight: bold; /* Make the text bold */
+}
+
+.undo-container button {
+  background-color: #f5c6cb; /* Button background */
+  color: #721c24; /* Button text color */
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px; /* Add padding for a better click area */
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s; /* Smooth transitions */
+}
+
+.undo-container button:hover {
+  background-color: #f1b0b4; /* Darker red on hover */
+  transform: scale(1.05); /* Slightly increase size on hover */
+}
+
+
 
 
 @keyframes App-logo-spin {

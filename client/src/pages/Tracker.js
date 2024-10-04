@@ -145,7 +145,12 @@ const TrackerPage = () => {
 
   const handleEditSubmit = async (data) => {
     console.log('Meal edited:', data);
-      // Calculate new calories based on the change in portion size
+    // Calculate new calories based on the change in portion size
+    const oldProtein = currentMeal.protein; // Get old protein value
+    const oldCarbs = currentMeal.carbs; // Get old carbs value
+    const oldFats = currentMeal.fats; // Get old fats value
+    const oldFiber = currentMeal.fiber; // Get old fiber value
+    const oldSodium = currentMeal.sodium; // Get old sodium value
     const oldPortionSize = currentMeal.portionSize; // Get the old portion size
     const oldCalories = currentMeal.nutrients; // Get the old calorie value
     const newPortionSize = data.portionSize; // Get the new portion size
@@ -153,14 +158,16 @@ const TrackerPage = () => {
     // Calculate the ratio of the new portion size to the old portion size
     const portionRatio = newPortionSize / oldPortionSize;
 
-    // Calculate the new calories based on the portion ratio
-    const newCalories = oldCalories * portionRatio;
-
-    // Prepare updated data to send to the database
     const updatedData = {
       ...data,
-      nutrients: newCalories, // Include the new calorie value
+      nutrients: parseFloat((oldCalories * portionRatio).toFixed(2)), // Include the new calorie value
+      protein: parseFloat((oldProtein * portionRatio).toFixed(2)), // Update protein value
+      carbs: parseFloat((oldCarbs * portionRatio).toFixed(2)), // Update carbs value
+      fats: parseFloat((oldFats * portionRatio).toFixed(2)), // Update fats value
+      fiber: parseFloat((oldFiber * portionRatio).toFixed(2)), // Update fiber value
+      sodium: parseFloat((oldSodium * portionRatio).toFixed(2)), // Update sodium value
     };
+
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:5001/api/meals/${currentMeal._id}`, {

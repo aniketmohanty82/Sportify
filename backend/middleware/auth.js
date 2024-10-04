@@ -1,5 +1,4 @@
 // middleware/auth.js
-
 const jwt = require('jsonwebtoken');
 
 function auth(req, res, next) {
@@ -16,9 +15,13 @@ function auth(req, res, next) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret');
 
     // Add user from payload
-    req.user = decoded.user;
+    req.user = decoded.user; // Add the user ID to the request object
     next();
   } catch (err) {
+    // Check for token expiration
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Token has expired, please log in again' });
+    }
     res.status(401).json({ message: 'Token is not valid' });
   }
 }

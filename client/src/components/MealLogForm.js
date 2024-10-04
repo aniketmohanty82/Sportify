@@ -60,6 +60,7 @@ const MealLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
         console.log(data); // Log nutrient data for now
 
         onSubmit({
+          userId: localStorage.getItem('userId'),
           foodItem,
           portionSize,
           mealCategory,

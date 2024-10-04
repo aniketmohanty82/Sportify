@@ -1,28 +1,44 @@
-// Navbar.js
-
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import React, { useState, useEffect } from 'react'; // Import useState and useEffect
+import { Link, useNavigate } from 'react-router-dom'; 
 import { FaHome, FaTasks, FaChartPie, FaCog, FaSignOutAlt, FaRunning } from 'react-icons/fa';
 import '../Navbar.css';
+import logo from '../assets/logo-no-background.png';
 
 const Navbar = () => {
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate(); 
+  const [username, setUsername] = useState(localStorage.getItem('username') || "Guest"); // State for username
 
   const handleLogout = () => {
-    // Remove the token from localStorage
     localStorage.removeItem('token');
-    // Optionally, clear other user data or reset state
-    // Redirect to login page
+    localStorage.removeItem('userName'); // Optionally clear username on logout
     navigate('/login');
   };
+
+  const updateUserInfo = () => {
+    const storedUsername = localStorage.getItem('userName');
+    if (storedUsername) {
+      setUsername(storedUsername);
+    } else {
+      setUsername("Guest");
+    }
+  };
+
+  useEffect(() => {
+    updateUserInfo(); // Initial update
+    const intervalId = setInterval(() => {
+      updateUserInfo(); // Update username every 10 seconds
+    }, 10000); // 10000 milliseconds = 10 seconds
+
+    return () => clearInterval(intervalId); // Clean up on unmount
+  }, []);
 
   return (
     <div className="navbar">
       {/* User info */}
       <div className="navbar__top">
         <div className="navbar__user">
-          <img src="https://via.placeholder.com/50" alt="User" className="navbar__user-pic" />
-          <h3 className="navbar__user-name">Dhruv Dhawan</h3>
+          <img src={logo} alt="User" className="navbar__user-pic" />
+          <h3 className="navbar__user-name">{username}</h3>
         </div>
 
         {/* Navigation Links */}
@@ -52,7 +68,7 @@ const Navbar = () => {
           <FaCog className="navbar__icon" />
           Settings
         </Link>
-        <button onClick={handleLogout} className="navbar__link navbar__logout-button">
+        <button onClick={handleLogout} className="navbar__link">
           <FaSignOutAlt className="navbar__icon" />
           Log out
         </button>

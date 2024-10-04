@@ -41,6 +41,11 @@ const mealLogSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // This indicates that userId references the User model
+    required: true, // Ensure that a userId is provided
+  },
 }, { timestamps: true });
 
 const MealLog = mongoose.model('MealLog', mealLogSchema, 'meallogs');

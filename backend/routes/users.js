@@ -5,6 +5,116 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+
+// Password Reset Request Route
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(400).json({ message: 'No account with that email found' });
+
+    // Generate a reset token
+    const token = crypto.randomBytes(20).toString('hex');
+
+    // Set token and expiration on the user object
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
+
+    await user.save();
+
+    // Send email with reset link
+    const resetLink = `http://localhost:3000/reset-password/${token}`;
+
+    // Configure nodemailer
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail', // e.g., Gmail, or your email service
+      auth: {
+        user: 'sai38281@gmail.com',
+        pass: 'damewsgosgeqnids',
+      },
+    });
+
+    const mailOptions = {
+      to: user.email,
+      from: 'sai38281@gmail.com',
+      subject: 'Password Reset Request',
+      text: `You are receiving this because you (or someone else) have requested to reset your account's password.\n\n
+Please click on the following link, or paste it into your browser to complete the process:\n\n
+${resetLink}\n\n
+If you did not request this, please ignore this email.\n`,
+    };
+
+    transporter.sendMail(mailOptions, (err, response) => {
+      if (err) {
+        console.error('There was an error sending the email:', err);
+        res.status(500).json({ message: 'Error sending email' });
+      } else {
+        res.status(200).json({ message: 'Password reset email sent' });
+      }
+    });
+  } catch (err) {
+    console.error('Error in forgot-password route:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Token Validation Route
+router.get('/reset-password/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    // Find user with matching token and check if it's not expired
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user)
+      return res.status(400).json({ message: 'Password reset token is invalid or has expired' });
+
+    // Token is valid
+    res.status(200).json({ message: 'Token is valid' });
+  } catch (err) {
+    console.error('Error in reset-password token validation:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Password Update Route
+router.post('/reset-password/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    // Find user with matching token and check if it's not expired
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user)
+      return res.status(400).json({ message: 'Password reset token is invalid or has expired' });
+
+    // Update password
+    user.password = password; // This will trigger the pre-save hook to hash the password
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.status(200).json({ message: 'Password has been updated' });
+  } catch (err) {
+    console.error('Error in password update route:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 // Register New User
 router.post('/register', async (req, res) => {
   try {

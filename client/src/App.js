@@ -9,6 +9,8 @@ import LogIn from './pages/LogIn';
 import Registration from './pages/Registration';
 import Sports from './pages/Sports';
 import ProtectedRoute from './components/ProtectedRoute'; // Import the ProtectedRoute component
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 const App = () => {
   return (
@@ -52,6 +54,8 @@ const AppContent = () => {
           />
           <Route path="/login" element={<LogIn />} />
           <Route path="/register" element={<Registration />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           {/* Add more routes here */}
         </Routes>
       </div>

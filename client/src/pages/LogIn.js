@@ -95,6 +95,11 @@ const LogIn = () => {
             <p className='ms-5'>
               Don't have an account? <a href="/register" className="link-info">Register here</a>
             </p>
+
+            <p className="small mb-5 pb-lg-3 ms-5">
+              <a className="text-muted" href="/forgot-password">Forgot password?</a>
+            </p>
+
           </div>
         </MDBCol>
 

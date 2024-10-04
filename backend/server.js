@@ -140,6 +140,33 @@ app.get('/api/euroleague', async (req, res) => {
     }
 });
 
+app.get('/api/euroleague_live', async (req, res) => {
+    try {
+        const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const data = await response.json();
+
+        if (data.sports_results && data.sports_results.games) {
+            const liveGames = data.sports_results.games.filter(game => game.status && (game.status.includes("Q") || game.status.includes("Halftime")))
+                .map(game => ({
+                    teams: game.teams.map(team => team.name),
+                    scores: game.teams.map(team => team.score),
+                    status: game.status
+                }));
+
+            if (liveGames.length > 0) {
+                res.json(liveGames);
+            } else {
+                res.json({ message: "No live games right now" });
+            }
+        } else {
+            res.json({ message: "No games data available" });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
 app.get('/api/wnba', async (req, res) => {
     try {
         const response = await fetch('https://serpapi.com/search.json?q=wnba+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');

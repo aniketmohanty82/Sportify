@@ -36,6 +36,8 @@ function Sports() {
   const [bundesligaGames, setBundesligaGames] = useState([]);
   const [NBAGames, setNBAGames] = useState([]);
   const [euroleagueGames, setEuroleagueGames] = useState([]);
+  const [euroleagueGamesLive, setEuroleagueGamesLive] = useState([]);
+
   // for testing
   const [bundesligaGamesLive, setBundesligaGamesLive] = useState({ message: "No teams are playing right now" });
   const [wnbaGamesLive, setWNBAGamesLive] = useState([]);
@@ -96,6 +98,21 @@ function Sports() {
       .catch(err => console.log(err));
   }, []);
 
+  useEffect(() => {
+    const fetchLiveGames = () => {
+      fetch('http://localhost:5001/api/euroleague_live')
+        .then(response => response.json())
+        .then(data => setEuroleagueGamesLive(data))
+        .catch(err => console.log(err));
+    };
+
+    fetchLiveGames();
+
+    const intervalId = setInterval(fetchLiveGames, 30000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   // Fetch WNBA League games live
   // useEffect(() => {
   //   fetch('http://localhost:5001/api/wnba')
@@ -150,7 +167,7 @@ function Sports() {
       <Paper key={index} elevation={3} sx={{ p: 2, m: 1, minWidth: '250px', position: 'relative' }}>
         <Typography variant="h6">Match {index + 1}</Typography>
 
-        {game.status && typeof game.status === 'string' && game.status.includes('Live') && (
+        {game.status && typeof game.status === 'string' && (game.status.includes('Live') || game.status.includes("Q") || game.status.includes("Halftime")) && (
           <Box
             sx={{
               position: 'absolute',
@@ -196,12 +213,20 @@ function Sports() {
             />
           </Box>
         </Box>
-        {game.minute && (
+        {(game.minute)&& (
           <Typography
             variant="caption"
             sx={{ position: 'absolute', bottom: 3, right: 8 }}
           >
-            {`Minutes played: ${game.minute}`}
+            {`${game.minute} mins played`}
+          </Typography>
+        )}
+        {(game.status && !game.minute )&& (
+          <Typography
+            variant="caption"
+            sx={{ position: 'absolute', bottom: 2, right: 8 }}
+          >
+            {`${game.status}`}
           </Typography>
         )}
       </Paper>
@@ -414,7 +439,6 @@ function Sports() {
                 </Box>
               )}
 
-
               {page === 'basketball' && (
                 <Box mt={4} sx={{ border: '2px solid #86dc3d', borderRadius: 2, padding: 2 }}>
                   <Typography variant="h4" align="center" sx={{ mb: 2 }}>NBA</Typography>
@@ -458,8 +482,30 @@ function Sports() {
                   >
                     {euroleagueGames.map((game, index) => renderMatch(game, index))}
                   </Box>
+
+                  {/* Live Matches Section */}
+                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold' }}>Live matches:</Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      overflowX: 'auto',
+                      p: 1,
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 1,
+                      backgroundColor: '#fff',
+                      '&::-webkit-scrollbar': { display: 'none' },
+                    }}
+                  >
+                    {/* Check if 'euroLeagueGamesLive' is a message or contains game data */}
+                    {euroleagueGamesLive.message ? (
+                      <Typography variant="body1" fontStyle="italic">{euroleagueGamesLive.message}</Typography>
+                    ) : (
+                      euroleagueGamesLive.map((game, index) => renderLiveMatch(game, index))
+                    )}
+                  </Box>
                 </Box>
               )}
+
               {/* WNBA
               {page === 'basketball' && (
                 <Box mt={4}>

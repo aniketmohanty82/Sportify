@@ -59,12 +59,18 @@ const MealLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
         const data = await response.json();
         console.log(data); // Log nutrient data for now
 
-        onSubmit({ // TODO ANISHA
+        onSubmit({
+          userId: localStorage.getItem('userId'),
           foodItem,
           portionSize,
           mealCategory,
           date: new Date(),
           nutrients: data.items[0].calories, // Add the nutrients to the submitted data
+          protein: data.items[0].protein_g,
+          carbs: data.items[0].carbohydrates_total_g,
+          fats: data.items[0].fat_total_g,
+          fiber: data.items[0].fiber_g,
+          sodium: data.items[0].sodium_mg,
         });
 
         // Clear the form after submission

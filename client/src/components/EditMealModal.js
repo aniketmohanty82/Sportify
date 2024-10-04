@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../MealLogForm.css'; // Import the same CSS file for styling
 
 const EditMealModal = ({ isOpen, onClose, meal, onDelete, onSubmit }) => {
   const [formData, setFormData] = useState({ foodItem: '', portionSize: '', mealCategory: '', nutrients: 0 });
@@ -32,11 +33,11 @@ const EditMealModal = ({ isOpen, onClose, meal, onDelete, onSubmit }) => {
   };
 
   return (
-    <div className="modal">
-      <div className="modal-content">
-        <h2>Edit Meal</h2>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <h2 className="title">Edit Meal</h2>
         <form onSubmit={handleSubmit}>
-          <div>
+          <div className="form-field">
             <label htmlFor="foodItem">Food Item:</label>
             <input
               type="text"
@@ -46,9 +47,10 @@ const EditMealModal = ({ isOpen, onClose, meal, onDelete, onSubmit }) => {
               placeholder="Food Item"
               required
               disabled
+              className="input"
             />
           </div>
-          <div>
+          <div className="form-field">
             <label htmlFor="portionSize">Portion Size:</label>
             <input
               type="number"
@@ -59,9 +61,10 @@ const EditMealModal = ({ isOpen, onClose, meal, onDelete, onSubmit }) => {
               onChange={handleChange}
               placeholder="Portion Size"
               required
+              className="input"
             />
           </div>
-          <div>
+          <div className="form-field">
             <label htmlFor="mealCategory">Meal Category:</label>
             <input
               type="text"
@@ -71,9 +74,10 @@ const EditMealModal = ({ isOpen, onClose, meal, onDelete, onSubmit }) => {
               placeholder="Meal Category"
               required
               disabled
+              className="input"
             />
           </div>
-          <div>
+          <div className="form-field">
             <label htmlFor="calories">Calories:</label>
             <input
               type="text"
@@ -83,13 +87,12 @@ const EditMealModal = ({ isOpen, onClose, meal, onDelete, onSubmit }) => {
               placeholder="Calories"
               required
               disabled
+              className="input"
             />
           </div>
-          <div className="button-group">
-            <button type="submit">Save Changes</button>
-            <button type="button" onClick={onClose}>Cancel</button>
-            <button type="button" onClick={onDelete}>Delete Meal</button>
-          </div>
+          <button type="submit" className="btn">Save Changes</button>
+          <button type="button" onClick={onClose} className="btn">Cancel</button>
+          <button type="deleteButton" onClick={onDelete} className="btn">Delete Meal</button>
         </form>
       </div>
     </div>

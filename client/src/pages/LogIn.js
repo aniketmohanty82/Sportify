@@ -34,6 +34,10 @@ const LogIn = () => {
 
       // Save token to localStorage
       localStorage.setItem('token', res.data.token);
+      localStorage.setItem('userId', res.data.user.id);  // Store the user ID
+      localStorage.setItem('userName', res.data.user.userName);
+      console.log(res.data.user)
+      console.log(localStorage.getItem('userName'))
 
       // Redirect to home page
       navigate('/');

@@ -16,8 +16,8 @@ const CaloriesChart = ({ calorieData }) => {
       {
         label: 'Calories',
         data: dataValues,
-        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(26, 166, 75, 0.8)',
+        borderColor: 'rgba(26, 166, 75, 1)',
         borderWidth: 1,
       },
     ],

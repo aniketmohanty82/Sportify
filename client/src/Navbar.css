@@ -24,8 +24,10 @@
   }
   
   .navbar__user-pic {
-    border-radius: 50%;
-    margin-right: 10px;
+    width: 40px; /* Adjust size as needed */
+    height: 40px; /* Adjust size as needed */
+    /* border-radius: 50%; Makes the image circular */
+    margin-right: 10px; /* Space between image and name */
   }
   
   .navbar__user-name {
@@ -47,11 +49,17 @@
     font-size: 14px;
     margin-bottom: 10px;
     transition: background 0.3s;
+    border: none; /* Remove border for button */
+    background: none; /* Remove default background */
+    cursor: pointer; /* Change cursor for better UX */
+  }
+
+  button.navbar__link {
+    background: none; /* Removes button default styling */
   }
   
   .navbar__link:hover {
     background-color: #333;
-
   }
   
   .navbar__icon {

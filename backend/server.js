@@ -23,14 +23,93 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 // Routes for fetching sports data
 app.get('/api/premier_league', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=google+sports+premier+league+games+played&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
-        const data = await response.json();
-        const games = data.sports_results.games;
+        const currentDate = new Date();
+        const dayOfWeek = currentDate.getDay(); // 0 for Sunday, 1 for Monday, etc.
+        
+        const lastSunday = new Date(currentDate);
+        lastSunday.setDate(currentDate.getDate() - dayOfWeek);
+        
+        const lastSaturday = new Date(lastSunday);
+        lastSaturday.setDate(lastSunday.getDate() - 1);
+        
+        const lastMonday = new Date(lastSunday);
+        lastMonday.setDate(lastSunday.getDate() - 6);
+
+        const dates = [lastSaturday, lastSunday, lastMonday].map(date => date.toISOString().split('T')[0]);
+
+        const games = [];
+
+        for (const date of dates) {
+            const response = await fetch(`https://serpapi.com/search.json?q=premier+league+games+${date}&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac`);
+            const data = await response.json();
+            if (data.sports_results && data.sports_results.games) {
+                games.push(...data.sports_results.games);
+            }
+        }
+
         const parsedGames = games.map(game => ({
+            date: game.date,
             teams: game.teams.map(team => team.name),
-            scores: game.teams.map(team => team.score)
+            scores: game.teams.map(team => team.score),
+            status: game.status
         }));
+
         res.json(parsedGames);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
+
+// test
+app.get('/api/test', async (req, res) => {
+    try {
+        const response = await fetch('https://serpapi.com/search.json?q=uefa+champions+league+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const data = await response.json();
+        const liveGames = data.sports_results.games.filter(game => game.status && game.status.includes("Live"))
+            .map(game => ({
+                teams: game.teams.map(team => team.name),
+                scores: game.teams.map(team => team.score),
+                minute: game.status.match(/\d+/)[0],  // Extract minute from the status string
+                status: game.status
+            }));
+
+        // Check if live games exist and return them
+        if (liveGames.length > 0) {
+            res.json(liveGames);
+        } else {
+            res.json({ message: "No live games right now" });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
+//uefa champions league games today
+
+// premier league games on today
+app.get('/api/premier_league_live', async (req, res) => {
+    try {
+        const response = await fetch('https://serpapi.com/search.json?q=premier+league+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const data = await response.json();
+
+        if (data.sports_results && data.sports_results.game_spotlight) {
+            const game = data.sports_results.game_spotlight;
+            if (game.status === 'Live') {
+                const parsedGame = {
+                    teams: game.teams.map(team => team.name),
+                    scores: game.teams.map(team => team.score),
+                    in_game_time: game.in_game_time.minute,
+                };
+                res.json(parsedGame);
+            } else {
+                res.json({ message: "No live games are being played right now" });
+            }
+        } else {
+            res.json({ message: "No teams are playing right now" });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send('Server error');
@@ -39,13 +118,40 @@ app.get('/api/premier_league', async (req, res) => {
 
 app.get('/api/bundesliga', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=google+sports+bundesliga+games+played+list&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
-        const data = await response.json();
-        const games = data.sports_results.games;
-        const parsedGames = games.map(game => ({
+        const currentDate = new Date();
+        const dayOfWeek = currentDate.getDay();
+
+        const lastSunday = new Date(currentDate);
+        lastSunday.setDate(currentDate.getDate() - dayOfWeek);
+
+        const lastSaturday = new Date(lastSunday);
+        lastSaturday.setDate(lastSunday.getDate() - 1);
+
+        const lastFriday = new Date(lastSunday);
+        lastFriday.setDate(lastSunday.getDate() - 2);
+
+        const today = new Date();
+        const dates = [lastFriday, lastSaturday, lastSunday]
+            .filter(date => date <= today)
+            .map(date => date.toISOString().split('T')[0]);
+
+        const allGames = [];
+
+        for (const date of dates) {
+            const response = await fetch(`https://serpapi.com/search.json?q=bundesliga+games+${date}&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac`);
+            const data = await response.json();
+            if (data.sports_results && data.sports_results.games) {
+                allGames.push(...data.sports_results.games);
+            }
+        }
+
+        const parsedGames = allGames.map(game => ({
+            date: game.date,
             teams: game.teams.map(team => team.name),
-            scores: game.teams.map(team => team.score)
+            scores: game.teams.map(team => team.score),
+            status: game.status
         }));
+
         res.json(parsedGames);
     } catch (err) {
         console.error(err);
@@ -55,7 +161,7 @@ app.get('/api/bundesliga', async (req, res) => {
 
 app.get('/api/nba', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=nba+2023%2F2024+games&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
+        const response = await fetch('https://serpapi.com/search.json?q=nba+finals+2023%2F2024+games&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
         const data = await response.json();
         const games = data.sports_results.games;
         const parsedGames = games.map(game => ({
@@ -71,7 +177,7 @@ app.get('/api/nba', async (req, res) => {
 
 app.get('/api/euroleague', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+2023%2F2024&location=indianapolis,+indiana,+united+states&api_key=82f5da5e041817f2a31eeb62e5ca61983a53bd7300e24abc03a5e93a8ca26676');
+        const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+2023%2F2024&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
         const data = await response.json();
         const games = data.sports_results.games;
         const parsedGames = games.map(game => ({
@@ -79,6 +185,56 @@ app.get('/api/euroleague', async (req, res) => {
             scores: game.teams.map(team => team.score)
         }));
         res.json(parsedGames);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
+app.get('/api/euroleague_live', async (req, res) => {
+    try {
+        const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const data = await response.json();
+
+        if (data.sports_results && data.sports_results.games) {
+            const liveGames = data.sports_results.games.filter(game => game.status && (game.status.includes("Q") || game.status.includes("Halftime")))
+                .map(game => ({
+                    teams: game.teams.map(team => team.name),
+                    scores: game.teams.map(team => team.score),
+                    status: game.status
+                }));
+
+            if (liveGames.length > 0) {
+                res.json(liveGames);
+            } else {
+                res.json({ message: "No live games right now" });
+            }
+        } else {
+            res.json({ message: "No games data available" });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
+app.get('/api/wnba', async (req, res) => {
+    try {
+        const response = await fetch('https://serpapi.com/search.json?q=wnba+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const data = await response.json();
+
+        if (data.sports_results.game_spotlight && data.sports_results.game_spotlight.status === 'Live') {
+            const game = data.sports_results.game_spotlight;
+            const parsedGame = {
+                teams: game.teams.map(team => team.name),
+                scores: game.teams.map(team => team.score),
+                in_game_time: game.in_game_time.minute,
+            };
+            console.log(parsedGame)
+            res.json(parsedGame);
+        } else {
+            res.json({ message: "No teams are playing right now" });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send('Server error');
@@ -99,7 +255,7 @@ app.post('/api/meals/logmeal', async (req, res) => {
     }
 });
 
-app.get('/api/meals', async (req, res) => {
+app.get('/api/meals', auth, async (req, res) => {
     try {
         // Get the current date in YYYY-MM-DD format
         const currentDate = new Date();
@@ -108,6 +264,7 @@ app.get('/api/meals', async (req, res) => {
 
         // Find meals logged on the current date
         const mealLogs = await MealLog.find({
+            userId: req.user.id,  // Filter by the current user's ID
             date: {
                 $gte: startOfDay,  // Greater than or equal to start of day
                 $lt: endOfDay      // Less than end of day
@@ -120,6 +277,36 @@ app.get('/api/meals', async (req, res) => {
         res.status(500).json({ message: "Error fetching meal logs", error });
     }
 });
+
+app.get('/api/mealsPast', auth, async (req, res) => {
+    try {
+        // Get the current date
+        const currentDate = new Date();
+
+        // Calculate the start date for the past seven days
+        const startDate = new Date(currentDate);
+        startDate.setDate(currentDate.getDate() - 7); // Set to 7 days before
+
+        // Set the time for the start of the day for both dates
+        const startOfStartDate = new Date(startDate.setHours(0, 0, 0, 0)); // Start of the day 7 days ago
+        const endOfCurrentDate = new Date(currentDate.setHours(23, 59, 59, 999)); // End of the current day
+
+        // Find meals logged in the last seven days
+        const mealLogs = await MealLog.find({
+            userId: req.user.id, // Filter by the current user's ID
+            date: {
+                $gte: startOfStartDate, // Greater than or equal to start of start date
+                $lt: endOfCurrentDate // Less than end of current date
+            }
+        });
+
+        res.status(200).json(mealLogs);
+    } catch (error) {
+        console.error("Error fetching meal logs", error);
+        res.status(500).json({ message: "Error fetching meal logs", error });
+    }
+});
+
 
 app.put('/api/meals/:id', async (req, res) => {
     try {

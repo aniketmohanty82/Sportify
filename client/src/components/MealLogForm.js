@@ -109,7 +109,7 @@ const MealLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
             id="portionSize"
             name="portionSize"
             type="number"
-            min="0" // Prevents negative values
+            min="1" // Prevents negative values
             placeholder="Enter portion size..."
           />
           <Select label="Meal Category" id="mealCategory" name="mealCategory">

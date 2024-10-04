@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { AiOutlinePlus } from 'react-icons/ai';
 import MealLogForm from '../components/MealLogForm';
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 import EditMealModal from '../components/EditMealModal';
@@ -10,18 +9,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../App.css';
 import '../MealLogs.css';
 import CaloriesChart from '../components/CalorieChart'; // Adjust the path as need
+import { AiOutlinePlus, AiOutlineInfoCircle } from 'react-icons/ai';
+
 
 const TrackerPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
   const [currentMeal, setCurrentMeal] = useState(null);
-
   const navigate = useNavigate(); // Initialize navigate
-
   const [successMessage, setSuccessMessage] = useState('');
-
   const [mealLogs, setMealLogs] = useState([]);
   const [totalCalories, setTotalCalories] = useState(0);
   const [totalProtein, setTotalProtein] = useState(0);
@@ -29,16 +26,32 @@ const TrackerPage = () => {
   const [totalCarbs, setTotalCarbs] = useState(0);
   const [totalFiber, setTotalFiber] = useState(0);
   const [lastSevenDaysCalories, setLastSevenDaysCalories] = useState([]);
+  const [showInfo, setShowInfo] = useState(false);
+  const [warningMessage, setWarningMessage] = useState('');
 
-  const [loading, setLoading] = useState(true);
-
-  // Daily calorie goal
+  // Daily calorie goal - max
   const dailyCalorieGoal = 2000;
+
+  // daily nutrient goals - max
+  const maxDailyProtein = 100;
+  const maxDailyCarbs = 250;
+  const maxDailyFats = 70;
+  const maxDailyFiber = 30;  
  
   // Function to calculate percentage of the daily goal
   const caloriePercentage = Math.min((totalCalories / dailyCalorieGoal) * 100, 100);
-
   const categories = ['Breakfast', 'Lunch', 'Dinner', 'Snacks'];
+
+  const showWarningMessage = (message) => {
+    setWarningMessage(message);
+    setTimeout(() => {
+        setWarningMessage('');
+    }, 10000); // Clear warning after 5 seconds
+  };
+
+  const handleInfoToggle = () => {
+    setShowInfo(!showInfo);
+  };
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -47,17 +60,6 @@ const TrackerPage = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCurrentMeal(null);
-  };
-
-  const handleCloseModal2 = () => {
-    setIsModalOpen(false);
-    setCurrentMeal(null);
-    showSuccessMessage('No Results Found!')
-  };
-
-  const handleOpenEditModal = (meal) => {
-    setCurrentMeal(meal);
-    setIsEditModalOpen(true);
   };
 
   const handleCloseEditModal = () => {
@@ -80,10 +82,10 @@ const TrackerPage = () => {
     setSuccessMessage(message);
     setTimeout(() => {
       setSuccessMessage('');
-    }, 5000); // Clear message after 5 seconds
+    }, 10000); // Clear message after 5 seconds
   };
 
-  // Function to calculate the total calories for the day - user story #9
+  // Function to calculate the total nutrients
   const calculateTotalCalories = () => {
     const today = new Date().toISOString().split('T')[0];
     const todayMeals = mealLogs.filter(log => {
@@ -104,6 +106,30 @@ const TrackerPage = () => {
     setTotalFats(Math.round(totalFats));
     setTotalCarbs(Math.round(totalCarbs));
     setTotalFiber(Math.round(totalFiber));
+
+    let exceededNutrients = [];
+
+    // Check if any value exceeds the recommended daily limit
+    if (totalCalories > dailyCalorieGoal) {
+      exceededNutrients.push('Calories');
+    }
+    if (totalProtein > maxDailyProtein) {
+      exceededNutrients.push('Protein');
+    }
+    if (totalCarbs > maxDailyCarbs) {
+      exceededNutrients.push('Carbs');
+    }
+    if (totalFats > maxDailyFats) {
+      exceededNutrients.push('Fats');
+    }
+    if (totalFiber > maxDailyFiber) {
+      exceededNutrients.push('Fiber');
+    }
+
+    // If there are any exceeded nutrients, display a combined warning message
+    if (exceededNutrients.length > 0) {
+      showWarningMessage(`${exceededNutrients.join(', ')} exceed daily limit!`);
+    }
   };
 
   const calculateCategoryCalories = (category) => {
@@ -223,7 +249,6 @@ const TrackerPage = () => {
   };
 
   const fetchMealLogs = async () => {
-    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5001/api/meals', {
@@ -242,8 +267,6 @@ const TrackerPage = () => {
       }
     } catch (error) {
       console.error('Error fetching meal logs:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -376,7 +399,7 @@ const TrackerPage = () => {
                 text={`${Math.round(caloriePercentage)}%`}
                 styles={buildStyles({
                   textSize: '16px',
-                  pathColor: `rgba(26, 166, 75, ${caloriePercentage / 100})`,
+                  pathColor: `rgba(26, 166, 75, 1)`,
                   textColor: '#000',
                   trailColor: '#d6d6d6',
                 })}
@@ -446,7 +469,48 @@ const TrackerPage = () => {
         boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
         marginBottom: '20px',
       }}>
-        <h2 style={{ marginBottom: '15px' }}>Nutrient Progress Bars</h2>
+        <h2 style={{ marginBottom: '15px' }}>Daily Nutrient Breakdown!</h2>
+
+        {/* Warning Message with Info Button */}
+        {warningMessage && (
+          <div className="warning-message" style={{ 
+            backgroundColor: '#ffcccc', 
+            color: '#cc0000', 
+            padding: '10px', 
+            borderRadius: '8px', 
+            marginBottom: '20px', 
+            boxShadow: '0 0 5px rgba(204, 0, 0, 0.5)', 
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center', // Aligns the button with the text
+          }}>
+            <p style={{ margin: 0 }}>{warningMessage}</p>
+            <button onClick={handleInfoToggle}
+            style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#333' }}>
+              <AiOutlineInfoCircle size={20} />
+            </button>
+            {showInfo && (
+              <div style={{ marginTop: '5px', backgroundColor: '#fff', border: '5px solid #ccc',
+                            padding: '5px', borderRadius: '5px', position: 'absolute', zIndex: '100',
+                }}>
+                <p>Recommended Daily Values:</p>
+                <ul>
+                  <li>Protein: {maxDailyProtein} g (Exceeded by: {totalProtein - maxDailyProtein} g)</li>
+                  <li>Carbs: {maxDailyCarbs} g (Exceeded by: {totalCarbs - maxDailyCarbs} g)</li>
+                  <li>Fats: {maxDailyFats} g (Exceeded by: {totalFats - maxDailyFats} g)</li>
+                  <li>Fiber: {maxDailyFiber} g (Exceeded by: {totalFiber - maxDailyFiber} g)</li>
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Check if there's any data, if not show "No data available" */}
+        {(totalProtein === 0 && totalFats === 0 && totalCarbs === 0 && totalFiber === 0) ? (
+          <p style={{ textAlign: 'center', color: '#999', fontSize: '1.2em' }}>
+            No data available for today - begin by adding in a new meal! 
+          </p>
+        ) : (
         <div className="nutrient-progress-bars" style={{ display: 'flex', justifyContent: 'space-between' }}>
           {[
             { label: 'Protein', value: totalProtein, goal: 100, color: 'bg-success' },
@@ -468,7 +532,8 @@ const TrackerPage = () => {
             </div>
           ))}
         </div>
-      </div>
+      )}
+    </div>
   
       {/* Modals and Success Message */}
       <MealLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} />

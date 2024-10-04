@@ -278,6 +278,36 @@ app.get('/api/meals', auth, async (req, res) => {
     }
 });
 
+app.get('/api/mealsPast', auth, async (req, res) => {
+    try {
+        // Get the current date
+        const currentDate = new Date();
+
+        // Calculate the start date for the past seven days
+        const startDate = new Date(currentDate);
+        startDate.setDate(currentDate.getDate() - 7); // Set to 7 days before
+
+        // Set the time for the start of the day for both dates
+        const startOfStartDate = new Date(startDate.setHours(0, 0, 0, 0)); // Start of the day 7 days ago
+        const endOfCurrentDate = new Date(currentDate.setHours(23, 59, 59, 999)); // End of the current day
+
+        // Find meals logged in the last seven days
+        const mealLogs = await MealLog.find({
+            userId: req.user.id, // Filter by the current user's ID
+            date: {
+                $gte: startOfStartDate, // Greater than or equal to start of start date
+                $lt: endOfCurrentDate // Less than end of current date
+            }
+        });
+
+        res.status(200).json(mealLogs);
+    } catch (error) {
+        console.error("Error fetching meal logs", error);
+        res.status(500).json({ message: "Error fetching meal logs", error });
+    }
+});
+
+
 app.put('/api/meals/:id', async (req, res) => {
     try {
         const { id } = req.params;

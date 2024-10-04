@@ -63,7 +63,6 @@ const Navbar = () => {
       </div>
 
       {/* Settings and Logout at the bottom */}
-      <div className="navbar__bottom">
         <Link to="/settings" className="navbar__link">
           <FaCog className="navbar__icon" />
           Settings
@@ -72,7 +71,6 @@ const Navbar = () => {
           <FaSignOutAlt className="navbar__icon" />
           Log out
         </button>
-      </div>
     </div>
   );
 };

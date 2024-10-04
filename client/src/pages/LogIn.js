@@ -40,7 +40,7 @@ const LogIn = () => {
       console.log(localStorage.getItem('userName'))
 
       // Redirect to home page
-      navigate('/tracker');
+      navigate('/');
 
     } catch (err) {
       console.error(err.response.data);

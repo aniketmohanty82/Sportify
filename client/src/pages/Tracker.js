@@ -25,6 +25,7 @@ const TrackerPage = () => {
   const [successMessage, setSuccessMessage] = useState('');
 
   const [mealLogs, setMealLogs] = useState([]);
+  const [mealLogsPast, setMealLogsPast] = useState([]);
   const [totalCalories, setTotalCalories] = useState(0);
   const [totalProtein, setTotalProtein] = useState(0);
   const [totalFats, setTotalFats] = useState(0);
@@ -130,8 +131,10 @@ const TrackerPage = () => {
 
       if (response.ok) {
         await fetchMealLogs();
+        await fetchMealLogsPast7Days();
         calculateTotalCalories(); //recalculate total calories
         calculateCategoryCalories();
+        getLastSevenDaysCalories();
         showSuccessMessage('Meal added successfully!'); // Success message
         handleCloseModal();
       } else if (response.status === 401) {
@@ -183,8 +186,10 @@ const TrackerPage = () => {
 
       if (response.ok) {
         await fetchMealLogs();
-        calculateTotalCalories(); //recalculate total calories
+        await calculateTotalCalories(); //recalculate total calories
+        fetchMealLogsPast7Days();
         calculateCategoryCalories();
+        getLastSevenDaysCalories();
         showSuccessMessage('Meal edited successfully!'); // Success message
         handleCloseEditModal();
       } else if (response.status === 401) {
@@ -212,8 +217,10 @@ const TrackerPage = () => {
         // Store the deleted meal
         setDeletedMeal(currentMeal);
         await fetchMealLogs();
+        await fetchMealLogsPast7Days();
         calculateTotalCalories();
         calculateCategoryCalories();
+        getLastSevenDaysCalories();
         showSuccessMessage('Meal deleted successfully!'); // Success message
         handleCloseDeleteModal();
 
@@ -249,8 +256,10 @@ const TrackerPage = () => {
 
         if (response.ok) {
           await fetchMealLogs();
+          await fetchMealLogsPast7Days();
           calculateTotalCalories(); // Recalculate total calories
           calculateCategoryCalories();
+          getLastSevenDaysCalories();
           showSuccessMessage('Meal restored successfully!'); // Success message
           setShowUndo(false);
           setDeletedMeal(null); // Clear the deleted meal
@@ -267,6 +276,7 @@ const TrackerPage = () => {
 
   const fetchMealLogs = async () => {
     setLoading(true);
+    fetchMealLogsPast7Days();
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5001/api/meals', {
@@ -277,6 +287,31 @@ const TrackerPage = () => {
       if (response.ok) {
         const data = await response.json();
         setMealLogs(data);
+      } else if (response.status === 401) {
+        // Unauthorized, redirect to login
+        navigate('/login');
+      } else {
+        console.error('Failed to fetch meal logs');
+      }
+    } catch (error) {
+      console.error('Error fetching meal logs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchMealLogsPast7Days = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5001/api/mealsPast', {
+        headers: {
+          'x-auth-token': token, // Include the token
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMealLogsPast(data);
       } else if (response.status === 401) {
         // Unauthorized, redirect to login
         navigate('/login');
@@ -307,7 +342,7 @@ const TrackerPage = () => {
       const formattedDate = currentDay.toISOString().split('T')[0];
 
       // Filter meal logs for the current day
-      const dailyMeals = mealLogs.filter(log => {
+      const dailyMeals = mealLogsPast.filter(log => {
         const logDate = new Date(log.date).toISOString().split('T')[0];
         return logDate === formattedDate;
       });
@@ -328,12 +363,14 @@ const TrackerPage = () => {
 
   useEffect(() => {
     fetchMealLogs();
+    fetchMealLogsPast7Days();
   }, []);
 
   useEffect(() => {
     calculateTotalCalories();  // Recalculate whenever mealLogs are updated
     calculateCategoryCalories();
     getLastSevenDaysCalories();
+    fetchMealLogsPast7Days();
   }, [mealLogs]);
 
 

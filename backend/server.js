@@ -40,7 +40,7 @@ app.get('/api/premier_league', async (req, res) => {
         const games = [];
 
         for (const date of dates) {
-            const response = await fetch(`https://serpapi.com/search.json?q=premier+league+games+${date}&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac`);
+            const response = await fetch(`https://serpapi.com/search.json?q=premier+league+games+${date}&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97`);
             const data = await response.json();
             if (data.sports_results && data.sports_results.games) {
                 games.push(...data.sports_results.games);
@@ -65,7 +65,7 @@ app.get('/api/premier_league', async (req, res) => {
 // test
 app.get('/api/test', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=uefa+champions+league+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const response = await fetch('https://serpapi.com/search.json?q=uefa+champions+league+games+on+today&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
         const data = await response.json();
         const liveGames = data.sports_results.games.filter(game => game.status && game.status.includes("Live"))
             .map(game => ({
@@ -87,12 +87,62 @@ app.get('/api/test', async (req, res) => {
     }
 });
 
-//uefa champions league games today
+//uefa champions league games recent
+app.get('/api/ucl', async (req, res) => {
+    try {
+        const currentDate = new Date();
+        const dayOfWeek = currentDate.getDay();
+        
+        // Calculate last Wednesday and Tuesday
+        const lastWednesday = new Date(currentDate);
+        lastWednesday.setDate(currentDate.getDate() - ((dayOfWeek + 4) % 7));
+        
+        const lastTuesday = new Date(lastWednesday);
+        lastTuesday.setDate(lastWednesday.getDate() - 1);
+
+        const dates = [lastTuesday, lastWednesday].map(date => date.toISOString().split('T')[0]);
+
+        const allGames = [];
+
+        for (const date of dates) {
+            const response = await fetch(`https://serpapi.com/search.json?q=uefa+champions+league+games+${date}&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97`);
+            const data = await response.json();
+            if (data.sports_results && data.sports_results.games) {
+                allGames.push(...data.sports_results.games);
+            }
+        }
+
+        const parsedGames = allGames.map(game => ({
+            date: game.date,
+            teams: game.teams.map(team => team.name),
+            scores: game.teams.map(team => team.score),
+            status: game.status
+        }));
+
+        // Sort games by date, most recent first
+        parsedGames.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // Remove duplicate games
+        const uniqueGames = parsedGames.filter((game, index, self) =>
+            index === self.findIndex((t) => t.date === game.date && t.teams[0] === game.teams[0] && t.teams[1] === game.teams[1])
+        );
+
+        if (uniqueGames.length > 0) {
+            res.json(uniqueGames);
+        } else {
+            res.json({ message: "No games found for the past Tuesday and Wednesday" });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
 
 // premier league games on today
 app.get('/api/premier_league_live', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=premier+league+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const response = await fetch('https://serpapi.com/search.json?q=premier+league+games+on+today&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
         const data = await response.json();
 
         if (data.sports_results && data.sports_results.game_spotlight) {
@@ -138,7 +188,7 @@ app.get('/api/bundesliga', async (req, res) => {
         const allGames = [];
 
         for (const date of dates) {
-            const response = await fetch(`https://serpapi.com/search.json?q=bundesliga+games+${date}&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac`);
+            const response = await fetch(`https://serpapi.com/search.json?q=bundesliga+games+${date}&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97`);
             const data = await response.json();
             if (data.sports_results && data.sports_results.games) {
                 allGames.push(...data.sports_results.games);
@@ -161,7 +211,7 @@ app.get('/api/bundesliga', async (req, res) => {
 
 app.get('/api/nba', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=nba+finals+2023%2F2024+games&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const response = await fetch('https://serpapi.com/search.json?q=nba+finals+2023%2F2024+games&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
         const data = await response.json();
         const games = data.sports_results.games;
         const parsedGames = games.map(game => ({
@@ -175,9 +225,36 @@ app.get('/api/nba', async (req, res) => {
     }
 });
 
+app.get('/api/nba_live', async (req, res) => {
+    try {
+        const response = await fetch('https://serpapi.com/search.json?q=NBA+games+on+today&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
+        const data = await response.json();
+
+        if (data.sports_results && data.sports_results.games) {
+            const liveGames = data.sports_results.games.filter(game => game.status && (game.status.includes("Q") || game.status.includes("Halftime")))
+                .map(game => ({
+                    teams: game.teams.map(team => team.name),
+                    scores: game.teams.map(team => team.score),
+                    status: game.status
+                }));
+
+            if (liveGames.length > 0) {
+                res.json(liveGames);
+            } else {
+                res.json({ message: "No live games right now" });
+            }
+        } else {
+            res.json({ message: "No games data available" });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
 app.get('/api/euroleague', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+2023%2F2024&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+2023%2F2024&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
         const data = await response.json();
         const games = data.sports_results.games;
         const parsedGames = games.map(game => ({
@@ -193,7 +270,7 @@ app.get('/api/euroleague', async (req, res) => {
 
 app.get('/api/euroleague_live', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+on+today&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
         const data = await response.json();
 
         if (data.sports_results && data.sports_results.games) {
@@ -220,7 +297,7 @@ app.get('/api/euroleague_live', async (req, res) => {
 
 app.get('/api/wnba', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=wnba+games+on+today&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const response = await fetch('https://serpapi.com/search.json?q=wnba+games+on+today&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
         const data = await response.json();
 
         if (data.sports_results.game_spotlight && data.sports_results.game_spotlight.status === 'Live') {

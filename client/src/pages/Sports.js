@@ -21,9 +21,9 @@ const vibrateKeyframe = (
 const theme = createTheme({
   palette: {
     mode: 'dark',
-    primary: { main: '#86dc3d' },
-    background: { default: '#000', paper: '#000' },
-    text: { primary: '#86dc3d' },
+    primary: { main: '#1aa64b' },
+    background: { default: '#000', paper: '#f9f9f9' },
+    text: { primary: '#000000' },
   },
 });
 
@@ -32,9 +32,11 @@ function Sports() {
   const [section, setSection] = useState('main');
   const [premierLeagueGames, setPremierLeagueGames] = useState([]);
   const [premierLeagueGamesLive, setPremierLeagueGamesLive] = useState([]);
+  const [championsLeagueGames, setChampionsLeagueGames] = useState([]);
   const [championsLeagueGamesLive, setChampionsLeagueGamesLive] = useState([]);
   const [bundesligaGames, setBundesligaGames] = useState([]);
   const [NBAGames, setNBAGames] = useState([]);
+  const [NBAGamesLive, setNBAGamesLive] = useState([]);
   const [euroleagueGames, setEuroleagueGames] = useState([]);
   const [euroleagueGamesLive, setEuroleagueGamesLive] = useState([]);
 
@@ -56,6 +58,14 @@ function Sports() {
     const intervalId = setInterval(fetchLiveGames, 30000);
 
     return () => clearInterval(intervalId);
+  }, []);
+
+  // Fetch UCL games
+  useEffect(() => {
+    fetch('http://localhost:5001/api/ucl')
+      .then(response => response.json())
+      .then(data => setChampionsLeagueGames(data))
+      .catch(err => console.log(err));
   }, []);
 
   // Fetch Premier League games
@@ -90,6 +100,21 @@ function Sports() {
       .catch(err => console.log(err));
   }, []);
 
+  useEffect(() => {
+    const fetchLiveGames = () => {
+      fetch('http://localhost:5001/api/nba_live')
+        .then(response => response.json())
+        .then(data => setNBAGamesLive(data))
+        .catch(err => console.log(err));
+    };
+
+    fetchLiveGames();
+
+    const intervalId = setInterval(fetchLiveGames, 30000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   // Fetch Euroleague games
   useEffect(() => {
     fetch('http://localhost:5001/api/euroleague')
@@ -112,6 +137,8 @@ function Sports() {
 
     return () => clearInterval(intervalId);
   }, []);
+
+
 
   const username = localStorage.getItem('username') || 'Guest';
 
@@ -215,7 +242,7 @@ function Sports() {
             />
           </Box>
         </Box>
-        {(game.minute)&& (
+        {(game.minute) && (
           <Typography
             variant="caption"
             sx={{ position: 'absolute', bottom: 3, right: 8 }}
@@ -223,7 +250,7 @@ function Sports() {
             {`${game.minute} mins played`}
           </Typography>
         )}
-        {(game.status && !game.minute )&& (
+        {(game.status && !game.minute) && (
           <Typography
             variant="caption"
             sx={{ position: 'absolute', bottom: 2, right: 8 }}
@@ -252,8 +279,8 @@ function Sports() {
         >
           <Box
             sx={{
-              background: 'linear-gradient(45deg, #000 30%, #111 90%)',
-              color: '#86dc3d',
+              backgroundColor: '#f9f9f9',
+              color: '#1aa64b',
               padding: '2rem',
               position: 'relative',
               overflow: 'hidden',
@@ -275,8 +302,9 @@ function Sports() {
                 component="h1"
                 sx={{
                   fontWeight: 'bold',
+                  fontFamily: 'Open Sans, sans-serif',
                   marginBottom: '0.5rem',
-                  textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
                 }}
               >
                 Welcome, {username}!
@@ -285,6 +313,7 @@ function Sports() {
                 variant="h6"
                 sx={{
                   fontWeight: 'normal',
+                  fontFamily: 'Open Sans, sans-serif',
                   opacity: 0.9,
                   textTransform: 'uppercase',
                   letterSpacing: '1px',
@@ -300,7 +329,7 @@ function Sports() {
                 right: 0,
                 width: '50%',
                 height: '100%',
-                background: 'linear-gradient(135deg, rgba(134,220,61,0.1) 0%, rgba(0,0,0,0) 100%)',
+                background: 'linear-gradient(135deg, rgba(134,220,61,0.1) 0%, rgba(249,249,249,0) 100%)',
                 clipPath: 'polygon(100% 0, 0% 100%, 100% 100%)',
                 zIndex: 1,
               }}
@@ -327,11 +356,11 @@ function Sports() {
               </Box>
 
               {page === 'soccer' && (
-                <Box mt={4} sx={{ border: '2px solid #86dc3d', borderRadius: 2, padding: 2 }}>
+                <Box mt={4} sx={{ boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', borderRadius: 2, padding: 2 }}>
                   <Typography variant="h4" align="center" sx={{ mb: 2 }}>Premier League</Typography>
 
                   {/* Recent Matches Section */}
-                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold' }}>Recent matches:</Typography>
+                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}>Recent matches:</Typography>
                   <Box
                     sx={{
                       display: 'flex',
@@ -348,7 +377,7 @@ function Sports() {
                   </Box>
 
                   {/* Live Matches Section */}
-                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold' }}>Live matches:</Typography>
+                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}>Live matches:</Typography>
                   <Box
                     sx={{
                       display: 'flex',
@@ -362,7 +391,7 @@ function Sports() {
                   >
                     {/* Check if 'premierLeagueGamesLive' is a message or contains game data */}
                     {premierLeagueGamesLive.message ? (
-                      <Typography variant="body1" fontStyle="italic">{premierLeagueGamesLive.message}</Typography>
+                      <Typography variant="body1" fontStyle="italic" fontFamily='Open Sans, sans-serif'>{premierLeagueGamesLive.message}</Typography>
                     ) : (
                       premierLeagueGamesLive.map((game, index) => renderLiveMatch(game, index))
                     )}
@@ -371,11 +400,11 @@ function Sports() {
               )}
 
               {page === 'soccer' && (
-                <Box mt={4} sx={{ border: '2px solid #86dc3d', borderRadius: 2, padding: 2 }}>
+                <Box mt={4} sx={{ boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', borderRadius: 2, padding: 2 }}>
                   <Typography variant="h4" align="center" sx={{ mb: 2 }}> Bundesliga</Typography>
 
                   {/* Recent Matches Section */}
-                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold' }}>Recent matches:</Typography>
+                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}>Recent matches:</Typography>
                   <Box
                     sx={{
                       display: 'flex',
@@ -392,7 +421,7 @@ function Sports() {
                   </Box>
 
                   {/* Live Matches Section */}
-                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold' }}>Live matches:</Typography>
+                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}>Live matches:</Typography>
                   <Box
                     sx={{
                       display: 'flex',
@@ -406,7 +435,7 @@ function Sports() {
                   >
                     {/* Check if 'premierLeagueGamesLive' is a message or contains game data */}
                     {bundesligaGamesLive.message ? (
-                      <Typography variant="body1" fontStyle="italic">{bundesligaGamesLive.message}</Typography>
+                      <Typography variant="body1" fontStyle="italic" fontFamily='Open Sans, sans-serif'>{bundesligaGamesLive.message}</Typography>
                     ) : (
                       bundesligaGamesLive.map((game, index) => renderLiveMatch(game, index))
                     )}
@@ -415,11 +444,28 @@ function Sports() {
               )}
 
               {page === 'soccer' && (
-                <Box mt={4} sx={{ border: '2px solid #86dc3d', borderRadius: 2, padding: 2 }}>
+                <Box mt={4} sx={{ boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', borderRadius: 2, padding: 2 }}>
                   <Typography variant="h4" align="center" sx={{ mb: 2 }}>Champions League</Typography>
 
+                  {/* Recent Matches Section */}
+                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}>Recent matches:</Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      overflowX: 'auto',
+                      p: 1,
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 1,
+                      backgroundColor: '#fff',
+                      '&::-webkit-scrollbar': { display: 'none' },
+                      mb: 2
+                    }}
+                  >
+                    {championsLeagueGames.map((game, index) => renderMatch(game, index))}
+                  </Box>
+
                   {/* Live Matches Section */}
-                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold' }}>Live matches:</Typography>
+                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}>Live matches:</Typography>
                   <Box
                     sx={{
                       display: 'flex',
@@ -433,7 +479,7 @@ function Sports() {
                   >
                     {/* Check if 'premierLeagueGamesLive' is a message or contains game data */}
                     {championsLeagueGamesLive.message ? (
-                      <Typography variant="body1" fontStyle="italic">{championsLeagueGamesLive.message}</Typography>
+                      <Typography variant="body1" fontStyle="italic" fontFamily='Open Sans, sans-serif'>{championsLeagueGamesLive.message}</Typography>
                     ) : (
                       championsLeagueGamesLive.map((game, index) => renderLiveMatch(game, index))
                     )}
@@ -442,11 +488,11 @@ function Sports() {
               )}
 
               {page === 'basketball' && (
-                <Box mt={4} sx={{ border: '2px solid #86dc3d', borderRadius: 2, padding: 2 }}>
+                <Box mt={4} sx={{ boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', borderRadius: 2, padding: 2 }}>
                   <Typography variant="h4" align="center" sx={{ mb: 2 }}>NBA</Typography>
 
                   {/* Recent Matches Section */}
-                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold' }}>Recent matches:</Typography>
+                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}>Recent matches:</Typography>
                   <Box
                     sx={{
                       display: 'flex',
@@ -461,15 +507,36 @@ function Sports() {
                   >
                     {NBAGames.map((game, index) => renderMatch(game, index))}
                   </Box>
+
+                  {/* Live Matches Section */}
+                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}>Live matches:</Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      overflowX: 'auto',
+                      p: 1,
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 1,
+                      backgroundColor: '#fff',
+                      '&::-webkit-scrollbar': { display: 'none' },
+                    }}
+                  >
+                    {/* Check if 'NBAGamesLive' is a message or contains game data */}
+                    {NBAGamesLive.message ? (
+                      <Typography variant="body1" fontStyle="italic" fontFamily='Open Sans, sans-serif'>{NBAGamesLive.message}</Typography>
+                    ) : (
+                      NBAGamesLive.map((game, index) => renderLiveMatch(game, index))
+                    )}
+                  </Box>
                 </Box>
               )}
 
               {page === 'basketball' && (
-                <Box mt={4} sx={{ border: '2px solid #86dc3d', borderRadius: 2, padding: 2 }}>
+                <Box mt={4} sx={{ boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', borderRadius: 2, padding: 2 }}>
                   <Typography variant="h4" align="center" sx={{ mb: 2 }}>Euroleague</Typography>
 
                   {/* Recent Matches Section */}
-                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold' }}>Recent matches:</Typography>
+                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}>Recent matches:</Typography>
                   <Box
                     sx={{
                       display: 'flex',
@@ -486,7 +553,7 @@ function Sports() {
                   </Box>
 
                   {/* Live Matches Section */}
-                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold' }}>Live matches:</Typography>
+                  <Typography variant="h6" align="left" sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}>Live matches:</Typography>
                   <Box
                     sx={{
                       display: 'flex',
@@ -500,7 +567,7 @@ function Sports() {
                   >
                     {/* Check if 'euroLeagueGamesLive' is a message or contains game data */}
                     {euroleagueGamesLive.message ? (
-                      <Typography variant="body1" fontStyle="italic">{euroleagueGamesLive.message}</Typography>
+                      <Typography variant="body1" fontStyle="italic" fontFamily='Open Sans, sans-serif'>{euroleagueGamesLive.message}</Typography>
                     ) : (
                       euroleagueGamesLive.map((game, index) => renderLiveMatch(game, index))
                     )}

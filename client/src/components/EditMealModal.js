@@ -29,7 +29,6 @@ const EditMealModal = ({ isOpen, onClose, meal, onDelete, onSubmit }) => {
     e.preventDefault();
     // Handle save changes
     onSubmit(formData);
-    //console.log('Saving changes:', formData);
   };
 
   return (
@@ -54,7 +53,7 @@ const EditMealModal = ({ isOpen, onClose, meal, onDelete, onSubmit }) => {
             <label htmlFor="portionSize">Portion Size:</label>
             <input
               type="number"
-              min="0"
+              min="1"
               id="portionSize"
               name="portionSize"
               value={formData.portionSize}

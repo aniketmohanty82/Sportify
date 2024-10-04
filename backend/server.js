@@ -92,15 +92,18 @@ app.get('/api/ucl', async (req, res) => {
     try {
         const currentDate = new Date();
         const dayOfWeek = currentDate.getDay();
-        
-        // Calculate last Wednesday and Tuesday
+
+        // Calculate last Wednesday, Tuesday, and Thursday
         const lastWednesday = new Date(currentDate);
         lastWednesday.setDate(currentDate.getDate() - ((dayOfWeek + 4) % 7));
-        
-        const lastTuesday = new Date(lastWednesday);
-        lastTuesday.setDate(lastWednesday.getDate() - 1);
 
-        const dates = [lastTuesday, lastWednesday].map(date => date.toISOString().split('T')[0]);
+        const lastTuesday = new Date(currentDate);
+        lastTuesday.setDate(currentDate.getDate() - ((dayOfWeek + 5) % 7));
+
+        const lastThursday = new Date(currentDate);
+        lastThursday.setDate(currentDate.getDate() - ((dayOfWeek + 3) % 7));
+
+        const dates = [lastTuesday, lastWednesday, lastThursday].map(date => date.toISOString().split('T')[0]);
 
         const allGames = [];
 
@@ -130,7 +133,7 @@ app.get('/api/ucl', async (req, res) => {
         if (uniqueGames.length > 0) {
             res.json(uniqueGames);
         } else {
-            res.json({ message: "No games found for the past Tuesday and Wednesday" });
+            res.json({ message: "No games found for the past Tuesday, Wednesday, and Thursday" });
         }
     } catch (err) {
         console.error(err);

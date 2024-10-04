@@ -131,7 +131,7 @@ const TrackerPage = () => {
 
       if (response.ok) {
         await fetchMealLogs();
-        await fetchMealLogsPast7Days();
+        fetchMealLogsPast7Days();
         calculateTotalCalories(); //recalculate total calories
         calculateCategoryCalories();
         getLastSevenDaysCalories();
@@ -186,8 +186,8 @@ const TrackerPage = () => {
 
       if (response.ok) {
         await fetchMealLogs();
-        await calculateTotalCalories(); //recalculate total calories
-        fetchMealLogsPast7Days();
+        await fetchMealLogsPast7Days();
+        calculateTotalCalories(); //recalculate total calories
         calculateCategoryCalories();
         getLastSevenDaysCalories();
         showSuccessMessage('Meal edited successfully!'); // Success message
@@ -217,7 +217,7 @@ const TrackerPage = () => {
         // Store the deleted meal
         setDeletedMeal(currentMeal);
         await fetchMealLogs();
-        await fetchMealLogsPast7Days();
+        fetchMealLogsPast7Days();
         calculateTotalCalories();
         calculateCategoryCalories();
         getLastSevenDaysCalories();
@@ -256,7 +256,7 @@ const TrackerPage = () => {
 
         if (response.ok) {
           await fetchMealLogs();
-          await fetchMealLogsPast7Days();
+          fetchMealLogsPast7Days();
           calculateTotalCalories(); // Recalculate total calories
           calculateCategoryCalories();
           getLastSevenDaysCalories();
@@ -369,8 +369,8 @@ const TrackerPage = () => {
   useEffect(() => {
     calculateTotalCalories();  // Recalculate whenever mealLogs are updated
     calculateCategoryCalories();
-    getLastSevenDaysCalories();
     fetchMealLogsPast7Days();
+    getLastSevenDaysCalories();
   }, [mealLogs]);
 
 

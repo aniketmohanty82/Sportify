@@ -10,8 +10,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../App.css';
 import '../MealLogs.css';
 import CaloriesChart from '../components/CalorieChart'; // Adjust the path as need
-import CaloriesChart from '../components/CalorieChart'; // Adjust the path as need
-
 const TrackerPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

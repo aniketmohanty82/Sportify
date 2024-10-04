@@ -23,13 +23,37 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 // Routes for fetching sports data
 app.get('/api/premier_league', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=premier+league+games+played+so+far&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
-        const data = await response.json();
-        const games = data.sports_results.games;
+        const currentDate = new Date();
+        const dayOfWeek = currentDate.getDay(); // 0 for Sunday, 1 for Monday, etc.
+        
+        const lastSunday = new Date(currentDate);
+        lastSunday.setDate(currentDate.getDate() - dayOfWeek);
+        
+        const lastSaturday = new Date(lastSunday);
+        lastSaturday.setDate(lastSunday.getDate() - 1);
+        
+        const lastMonday = new Date(lastSunday);
+        lastMonday.setDate(lastSunday.getDate() - 6);
+
+        const dates = [lastSaturday, lastSunday, lastMonday].map(date => date.toISOString().split('T')[0]);
+
+        const games = [];
+
+        for (const date of dates) {
+            const response = await fetch(`https://serpapi.com/search.json?q=premier+league+games+${date}&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac`);
+            const data = await response.json();
+            if (data.sports_results && data.sports_results.games) {
+                games.push(...data.sports_results.games);
+            }
+        }
+
         const parsedGames = games.map(game => ({
+            date: game.date,
             teams: game.teams.map(team => team.name),
-            scores: game.teams.map(team => team.score)
+            scores: game.teams.map(team => team.score),
+            status: game.status
         }));
+
         res.json(parsedGames);
     } catch (err) {
         console.error(err);
@@ -94,13 +118,40 @@ app.get('/api/premier_league_live', async (req, res) => {
 
 app.get('/api/bundesliga', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=google+sports+bundesliga+games+played+list&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
-        const data = await response.json();
-        const games = data.sports_results.games;
-        const parsedGames = games.map(game => ({
+        const currentDate = new Date();
+        const dayOfWeek = currentDate.getDay();
+
+        const lastSunday = new Date(currentDate);
+        lastSunday.setDate(currentDate.getDate() - dayOfWeek);
+
+        const lastSaturday = new Date(lastSunday);
+        lastSaturday.setDate(lastSunday.getDate() - 1);
+
+        const lastFriday = new Date(lastSunday);
+        lastFriday.setDate(lastSunday.getDate() - 2);
+
+        const today = new Date();
+        const dates = [lastFriday, lastSaturday, lastSunday]
+            .filter(date => date <= today)
+            .map(date => date.toISOString().split('T')[0]);
+
+        const allGames = [];
+
+        for (const date of dates) {
+            const response = await fetch(`https://serpapi.com/search.json?q=bundesliga+games+${date}&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac`);
+            const data = await response.json();
+            if (data.sports_results && data.sports_results.games) {
+                allGames.push(...data.sports_results.games);
+            }
+        }
+
+        const parsedGames = allGames.map(game => ({
+            date: game.date,
             teams: game.teams.map(team => team.name),
-            scores: game.teams.map(team => team.score)
+            scores: game.teams.map(team => team.score),
+            status: game.status
         }));
+
         res.json(parsedGames);
     } catch (err) {
         console.error(err);
@@ -110,7 +161,7 @@ app.get('/api/bundesliga', async (req, res) => {
 
 app.get('/api/nba', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=nba+2023%2F2024+games&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
+        const response = await fetch('https://serpapi.com/search.json?q=nba+finals+2023%2F2024+games&location=indianapolis,+indiana,+united+states&api_key=5a3e9946072de5106decb13c65c5c09384fc0ab71fe065616f94e0b8c33ba1ac');
         const data = await response.json();
         const games = data.sports_results.games;
         const parsedGames = games.map(game => ({

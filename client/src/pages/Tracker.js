@@ -24,7 +24,6 @@ const TrackerPage = () => {
   const navigate = useNavigate(); // Initialize navigate
   const [successMessage, setSuccessMessage] = useState('');
 
-  const [mealLogs, setMealLogs] = useState([]);
   const [mealLogsPast, setMealLogsPast] = useState([]);
   const [totalCalories, setTotalCalories] = useState(0);
   const [totalProtein, setTotalProtein] = useState(0);
@@ -66,6 +65,12 @@ const TrackerPage = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCurrentMeal(null);
+  };
+
+  const handleCloseModal2 = () => {
+    setIsModalOpen(false);
+    setCurrentMeal(null);
+    showSuccessMessage("No Results Found!")
   };
 
   const handleCloseEditModal = () => {
@@ -116,9 +121,6 @@ const TrackerPage = () => {
     let exceededNutrients = [];
 
     // Check if any value exceeds the recommended daily limit
-    if (totalCalories > dailyCalorieGoal) {
-      exceededNutrients.push('Calories');
-    }
     if (totalProtein > maxDailyProtein) {
       exceededNutrients.push('Protein');
     }
@@ -135,6 +137,7 @@ const TrackerPage = () => {
     // If there are any exceeded nutrients, display a combined warning message
     if (exceededNutrients.length > 0) {
       showWarningMessage(`${exceededNutrients.join(', ')} exceed daily limit!`);
+      exceededNutrients = [];
     }
   };
 
@@ -304,7 +307,6 @@ const TrackerPage = () => {
   };
 
   const fetchMealLogs = async () => {
-    setLoading(true);
     fetchMealLogsPast7Days();
     try {
       const token = localStorage.getItem('token');
@@ -324,13 +326,10 @@ const TrackerPage = () => {
       }
     } catch (error) {
       console.error('Error fetching meal logs:', error);
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
 
   const fetchMealLogsPast7Days = async () => {
-    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5001/api/mealsPast', {
@@ -349,8 +348,6 @@ const TrackerPage = () => {
       }
     } catch (error) {
       console.error('Error fetching meal logs:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -421,24 +418,24 @@ const TrackerPage = () => {
         <div className="success-message">
           <p>{successMessage}</p>
         </div>
-      )}
+    )}
 
-{showUndo && (
+    {showUndo && (
         <div className="undo-container">
-          <p>Meal deleted. <button onClick={handleUndoDelete}>Undo</button></p>
+          <p><button onClick={handleUndoDelete}>Undo</button></p>
         </div>
-      )}
+    )}
 
-      {/* Top row with date and add button */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: '15px', 
-        padding: '10px 20px', 
-        borderRadius: '15px', 
-        backgroundColor: '#f9f9f9', 
-        boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+    {/* Top row with date and add button */}
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'space-between', 
+      alignItems: 'center', 
+      marginBottom: '15px', 
+      padding: '10px 20px', 
+      borderRadius: '15px', 
+      backgroundColor: '#f9f9f9', 
+      boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
       }}>
         {/* Current Date Display */}
         <h2 style={{ 
@@ -490,7 +487,7 @@ const TrackerPage = () => {
                 text={`${Math.round(caloriePercentage)}%`}
                 styles={buildStyles({
                   textSize: '16px',
-                  pathColor: `rgba(26, 166, 75, ${caloriePercentage / 100})`,
+                  pathColor: `rgba(26, 166, 75, 1})`,
                   textColor: '#000',
                   trailColor: '#d6d6d6',
                 })}
@@ -586,10 +583,10 @@ const TrackerPage = () => {
                 }}>
                 <p>Recommended Daily Values:</p>
                 <ul>
-                  <li>Protein: {maxDailyProtein} g (Exceeded by: {totalProtein - maxDailyProtein} g)</li>
-                  <li>Carbs: {maxDailyCarbs} g (Exceeded by: {totalCarbs - maxDailyCarbs} g)</li>
-                  <li>Fats: {maxDailyFats} g (Exceeded by: {totalFats - maxDailyFats} g)</li>
-                  <li>Fiber: {maxDailyFiber} g (Exceeded by: {totalFiber - maxDailyFiber} g)</li>
+                  <li>Protein: {maxDailyProtein} g {totalProtein - maxDailyProtein > 0 && `(Exceeded by: ${totalProtein - maxDailyProtein} g)`}</li>
+                  <li>Carbs: {maxDailyCarbs} g {totalCarbs - maxDailyCarbs > 0 && `(Exceeded by: ${totalCarbs - maxDailyCarbs} g)`}</li>
+                  <li>Fats: {maxDailyFats} g {totalFats - maxDailyFats > 0 && `(Exceeded by: ${totalFats - maxDailyFats} g)`}</li>
+                  <li>Fiber: {maxDailyFiber} g {totalFiber - maxDailyFiber > 0 && `(Exceeded by: ${totalFiber - maxDailyFiber} g)`}</li>
                 </ul>
               </div>
             )}
@@ -627,7 +624,7 @@ const TrackerPage = () => {
     </div>
   
       {/* Modals and Success Message */}
-      <MealLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} />
+      <MealLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} onError={handleCloseModal2} />
       <EditMealModal
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}

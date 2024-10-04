@@ -78,8 +78,8 @@ const MealLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
         onClose(); // Close the modal after submission
       } catch (error) {
         console.error('Error fetching nutrient data:', error);
-        reset();
         onError(); 
+        // reset()
       }
     },
   });

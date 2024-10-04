@@ -131,7 +131,7 @@ const TrackerPage = () => {
 
       if (response.ok) {
         await fetchMealLogs();
-        fetchMealLogsPast7Days();
+        // await fetchMealLogsPast7Days();
         calculateTotalCalories(); //recalculate total calories
         calculateCategoryCalories();
         getLastSevenDaysCalories();
@@ -186,10 +186,10 @@ const TrackerPage = () => {
 
       if (response.ok) {
         await fetchMealLogs();
-        await fetchMealLogsPast7Days();
+        // await fetchMealLogsPast7Days();
         calculateTotalCalories(); //recalculate total calories
         calculateCategoryCalories();
-        getLastSevenDaysCalories();
+        //getLastSevenDaysCalories();
         showSuccessMessage('Meal edited successfully!'); // Success message
         handleCloseEditModal();
       } else if (response.status === 401) {
@@ -217,10 +217,10 @@ const TrackerPage = () => {
         // Store the deleted meal
         setDeletedMeal(currentMeal);
         await fetchMealLogs();
-        fetchMealLogsPast7Days();
+        // await fetchMealLogsPast7Days();
         calculateTotalCalories();
         calculateCategoryCalories();
-        getLastSevenDaysCalories();
+        //getLastSevenDaysCalories();
         showSuccessMessage('Meal deleted successfully!'); // Success message
         handleCloseDeleteModal();
 
@@ -256,10 +256,10 @@ const TrackerPage = () => {
 
         if (response.ok) {
           await fetchMealLogs();
-          fetchMealLogsPast7Days();
+          // await fetchMealLogsPast7Days();
           calculateTotalCalories(); // Recalculate total calories
           calculateCategoryCalories();
-          getLastSevenDaysCalories();
+          //getLastSevenDaysCalories();
           showSuccessMessage('Meal restored successfully!'); // Success message
           setShowUndo(false);
           setDeletedMeal(null); // Clear the deleted meal
@@ -369,9 +369,8 @@ const TrackerPage = () => {
   useEffect(() => {
     calculateTotalCalories();  // Recalculate whenever mealLogs are updated
     calculateCategoryCalories();
-    fetchMealLogsPast7Days();
     getLastSevenDaysCalories();
-  }, [mealLogs]);
+  }, [mealLogs, mealLogsPast]);
 
 
   const getMealsByCategory = (category) => {

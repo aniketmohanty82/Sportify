@@ -67,11 +67,24 @@ app.get('/api/test', async (req, res) => {
     try {
         const response = await fetch('https://serpapi.com/search.json?q=uefa+champions+league+games+on+today&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
         const data = await response.json();
-        const liveGames = data.sports_results.games.filter(game => game.status && game.status.includes("Live"))
+
+        // Check if the API returned an error
+        if (data.error) {
+            console.error('API Error:', data.error);
+            return res.status(500).json({ message: "Error fetching data from API" });
+        }
+
+        // Check if sports_results exists
+        if (!data.sports_results || !data.sports_results.games) {
+            return res.json({ message: "No games data available" });
+        }
+
+        const liveGames = data.sports_results.games
+            .filter(game => game.status && game.status.includes("Live"))
             .map(game => ({
                 teams: game.teams.map(team => team.name),
                 scores: game.teams.map(team => team.score),
-                minute: game.status.match(/\d+/)[0],  // Extract minute from the status string
+                minute: game.status.match(/\d+/)?.[0] || 'N/A',  // Extract minute from the status string, use 'N/A' if not found
                 status: game.status
             }));
 
@@ -82,8 +95,8 @@ app.get('/api/test', async (req, res) => {
             res.json({ message: "No live games right now" });
         }
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
+        console.error('Error:', err);
+        res.status(500).json({ message: "Server error", error: err.message });
     }
 });
 
@@ -104,6 +117,7 @@ app.get('/api/ucl', async (req, res) => {
         lastThursday.setDate(currentDate.getDate() - ((dayOfWeek + 3) % 7));
 
         const dates = [lastTuesday, lastWednesday, lastThursday].map(date => date.toISOString().split('T')[0]);
+        console.log(dates);
 
         const allGames = [];
 
@@ -122,16 +136,8 @@ app.get('/api/ucl', async (req, res) => {
             status: game.status
         }));
 
-        // Sort games by date, most recent first
-        parsedGames.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        // Remove duplicate games
-        const uniqueGames = parsedGames.filter((game, index, self) =>
-            index === self.findIndex((t) => t.date === game.date && t.teams[0] === game.teams[0] && t.teams[1] === game.teams[1])
-        );
-
-        if (uniqueGames.length > 0) {
-            res.json(uniqueGames);
+        if (parsedGames.length > 0) {
+            res.json(parsedGames);
         } else {
             res.json({ message: "No games found for the past Tuesday, Wednesday, and Thursday" });
         }

@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
     unique: true, // Ensures unique emails
   },
   password: { type: String, required: true },
+  timezone: { type: String, default: 'UTC' }, // Adding the timezone field with a default value
   resetPasswordToken: String,
   resetPasswordExpires: Date,
 });

@@ -118,7 +118,7 @@ router.post('/reset-password/:token', async (req, res) => {
 // Register New User
 router.post('/register', async (req, res) => {
   try {
-    const { firstName, lastName, username, email, password } = req.body;
+    const { firstName, lastName, username, email, password, timezone } = req.body;
 
     // Validate input
     if (!firstName || !lastName || !username || !email || !password) {
@@ -134,20 +134,21 @@ router.post('/register', async (req, res) => {
     if (usernameExists)
       return res.status(400).json({ message: 'Username already in use.' });
 
-    // Create new user
+    // Create new user with timezone
     const newUser = new User({
       firstName,
       lastName,
       username,
       email,
       password,
+      timezone // Save the timezone
     });
 
     // Save user to DB
     const savedUser = await newUser.save();
     res.status(201).json({
       message: 'User registered successfully',
-      user: { id: savedUser._id, email: savedUser.email, username: savedUser.username },
+      user: { id: savedUser._id, email: savedUser.email, username: savedUser.username, timezone: 'UTC' },
     });
   } catch (err) {
     console.error(err);
@@ -203,6 +204,57 @@ router.post('/login', async (req, res) => {
     );
   } catch (err) {
     console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update user's time zone
+router.put('/update-timezone', async (req, res) => {
+  try {
+    const { userId, timezone } = req.body;
+
+    // Validate input
+    if (!userId || !timezone) {
+      return res.status(400).json({ message: 'Please provide userId and timezone' });
+    }
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update the time zone
+    user.timezone = timezone;
+    await user.save();
+
+    res.status(200).json({ message: 'Timezone updated successfully', timezone: user.timezone });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Fetch user's time zone
+router.get('/timezone', async (req, res) => {
+  try {
+    const { userId } = req.query;  // Expecting userId in query parameters
+
+    // Validate input
+    if (!userId) {
+      return res.status(400).json({ message: 'Please provide userId' });
+    }
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return the user's time zone
+    res.status(200).json({ timezone: user.timezone });
+  } catch (err) {
+    console.error('Error fetching time zone:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });

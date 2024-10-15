@@ -36,6 +36,7 @@ const LogIn = () => {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('userId', res.data.user.id);  // Store the user ID
       localStorage.setItem('userName', res.data.user.userName);
+      localStorage.setItem('timeZone', res.data.user.timeZone);
       console.log(res.data.user)
       console.log(localStorage.getItem('userName'))
 

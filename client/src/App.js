@@ -11,6 +11,7 @@ import Sports from './pages/Sports';
 import ProtectedRoute from './components/ProtectedRoute'; // Import the ProtectedRoute component
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Settings from './pages/Settings';
 
 const App = () => {
   return (
@@ -49,6 +50,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <Sports />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             }
           />

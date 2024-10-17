@@ -12,6 +12,7 @@ import ProtectedRoute from './components/ProtectedRoute'; // Import the Protecte
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
+import Workout from './pages/Workout';
 
 const App = () => {
   return (
@@ -58,6 +59,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <Settings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/workout"
+            element={
+              <ProtectedRoute>
+                <Workout />
               </ProtectedRoute>
             }
           />

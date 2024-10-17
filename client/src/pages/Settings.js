@@ -9,7 +9,7 @@ const Settings = () => {
     // Fetch the user's current time zone from backend when the page loads
     const fetchUserTimeZone = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/users/timezone?userId=${userId}`);
+        const response = await fetch(`http://localhost:5001/users/timezone?userId=${userId}`);
         const data = await response.json();
         if (response.ok) {
           setUserTimeZone(data.timezone); // Ensure you use 'timezone' based on the server response
@@ -27,7 +27,7 @@ const Settings = () => {
     try {
       setUserTimeZone(timeZone);
       // Send the updated time zone to the backend
-      const response = await fetch('http://localhost:5001/api/users/update-timezone', {
+      const response = await fetch('http://localhost:5001/users/update-timezone', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

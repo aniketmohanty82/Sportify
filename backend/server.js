@@ -425,6 +425,7 @@ app.delete('/api/meals/:id', async (req, res) => {
 // User routes and protected routes
 const usersRouter = require('./routes/users');
 app.use('/users', usersRouter);
+app.use('/api/workouts', require('./routes/workouts')); // Workout routes
 
 app.get('/tracker', auth, (req, res) => {
     res.json({ message: 'Welcome to the protected tracker route' });

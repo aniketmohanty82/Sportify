@@ -51,6 +51,10 @@ const Navbar = () => {
             <FaRunning className="navbar__icon" />
             Sports
           </Link>
+          <Link to="/workout" className="navbar__link">
+            <FaTasks className="navbar__icon" />
+            Workout
+          </Link>
           <Link to="/tasks" className="navbar__link">
             <FaTasks className="navbar__icon" />
             Tasks

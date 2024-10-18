@@ -1,2 +1,7 @@
 node_modules
 npm-debug.log
+build
+.dockerignore
+Dockerfile
+docker-compose.yml
+README.md

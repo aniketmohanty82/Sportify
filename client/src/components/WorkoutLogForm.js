@@ -9,57 +9,48 @@ const Field = ({ label, id, ...rest }) => (
   </div>
 );
 
-const Select = ({ label, id, children, ...rest }) => (
-  <div className="form-field">
-    <label htmlFor={id}>{label}</label>
-    <select id={id} className="select" {...rest}>
-      {children}
-    </select>
-  </div>
-);
-
 const WorkoutLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
   const { form, reset } = useForm({
     defaultValues: {
       exercise: '',
       sets: '',
       reps: '',
-      workoutCategory: '',
     },
     onSubmit: async (values) => {
-      const { exercise, sets, reps, workoutCategory } = values;
-
+      const { exercise, sets, reps } = values;
+    
       if (!exercise) {
         alert('Please enter an exercise.');
         return;
       }
-
-      if (sets <= 0) {
-        alert('Please enter the number of sets.');
+    
+      if (Number(sets) <= 0) { // Ensure sets is a number
+        alert('Please enter a valid number of sets.');
         return;
       }
-
-      if (reps <= 0) {
-        alert('Please enter the number of reps.');
+    
+      if (Number(reps) <= 0) { // Ensure reps is a number
+        alert('Please enter a valid number of reps.');
         return;
       }
-
-      if (!workoutCategory) {
-        alert('Please choose the workout category.');
-        return;
-      }
-
+    
       try {
+        console.log('Form data prepared for submission:', {
+          userId: localStorage.getItem('userId'),
+          exercise,
+          sets: Number(sets),
+          reps: Number(reps),
+          date: new Date(),
+        });
         // Submit the form data to the backend or handle it appropriately
         onSubmit({
           userId: localStorage.getItem('userId'),
           exercise,
-          sets,
-          reps,
-          workoutCategory,
-          date: new Date(),
+          sets: Number(sets), // Convert sets to a number
+          reps: Number(reps), // Convert reps to a number
+          date: new Date(), // Add the current date
         });
-
+    
         // Clear the form after submission
         reset();
         onClose(); // Close the modal after submission
@@ -67,7 +58,7 @@ const WorkoutLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
         console.error('Error submitting workout log:', error);
         onError();
       }
-    },
+    },    
   });
 
   useEffect(() => {
@@ -95,7 +86,7 @@ const WorkoutLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
             id="sets"
             name="sets"
             type="number"
-            min="1" // Prevents negative values
+            min="1" // Prevent negative values
             placeholder="Enter number of sets..."
           />
           <Field
@@ -103,16 +94,9 @@ const WorkoutLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
             id="reps"
             name="reps"
             type="number"
-            min="1" // Prevents negative values
+            min="1" // Prevent negative values
             placeholder="Enter number of reps..."
           />
-          <Select label="Workout Category" id="workoutCategory" name="workoutCategory">
-            <option value="">Select Workout Category</option>
-            <option value="Strength Training">Strength Training</option>
-            <option value="Cardio">Cardio</option>
-            <option value="Flexibility">Flexibility</option>
-            <option value="Balance">Balance</option>
-          </Select>
           <button type="submit" className="btn">Log Workout</button>
         </form>
       </div>

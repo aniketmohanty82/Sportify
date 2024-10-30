@@ -1,4 +1,3 @@
-// models/Workout.js
 const mongoose = require('mongoose');
 
 const WorkoutSchema = new mongoose.Schema({
@@ -7,22 +6,23 @@ const WorkoutSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  workoutType: {
+  exercise: {
     type: String,
-    required: true,
+    required: true, // Name of the exercise
   },
-  duration: {
+  sets: {
     type: Number,
-    required: true, // Duration in minutes
+    required: true, // Number of sets
   },
-  caloriesBurned: {
+  reps: {
     type: Number,
-    required: true, // Calories burned during the workout
+    required: true, // Number of reps per set
   },
   date: {
     type: Date,
-    default: Date.now,
+    //default: Date.now, // Date of the workout
+    required: true,
   },
 });
 
-module.exports = mongoose.model('Workout', WorkoutSchema);
+module.exports = mongoose.model('Workouts', WorkoutSchema);

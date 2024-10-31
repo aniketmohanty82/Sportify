@@ -68,3 +68,33 @@
     background-color: #45a049;
   }
   
+  .workout-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  
+  .workout-table th, .workout-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  
+  .workout-table th {
+    background-color: #f2f2f2;
+    text-align: left;
+  }
+  
+  .workout-row {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .workout-row:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .workout-table td {
+    padding: 8px;
+    text-align: left;
+  }
+  

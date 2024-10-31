@@ -20,7 +20,9 @@
     "jsonwebtoken": "^9.0.2",
     "mdb-react-ui-kit": "^9.0.0",
     "mongoose": "^8.6.3",
+    "nodemailer": "^6.9.15",
     "react": "^18.3.1",
+    "react-calendar-heatmap": "^1.9.0",
     "react-chartjs-2": "^5.2.0",
     "react-circular-progressbar": "^2.1.0",
     "react-cool-form": "^0.4.1",
@@ -29,8 +31,7 @@
     "react-router-dom": "^6.26.2",
     "react-scripts": "5.0.1",
     "react-toastify": "^10.0.5",
-    "web-vitals": "^2.1.4",
-    "nodemailer": "^6.9.15"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",

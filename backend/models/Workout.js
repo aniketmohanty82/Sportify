@@ -18,6 +18,10 @@ const WorkoutSchema = new mongoose.Schema({
     type: Number,
     required: true, // Number of reps per set
   },
+  weight: {
+    type: Number,
+    required: true, // Number of reps per set
+  },
   date: {
     type: Date,
     //default: Date.now, // Date of the workout

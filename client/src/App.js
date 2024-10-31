@@ -13,7 +13,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import Workout from './pages/Workout';
-
+import RunPage from './pages/RunPage';
 const App = () => {
   return (
     <Router>
@@ -51,6 +51,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <Sports />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/runs"
+            element={
+              <ProtectedRoute>
+                <RunPage />
               </ProtectedRoute>
             }
           />

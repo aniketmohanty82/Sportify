@@ -13,6 +13,7 @@ router.post(
   [
     check('duration', 'Duration is required and should be a positive number').isInt({ min: 1 }),
     check('distance', 'Distance is required and should be a positive number').isFloat({ min: 0.1 }),
+    check('date', 'Date is required and should be a valid date').not().isEmpty(), // Add validation for date
   ],
   auth,
   async (req, res) => {
@@ -21,14 +22,14 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { duration, distance, userId } = req.body;
+    const { duration, distance, userId, date } = req.body; // Include date from the request body
 
     try {
       const newRun = new Run({
         userId,
         duration,
         distance,
-        date: new Date(),
+        date: new Date(date), // Use the date provided in the request
       });
 
       const run = await newRun.save();
@@ -68,7 +69,7 @@ router.put(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
+    
     const { duration, distance } = req.body;
 
     try {

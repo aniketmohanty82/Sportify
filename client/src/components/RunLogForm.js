@@ -27,7 +27,7 @@ const RunLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
         userId: localStorage.getItem('userId'),
         duration: Number(duration),
         distance: Number(distance),
-        date: new Date(date), // Use the date provided in the form
+        date: date
       });
       reset();
       onClose();

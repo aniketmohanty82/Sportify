@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import '../RunLogForm.css'; // Use your CSS file for styling
+import '../RunLogForm.css';
+import ConfirmDeleteRunModal from '../components/ConfirmDeleteRunModal';
 
 const EditRunModal = ({ isOpen, onClose, run, onSubmit, onDelete }) => {
   const [formData, setFormData] = useState({ date: '', duration: '', distance: '' });
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false); // Control for delete confirmation modal
 
   useEffect(() => {
     if (run) {
       setFormData({
-        date: new Date(run.date).toISOString().split('T')[0], // Format date as YYYY-MM-DD
+        date: new Date(run.date).toISOString().split('T')[0],
         duration: run.duration,
         distance: run.distance,
       });
@@ -26,7 +28,7 @@ const EditRunModal = ({ isOpen, onClose, run, onSubmit, onDelete }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({ ...formData, _id: run._id });
   };
 
   return (
@@ -78,8 +80,28 @@ const EditRunModal = ({ isOpen, onClose, run, onSubmit, onDelete }) => {
           </div>
           <button type="submit" className="btn">Save Changes</button>
           <button type="button" onClick={onClose} className="btn">Cancel</button>
-          <button type="button" onClick={onDelete} className="btn">Delete Run</button>
+          <button
+            type="button"
+            onClick={() => setIsConfirmDeleteOpen(true)} // Open the confirm delete modal
+            className="btn"
+          >
+            Delete Run
+          </button>
         </form>
+
+        <ConfirmDeleteRunModal
+          isOpen={isConfirmDeleteOpen}
+          onClose={() => setIsConfirmDeleteOpen(false)}
+          onConfirm={() => {
+            if (typeof onDelete === 'function') {
+              onDelete(run._id); // Calls delete function if it’s defined correctly
+              setIsConfirmDeleteOpen(false);
+              onClose(); // Close edit modal after deletion
+            } else {
+              console.error("onDelete is not a function");
+            }
+          }}
+        />
       </div>
     </div>
   );

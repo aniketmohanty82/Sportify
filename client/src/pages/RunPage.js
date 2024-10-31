@@ -82,7 +82,7 @@ const RunPage = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:5001/api/runs/${updatedRun._id}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
         body: JSON.stringify(updatedRun),
       });
@@ -92,7 +92,7 @@ const RunPage = () => {
         throw new Error(`Error updating run: ${errorText}`);
       }
 
-      fetchRuns();
+      fetchRuns(); // Refresh data after successful edit
       setIsEditModalOpen(false);
     } catch (error) {
       console.error('Error updating run:', error.message);
@@ -100,27 +100,27 @@ const RunPage = () => {
     }
   };
 
-  // Delete a run
   const deleteRun = async (runId) => {
+    console.log("Attempting to delete run with ID:", runId); // Check if the correct ID is being passed
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:5001/api/runs/${runId}`, {
         method: 'DELETE',
         headers: { 'x-auth-token': token },
       });
-
+  
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error deleting run: ${errorText}`);
       }
-
-      fetchRuns();
-      setIsDeleteModalOpen(false);
+  
+      fetchRuns(); // Refresh the list of runs
+      setIsEditModalOpen(false); // Close the edit modal after deletion
     } catch (error) {
       console.error('Error deleting run:', error.message);
       alert(error.message);
     }
-  };
+  };  
 
   useEffect(() => {
     fetchRuns();
@@ -161,22 +161,24 @@ const RunPage = () => {
         </button>
       </div>
 
-      {/* Time Frame Selector */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-        <select value={timeFrame} onChange={(e) => setTimeFrame(e.target.value)} style={{ padding: '10px', fontSize: '16px', borderRadius: '5px' }}>
-          <option value="week">Past Week</option>
-          <option value="month">Past Month</option>
-          <option value="all">All Time</option>
-        </select>
-      </div>
-
-      {/* Graphs Section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
-        <div style={{ flex: 1 }}>
-          <RunDistanceChart runs={filteredRuns} />
+      <div style={{ padding: '20px', borderRadius: '15px', backgroundColor: '#f9f9f9', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
+        {/* Time Frame Selector */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+          <select value={timeFrame} onChange={(e) => setTimeFrame(e.target.value)} style={{ padding: '10px', fontSize: '16px', borderRadius: '5px' }}>
+            <option value="week">Past Week</option>
+            <option value="month">Past Month</option>
+            <option value="all">All Time</option>
+          </select>
         </div>
-        <div style={{ flex: 1 }}>
-          <SpeedGraph runs={filteredRuns} />
+
+        {/* Graphs Section */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
+          <div style={{ flex: 1 }}>
+            <RunDistanceChart runs={filteredRuns} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <SpeedGraph runs={filteredRuns} />
+          </div>
         </div>
       </div>
 
@@ -218,7 +220,7 @@ const RunPage = () => {
 
       {/* Modals */}
       <RunLogForm isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={logRun} />
-      <EditRunModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} onSubmit={editRun} run={currentRun} />
+      <EditRunModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} onSubmit={editRun} onDelete={deleteRun} run={currentRun} />
       <ConfirmDeleteRunModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} onConfirm={() => deleteRun(currentRun._id)} />
     </div>
   );

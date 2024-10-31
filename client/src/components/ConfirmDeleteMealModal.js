@@ -1,4 +1,5 @@
 import React from 'react';
+import '../MealLogForm.css'; // Use your CSS file for styling
 
 const ConfirmDeleteMealModal = ({ isOpen, onClose, onConfirm, mealName }) => {
   if (!isOpen) return null;

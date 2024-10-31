@@ -1,5 +1,6 @@
 import React from 'react';
-import '../RunLogForm.css'; // Use your CSS file for styling
+import '../MealLogForm.css'; 
+
 
 const ConfirmDeleteRunModal = ({ isOpen, onClose, onConfirm }) => {
   

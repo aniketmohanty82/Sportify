@@ -71,6 +71,7 @@ const Settings = () => {
 
       const data = await response.json();
       setDarkMode(data.darkMode);
+      console.log(darkMode)
     } catch (error) {
       console.error('Error fetching dark mode setting:', error);
     }
@@ -79,11 +80,13 @@ const Settings = () => {
   const toggleDarkMode = async () => {
     try {
       // Toggle dark mode locally
+      console.log(darkMode)
       const updatedDarkMode = !darkMode; // Toggle from the previous state
       setDarkMode(updatedDarkMode)
+      console.log(updatedDarkMode)
 
       // Save the updated dark mode setting on the server
-      await fetch(`http://localhost:5001/users/update-darkMode`, {
+      fetch(`http://localhost:5001/users/update-darkMode`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -304,7 +304,7 @@ router.put('/update-darkMode', async (req, res) => {
   try {
     const { userId, darkMode } = req.body;
 
-    if (!userId || !darkMode) {
+    if (!userId) {
       return res.status(400).json({ message: 'Please provide userId and darkMode' });
     }
 

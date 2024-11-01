@@ -112,6 +112,10 @@ const Settings = () => {
   
       if (response.ok) {
         setMessage('Time zone updated successfully!');
+        console.log("before removal", localStorage.getItem('timeZone'))
+        localStorage.removeItem('timeZone')
+        localStorage.setItem('timeZone', timeZone)
+        console.log("after removal", localStorage.getItem('timeZone'))
         window.location.reload();
       } else {
         const errorData = await response.json();

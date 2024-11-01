@@ -9,6 +9,7 @@ import { Global, css } from '@emotion/react';
 
 
 const timezone = localStorage.getItem('timeZone');
+console.log(timezone)
 
 const vibrateKeyframe = (
   <Global
@@ -877,6 +878,8 @@ function Sports() {
 
   // Fetch Premier League games
   useEffect(() => {
+    const timezone = localStorage.getItem('timeZone');
+    console.log(timezone)
     fetch('http://localhost:5001/api/premier_league')
       .then(response => response.json())
       .then(data => setPremierLeagueGames(data))

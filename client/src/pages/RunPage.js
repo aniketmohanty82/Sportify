@@ -17,8 +17,32 @@ const RunPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
   const [timeFrame, setTimeFrame] = useState('week');
+  const [darkMode, setDarkMode] = useState(false);
+  const userId = localStorage.getItem('userId');
+  const token = localStorage.getItem('token');
 
-  const darkMode = true;
+  const fetchDarkModeSetting = async () => {
+    try {
+      const response = await fetch(`http://localhost:5001/users/darkMode?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token, // Include token if authentication is needed
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch dark mode setting');
+      }
+
+      const data = await response.json();
+      setDarkMode(data.darkMode);
+      console.log(darkMode)
+    } catch (error) {
+      console.error('Error fetching dark mode setting:', error);
+    }
+  };
+
 
   // Fetch runs data from the backend
   const fetchRuns = async () => {
@@ -126,6 +150,7 @@ const RunPage = () => {
 
   useEffect(() => {
     fetchRuns();
+    fetchDarkModeSetting()
   }, []);
 
   const filterRunsByTimeFrame = (runs, timeFrame) => {

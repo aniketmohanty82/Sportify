@@ -240,6 +240,7 @@ const RunPage = () => {
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         onSubmit={logRun}
+        darkMode={darkMode}
       />
       <EditRunModal
         isOpen={isEditModalOpen}

@@ -238,66 +238,78 @@ const Workout = () => {
     return filteredWorkouts.filter((w) => new Date(w.date) >= startDate);
   };
 
-  useEffect(() => {
-    if (selectedExercise) {
-      const filteredData = filterWorkouts(selectedExercise, timeframeProgress);
-      if (filteredData.length === 0) {
-        setChartData({ labels: [], datasets: [] });
-        return;
-      }
+  // Inside the component
 
-      // Calculate max reps for each weight
-      const weightRepsMap = {};
-      filteredData.forEach(({ weight, reps }) => {
-        if (!weightRepsMap[weight] || reps > weightRepsMap[weight]) {
-          weightRepsMap[weight] = reps;
-        }
-      });
-
-      const weights = Object.keys(weightRepsMap).map(Number).sort((a, b) => a - b);
-      const maxReps = weights.map((weight) => weightRepsMap[weight]);
-
-      setChartData({
-        labels: weights,
-        datasets: [
-          {
-            label: 'Max Reps at Each Weight',
-            data: maxReps,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderWidth: 2,
-            fill: false,
-            pointRadius: 5,
-          },
-        ],
-      });
+useEffect(() => {
+  if (selectedExercise) {
+    const filteredData = filterWorkouts(selectedExercise, timeframeProgress);
+    if (filteredData.length === 0) {
+      setChartData({ labels: [], datasets: [] });
+      return;
     }
-  }, [selectedExercise, timeframeProgress]);
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        title: { display: true, text: 'Weight (lbs)' },
-      },
-      y: {
-        title: { display: true, text: 'Max Reps' },
-        beginAtZero: true,
+    // Calculate max reps for each weight
+    const weightRepsMap = {};
+    filteredData.forEach(({ weight, reps }) => {
+      if (!weightRepsMap[weight] || reps > weightRepsMap[weight]) {
+        weightRepsMap[weight] = reps;
+      }
+    });
+
+    const weights = Object.keys(weightRepsMap).map(Number).sort((a, b) => a - b);
+    const maxReps = weights.map((weight) => weightRepsMap[weight]);
+
+    setChartData({
+      labels: weights,
+      datasets: [
+        {
+          label: 'Max Reps at Each Weight',
+          data: maxReps,
+          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderWidth: 2,
+          fill: false,
+          pointRadius: 5,
+        },
+      ],
+    });
+  }
+}, [selectedExercise, timeframeProgress]);
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: 'Weight (lbs)',
       },
     },
-    plugins: {
-      tooltip: {
-        callbacks: {
-          label: function (tooltipItem) {
-            const weight = tooltipItem.label;
-            const reps = tooltipItem.raw;
-            return `Weight: ${weight} lbs, Max Reps: ${reps}`;
-          },
+    y: {
+      title: {
+        display: true,
+        text: 'Max Reps',
+      },
+      beginAtZero: true,
+    },
+  },
+  plugins: {
+    tooltip: {
+      callbacks: {
+        label: function (tooltipItem) {
+          const weight = tooltipItem.label;
+          const reps = tooltipItem.raw;
+          return `Weight: ${weight} lbs, Reps: ${reps}`;
         },
       },
     },
-  };
+    title: {
+      display: true,
+      text: 'Max Reps at Each Weight',
+    },
+  },
+};
 
   const calculateWeeklyConsistency = (workouts) => {
     if (workouts.length === 0) return 0;
@@ -469,82 +481,67 @@ const Workout = () => {
       )}
     </div>
 
-      {/* Consistency Widget */}
-      <div style={{ padding: '20px', borderRadius: '15px', backgroundColor: '#f9f9f9', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', marginBottom: '20px' }}>
-      <h2 style={{ width: '100%', marginBottom: '15px' }}>Workout Consistency</h2>
-        {/* Consistency Metrics */}
-        <p style={{ fontSize: '18px', color: '#333' }}>Average Workouts per Week: {weeklyConsistency}</p>
-        <p style={{ fontSize: '18px', color: '#333' }}>Longest Streak (Weeks): {longestStreak}</p>
-        {workoutGaps.length > 0 && (
-          <div style={{ marginTop: '15px' }}>
-            <h3 style={{ fontSize: '16px', color: '#333', marginBottom: '10px' }}>Workout Gaps:</h3>
-            <ul>
-              {workoutGaps.map((gap, index) => (
-                <li key={index} style={{ fontSize: '14px', color: '#666' }}>
-                  {gap.start} - {gap.end}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        {/* Dropdown for selecting timeframe */}
-        <div style={{ marginTop: '20px', marginBottom: '20px' }}>
-          <label style={{ marginRight: '10px', fontSize: '18px' }}>Select Timeframe:</label>
-          <select value={timeframe} onChange={(e) => setTimeframe(e.target.value)} style={{ padding: '8px', fontSize: '16px' }}>
-            <option value="week">Last Week</option>
-            <option value="month">Last Month</option>
-          </select>
-        </div>
-
-        {/* Consistency Line Chart */}
-        <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '15px', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', marginBottom: '20px' }}>
-  <h2 style={{ textAlign: 'center', fontSize: '20px', marginBottom: '15px' }}>Workout Consistency Over Time</h2>
-  <Line data={consistencyData} options={{
-    consistencyOptions}} />
-</div>
-</div>
-
-        {/* Progress Widget */}
-        <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '15px', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', marginBottom: '20px' }}>
-  <h2 style={{ textAlign: 'center', fontSize: '20px', marginBottom: '15px' }}>Workout Progress</h2>
-  
-  {/* Exercise Selector */}
-  <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-    <label style={{ marginRight: '10px', fontSize: '18px' }}>Select Exercise:</label>
-    <select value={selectedExercise} onChange={(e) => setSelectedExercise(e.target.value)} style={{ padding: '8px', fontSize: '16px' }}>
-      {exerciseOptions.map((exercise) => (
-        <option key={exercise} value={exercise}>{exercise}</option>
-      ))}
-    </select>
-  </div>
-
-  {/* Timeframe Selector */}
-  <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-    <label style={{ marginRight: '10px', fontSize: '18px' }}>Select Timeframe:</label>
-    <select value={timeframeProgress} onChange={(e) => setTimeframeProgress(e.target.value)} style={{ padding: '8px', fontSize: '16px' }}>
-      <option value="month">Last Month</option>
-      <option value="3months">Last 3 Months</option>
-      <option value="6months">Last 6 Months</option>
-    </select>
-  </div>
-
-  {/* Line Chart for Max Reps at Each Weight */}
-  {chartData.labels.length > 0 ? (
-    <div style={{ padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '15px' }}>
-      <Line data={chartData} options={{
-        ...chartOptions,
-        plugins: {
-          ...chartOptions.plugins,
-          title: {
-            display: true,
-            text: 'Max Reps at Each Weight',
-          },
-        },
-      }} />
+    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+  {/* Consistency Widget */}
+  <div style={{ flex: '1', minWidth: '320px', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '15px', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', marginBottom: '20px' }}>
+  <h2 style={{ width: '100%', marginBottom: '15px' }}>Workout Consistency</h2>
+  <p style={{ fontSize: '16px', color: '#333', textAlign: 'center' }}>Average Workouts per Week: {weeklyConsistency}</p>
+    <p style={{ fontSize: '16px', color: '#333', textAlign: 'center' }}>Longest Streak (Weeks): {longestStreak}</p>
+    {workoutGaps.length > 0 && (
+      <div style={{ marginTop: '10px' }}>
+        <h3 style={{ fontSize: '15px', color: '#333', marginBottom: '5px' }}>Workout Gaps:</h3>
+        <ul style={{ paddingLeft: '15px', fontSize: '14px', color: '#666' }}>
+          {workoutGaps.map((gap, index) => (
+            <li key={index}>{gap.start} - {gap.end}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+    <div style={{ marginTop: '15px', marginBottom: '15px', textAlign: 'center' }}>
+      <label style={{ marginRight: '10px', fontSize: '16px' }}>Select Timeframe:</label>
+      <select value={timeframe} onChange={(e) => setTimeframe(e.target.value)} style={{ padding: '6px', fontSize: '14px' }}>
+        <option value="week">Last Week</option>
+        <option value="month">Last Month</option>
+      </select>
     </div>
-  ) : (
-    <p style={{ color: '#666', fontSize: '16px', textAlign: 'center' }}>More data is needed for meaningful visualization.</p>
-  )}
+    <div style={{ padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '15px', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
+      <Line data={consistencyData} options={consistencyOptions} />
+    </div>
+  </div>
+
+  {/* Progress Widget */}
+  <div style={{ flex: '1', minWidth: '320px', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '15px', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', marginBottom: '20px' }}>
+    <h2 style={{ width: '100%', marginBottom: '15px' }}>Workout Progress</h2>
+    <div style={{ marginBottom: '15px', textAlign: 'center' }}>
+      <label style={{ marginRight: '10px', fontSize: '16px' }}>Select Exercise:</label>
+      <select value={selectedExercise} onChange={(e) => setSelectedExercise(e.target.value)} style={{ padding: '6px', fontSize: '14px' }}>
+        {exerciseOptions.map((exercise) => (
+          <option key={exercise} value={exercise}>{exercise}</option>
+        ))}
+      </select>
+    </div>
+    <div style={{ marginBottom: '15px', textAlign: 'center' }}>
+      <label style={{ marginRight: '10px', fontSize: '16px' }}>Select Timeframe:</label>
+      <select value={timeframeProgress} onChange={(e) => setTimeframeProgress(e.target.value)} style={{ padding: '6px', fontSize: '14px' }}>
+        <option value="month">Last Month</option>
+        <option value="3months">Last 3 Months</option>
+        <option value="6months">Last 6 Months</option>
+      </select>
+    </div>
+    {chartData.labels.length > 0 ? (
+      <div style={{ padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '15px' }}>
+        <Line data={chartData} options={{
+          ...chartOptions,
+          plugins: {
+            ...chartOptions.plugins,
+            title: { display: true, text: 'Max Reps at Each Weight' },
+          },
+        }} />
+      </div>
+    ) : (
+      <p style={{ color: '#666', fontSize: '14px', textAlign: 'center' }}>More data is needed for meaningful visualization.</p>
+    )}
+  </div>
 </div>
 
       {/* Modal for adding workouts */}

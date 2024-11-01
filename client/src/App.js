@@ -33,7 +33,7 @@ const AppContent = () => {
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div style={{ display: 'flex', backgroundColor: 'black' }}>
       {!shouldHideNavbar && <Navbar />}
       <div style={{ flex: 1, padding: '20px' }}>
         <Routes>

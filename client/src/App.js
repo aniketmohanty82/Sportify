@@ -1,3 +1,5 @@
+// src/App.js
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
@@ -11,6 +13,8 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import Workout from './pages/Workout';
+import EditAccount from './pages/EditAccount';
+import AccountDeleted from './pages/AccountDeleted'; // Import the AccountDeleted component
 
 const App = () => {
   return (
@@ -23,7 +27,7 @@ const App = () => {
 const AppContent = () => {
   const location = useLocation();
 
-  const hideNavbarPaths = ['/login', '/register'];
+  const hideNavbarPaths = ['/login', '/register', '/account-deleted'];
 
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
 
@@ -64,6 +68,18 @@ const AppContent = () => {
                 <Workout />
               </ProtectedRoute>
             }
+          />
+          <Route
+            path="/edit-account"
+            element={
+              <ProtectedRoute>
+                <EditAccount />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/account-deleted" // Added route for account deletion confirmation
+            element={<AccountDeleted />}
           />
           <Route path="/login" element={<LogIn />} />
           <Route path="/register" element={<Registration />} />

@@ -1,3 +1,5 @@
+// middleware/auth.js
+
 const jwt = require('jsonwebtoken');
 
 function auth(req, res, next) {

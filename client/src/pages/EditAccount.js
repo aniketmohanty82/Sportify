@@ -1,6 +1,9 @@
+// src/pages/EditAccount.js
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import '../EditAccount.css'; // Import the CSS file
 
 const EditAccount = () => {
   const navigate = useNavigate();
@@ -17,6 +20,7 @@ const EditAccount = () => {
   const userId = localStorage.getItem('userId');
 
   useEffect(() => {
+    // Fetch current user data
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -28,7 +32,6 @@ const EditAccount = () => {
         setUserData(res.data);
       } catch (err) {
         console.error(err);
-        // Handle unauthorized access
         if (err.response.status === 401) {
           navigate('/login');
         }
@@ -56,7 +59,7 @@ const EditAccount = () => {
   };
 
   const handleCancel = () => {
-    navigate('/');
+    navigate('/settings'); // Assuming the profile page is '/settings'
   };
 
   const handleSubmit = async (e) => {
@@ -141,6 +144,7 @@ const EditAccount = () => {
             <p className="error-message">{errors.email}</p>
           )}
         </div>
+
         <div className="form-buttons">
           <button type="submit">Save Changes</button>
           <button type="button" onClick={handleCancel} className="cancel-button">

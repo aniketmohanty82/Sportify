@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const auth = require('../middleware/auth');
 
 const { OAuth2Client } = require('google-auth-library');
 
@@ -195,6 +196,64 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Update User Details
+router.put('/update/:id', auth, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const { firstName, lastName, username, email } = req.body;
+
+    // Validate input
+    if (!firstName || !lastName || !username || !email) {
+      return res.status(400).json({ message: 'Please enter all required fields' });
+    }
+
+    // Validate email format
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: 'Invalid email format' });
+    }
+
+    // Check if the username or email is already taken by another user
+    const existingUser = await User.findOne({
+      $or: [{ username }, { email }],
+      _id: { $ne: userId },
+    });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Username or email already in use' });
+    }
+
+    // Find the user by ID and update
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update user fields
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.username = username;
+    user.email = email;
+
+    await user.save();
+
+    res.status(200).json({
+      message: 'Account updated successfully',
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email,
+        timezone: user.timezone,
+      },
+    });
+  } catch (err) {
+    console.error('Error updating user:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 router.put('/update-timezone', async (req, res) => {
   try {
     const { userId, timezone } = req.body;
@@ -294,6 +353,56 @@ router.post('/google-login', async (req, res) => {
   } catch (error) {
     console.error('Error during Google authentication:', error);
     res.status(401).json({ message: 'Google authentication failed' });
+  }
+});
+
+router.get('/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Fetch user data by ID
+    const user = await User.findById(userId).select('-password'); // Exclude password for security
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return the user data
+    res.json({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      email: user.email,
+      timezone: user.timezone,
+    });
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.delete('/:userId', auth, async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Check if the authenticated user matches the user to be deleted
+    if (req.user.id !== userId) {
+      return res.status(403).json({ message: 'Unauthorized action' });
+    }
+
+    // Find and delete the user
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Optionally delete associated data (e.g., posts, comments)
+    // await AssociatedModel.deleteMany({ userId });
+
+    res.status(200).json({ message: 'Account deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

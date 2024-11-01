@@ -17,7 +17,7 @@ const Settings = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const userId = localStorage.getItem('userId');
-  const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(false);
 
@@ -30,7 +30,7 @@ const Settings = () => {
       try {
         const response = await fetch(`http://localhost:5001/users/${userId}`, {
           headers: {
-            'x-auth-token': token, // Include the token in headers
+            'x-auth-token': token,
           },
         });
         const data = await response.json();
@@ -102,13 +102,14 @@ const Settings = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'x-auth-token': token, // Include the token
+          'x-auth-token': token,
         },
         body: JSON.stringify({ userId, timezone: timeZone }),
       });
-
+  
       if (response.ok) {
         setMessage('Time zone updated successfully!');
+        window.location.reload();
       } else {
         const errorData = await response.json();
         setError(errorData.message || 'Failed to update timezone');
@@ -128,7 +129,6 @@ const Settings = () => {
     navigate('/edit-account');
   };
 
-  // Functions to handle the delete account process with a modal
   const handleDeleteAccountClick = () => {
     setShowModal(true);
   };
@@ -139,16 +139,14 @@ const Settings = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'x-auth-token': token, // Include the token in headers
+          'x-auth-token': token,
         },
       });
 
       if (response.ok) {
-        // Clear any user-related data
         localStorage.removeItem('userId');
-        localStorage.removeItem('token'); // Remove token as well
-        // Redirect to a confirmation page
-        navigate('/account-deleted'); // Ensure this route exists
+        localStorage.removeItem('token');
+        navigate('/account-deleted');
       } else {
         const data = await response.json();
         setError(data.message || 'Failed to delete account');
@@ -165,7 +163,6 @@ const Settings = () => {
     setShowModal(false);
   };
 
-  // Available time zones
   const timeZones = [
     'UTC',
     'America/New_York',
@@ -173,16 +170,15 @@ const Settings = () => {
     'Europe/London',
     'Asia/Tokyo',
     'Australia/Sydney',
-    'Africa/Cairo', // Add more as needed
+    'Africa/Cairo',
   ];
 
   return (
-    <div className="settings-container">
-      <h2>{darkMode ? "Account Settings" : null}</h2>
+    <div className={`settings-container ${darkMode ? 'dark-mode' : ''}`}>
+      <h2>Account Settings</h2>
       {message && <p className="success-message">{message}</p>}
       {error && <p className="error-message">{error}</p>}
 
-      {/* Profile Information Section */}
       <div className="profile-info">
         <h3>Profile Information</h3>
         <div className="profile-item">
@@ -241,14 +237,14 @@ const Settings = () => {
             ))}
           </select>
           <button
-            type="button" /* Added to prevent default form submission */
+            type="button"
             onClick={() => handleTimeZoneSave(userTimeZone)}
             className="button save-button"
           >
             Save
           </button>
           <button
-            type="button" /* Added to prevent default form submission */
+            type="button"
             onClick={handleCancel}
             className="button cancel-button"
           >
@@ -257,17 +253,16 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* Edit and Delete Account Buttons */}
       <div className="edit-delete-buttons">
         <button
-          type="button" /* Added to prevent default form submission */
+          type="button"
           onClick={handleEditAccount}
           className="button edit-account"
         >
           Edit Account
         </button>
         <button
-          type="button" /* Added to prevent default form submission */
+          type="button"
           onClick={handleDeleteAccountClick}
           className="button delete-account"
         >
@@ -275,7 +270,6 @@ const Settings = () => {
         </button>
       </div>
 
-      {/* Confirmation Modal */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
@@ -286,14 +280,14 @@ const Settings = () => {
             </p>
             <div className="modal-buttons">
               <button
-                type="button" /* Added to prevent default form submission */
+                type="button"
                 onClick={handleConfirmDelete}
                 className="button delete-account"
               >
                 Yes, Delete
               </button>
               <button
-                type="button" /* Added to prevent default form submission */
+                type="button"
                 onClick={handleCancelDelete}
                 className="button cancel-button"
               >

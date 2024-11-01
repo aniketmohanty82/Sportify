@@ -18,6 +18,8 @@ const RunPage = () => {
   const [fetchError, setFetchError] = useState(null);
   const [timeFrame, setTimeFrame] = useState('week');
 
+  const darkMode = true;
+
   // Fetch runs data from the backend
   const fetchRuns = async () => {
     setIsLoading(true);
@@ -147,24 +149,30 @@ const RunPage = () => {
   const filteredRuns = filterRunsByTimeFrame(runs, timeFrame);
 
   return (
-    <div className="tracker-page">
+    <div className={`tracker-page ${darkMode ? 'dark-mode' : ''}`}>
       {/* Date and Add Run Button */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '10px 20px', borderRadius: '15px', backgroundColor: '#f9f9f9', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
-        <h2 style={{ fontSize: '24px', color: '#333', fontFamily: 'Open Sans, sans-serif' }}>{new Date().toLocaleDateString()}</h2>
+      <div className="header-section">
+        <h2 className="current-date">{new Date().toLocaleDateString()}</h2>
         <button
           title="Add New"
           onClick={() => setIsFormOpen(true)}
-          style={{ backgroundColor: '#1aa64b', color: '#fff', padding: '10px 15px', borderRadius: '10px', border: 'none', fontSize: '16px', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}
+          className="add-run-button"
         >
           <AiOutlinePlus size={24} />
-          <span style={{ marginLeft: '8px' }}>Add a run</span>
+          <span>Add a run</span>
         </button>
       </div>
 
-      <div style={{ padding: '10px 20px', marginBottom: '20px', borderRadius: '15px', backgroundColor: '#f9f9f9', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
+      {/* Graph Container */}
+      <div className="graph-container">
         {/* Time Frame Selector */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-          <select value={timeFrame} onChange={(e) => setTimeFrame(e.target.value)} style={{ padding: '10px', fontSize: '16px', borderRadius: '5px' }}>
+        <div className="time-frame-selector">
+          <label htmlFor="timeFrame">Select Time Frame:</label>
+          <select
+            id="timeFrame"
+            value={timeFrame}
+            onChange={(e) => setTimeFrame(e.target.value)}
+          >
             <option value="week">Past Week</option>
             <option value="month">Past Month</option>
             <option value="all">All Time</option>
@@ -172,37 +180,44 @@ const RunPage = () => {
         </div>
 
         {/* Graphs Section */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginBottom: '20px' }}>
-          <div style={{ flex: 1 }}>
-            <RunDistanceChart runs={filteredRuns} />
+        <div className="graphs-section">
+          <div className="graph">
+            <RunDistanceChart runs={filteredRuns} darkMode={darkMode} />
           </div>
-          <div style={{ flex: 1 }}>
-            <SpeedGraph runs={filteredRuns} />
+          <div className="graph">
+            <SpeedGraph runs={filteredRuns} darkMode={darkMode} />
           </div>
         </div>
       </div>
 
       {/* Run Logs Table */}
-      <div style={{ padding: '20px', borderRadius: '15px', backgroundColor: '#f9f9f9', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
-        <h2 style={{ marginBottom: '10px' }}>Run Logs</h2>
-        
+      <div className="run-logs-section">
+        <h2>Run Logs</h2>
+
         {isLoading ? (
           <p>Loading runs...</p>
         ) : fetchError ? (
-          <p style={{ color: 'red' }}>{fetchError}</p>
+          <p className="error-message">{fetchError}</p>
         ) : (
-          <table className="run-table" style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+          <table className="run-table">
             <thead>
-              <tr style={{ borderBottom: '1px solid #ddd' }}>
-                <th style={{ padding: '10px' }}>Date</th>
-                <th style={{ padding: '10px' }}>Duration (min)</th>
-                <th style={{ padding: '10px' }}>Distance (km)</th>
+              <tr>
+                <th>Date</th>
+                <th>Duration (min)</th>
+                <th>Distance (km)</th>
               </tr>
             </thead>
             <tbody>
               {runs.length > 0 ? (
                 runs.map((run) => (
-                  <tr key={run._id} onClick={() => { setCurrentRun(run); setIsEditModalOpen(true); }} style={{ cursor: 'pointer', transition: 'background-color 0.3s', padding: '10px' }}>
+                  <tr
+                    key={run._id}
+                    className="run-row"
+                    onClick={() => {
+                      setCurrentRun(run);
+                      setIsEditModalOpen(true);
+                    }}
+                  >
                     <td>{new Date(run.date).toLocaleDateString()}</td>
                     <td>{run.duration}</td>
                     <td>{run.distance}</td>
@@ -210,7 +225,9 @@ const RunPage = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3" style={{ textAlign: 'center', padding: '10px' }}>No runs logged yet</td>
+                  <td colSpan="3" style={{ textAlign: 'center' }}>
+                    No runs logged yet
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -219,9 +236,24 @@ const RunPage = () => {
       </div>
 
       {/* Modals */}
-      <RunLogForm isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={logRun} />
-      <EditRunModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} onSubmit={editRun} onDelete={deleteRun} run={currentRun} />
-      <ConfirmDeleteRunModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} onConfirm={() => deleteRun(currentRun._id)} />
+      <RunLogForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={logRun}
+        darkMode={darkMode}
+      />
+      <EditRunModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSubmit={editRun}
+        onDelete={deleteRun}
+        run={currentRun}
+      />
+      <ConfirmDeleteRunModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => deleteRun(currentRun._id)}
+      />
     </div>
   );
 };

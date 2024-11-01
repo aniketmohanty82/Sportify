@@ -9,75 +9,63 @@ const Field = ({ label, id, ...rest }) => (
   </div>
 );
 
-const Select = ({ label, id, children, ...rest }) => (
-  <div className="form-field">
-    <label htmlFor={id}>{label}</label>
-    <select id={id} className="select" {...rest}>
-      {children}
-    </select>
-  </div>
-);
-
 const WorkoutLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
   const { form, reset } = useForm({
     defaultValues: {
       exercise: '',
       sets: '',
       reps: '',
-      workoutCategory: '',
+      weight: '',
     },
     onSubmit: async (values) => {
-      const { exercise, sets, reps, workoutCategory } = values;
-
+      const { exercise, sets, reps, weight } = values;
+    
       if (!exercise) {
         alert('Please enter an exercise.');
         return;
       }
-
-      if (sets <= 0) {
-        alert('Please enter the number of sets.');
+    
+      if (Number(sets) <= 0) { 
+        alert('Please enter a valid number of sets.');
+        return;
+      }
+    
+      if (Number(reps) <= 0) { 
+        alert('Please enter a valid number of reps.');
         return;
       }
 
-      if (reps <= 0) {
-        alert('Please enter the number of reps.');
+      if (Number(weight) <= 0) { 
+        alert('Please enter a valid weight.');
         return;
       }
-
-      if (!workoutCategory) {
-        alert('Please choose the workout category.');
-        return;
-      }
-
+    
       try {
-        // Submit the form data to the backend or handle it appropriately
         onSubmit({
           userId: localStorage.getItem('userId'),
           exercise,
-          sets,
-          reps,
-          workoutCategory,
+          sets: Number(sets),
+          reps: Number(reps),
+          weight,
           date: new Date(),
         });
-
-        // Clear the form after submission
+    
         reset();
-        onClose(); // Close the modal after submission
+        onClose();
       } catch (error) {
         console.error('Error submitting workout log:', error);
         onError();
       }
-    },
+    },    
   });
 
   useEffect(() => {
     if (!isOpen) {
-      // Reset the component state when closed
       reset();
     }
   }, [isOpen, reset]);
 
-  if (!isOpen) return null; // Render nothing if the modal is not open
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -95,7 +83,7 @@ const WorkoutLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
             id="sets"
             name="sets"
             type="number"
-            min="1" // Prevents negative values
+            min="1"
             placeholder="Enter number of sets..."
           />
           <Field
@@ -103,17 +91,19 @@ const WorkoutLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
             id="reps"
             name="reps"
             type="number"
-            min="1" // Prevents negative values
+            min="1"
             placeholder="Enter number of reps..."
           />
-          <Select label="Workout Category" id="workoutCategory" name="workoutCategory">
-            <option value="">Select Workout Category</option>
-            <option value="Strength Training">Strength Training</option>
-            <option value="Cardio">Cardio</option>
-            <option value="Flexibility">Flexibility</option>
-            <option value="Balance">Balance</option>
-          </Select>
-          <button type="submit" className="btn">Log Workout</button>
+          <Field
+            label="Weight (lbs)"
+            id="weight"
+            name="weight"
+            type="number"
+            min="1"
+            placeholder="Enter weight..."
+          />
+
+          <button type="submit" className="btn">Log Exercise</button>
         </form>
       </div>
     </div>

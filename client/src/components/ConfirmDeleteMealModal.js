@@ -1,6 +1,7 @@
 import React from 'react';
+import '../MealLogForm.css'; // Use your CSS file for styling
 
-const ConfirmDeleteModal = ({ isOpen, onClose, onConfirm, mealName }) => {
+const ConfirmDeleteMealModal = ({ isOpen, onClose, onConfirm, mealName }) => {
   if (!isOpen) return null;
 
   return (
@@ -15,4 +16,4 @@ const ConfirmDeleteModal = ({ isOpen, onClose, onConfirm, mealName }) => {
   );
 };
 
-export default ConfirmDeleteModal;
+export default ConfirmDeleteMealModal;

@@ -917,15 +917,19 @@ const chartOptions = {
   
       {/* Today's Workout */}
       <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '16px', padding: '20px', borderRadius: '15px', backgroundColor: '#f9f9f9', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', marginBottom: '20px' }}>
-        {Object.keys(groupedWorkouts).map((exerciseName) =>
-          groupedWorkouts[exerciseName].map((log, index) => (
-            <div key={`${exerciseName}-${index}`} style={{ backgroundColor: '#e0f7e0', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)', padding: '15px', width: 'calc(25% - 16px)', minWidth: '200px', transition: 'transform 0.2s ease', textAlign: 'center', margin: '10px 0' }} onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.02)')} onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}>
-              <h3 style={{ fontSize: '18px', color: '#2b2b2b', marginBottom: '8px', fontWeight: 'bold', textTransform: 'capitalize' }}>{exerciseName}</h3>
-              <p><span style={{ fontWeight: 'bold', color: '#333' }}>Sets:</span> {log.sets}</p>
-              <p><span style={{ fontWeight: 'bold', color: '#333' }}>Reps:</span> {log.reps}</p>
-              <p><span style={{ fontWeight: 'bold', color: '#333' }}>Weight:</span> {log.weight} lbs</p>
-            </div>
-          ))
+        {Object.keys(groupedWorkouts).length > 0 ? (
+          Object.keys(groupedWorkouts).map((exerciseName) =>
+            groupedWorkouts[exerciseName].map((log, index) => (
+              <div key={`${exerciseName}-${index}`} style={{ backgroundColor: '#e0f7e0', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)', padding: '15px', width: 'calc(25% - 16px)', minWidth: '200px', transition: 'transform 0.2s ease', textAlign: 'center', margin: '10px 0' }} onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.02)')} onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}>
+                <h3 style={{ fontSize: '18px', color: '#2b2b2b', marginBottom: '8px', fontWeight: 'bold', textTransform: 'capitalize' }}>{exerciseName}</h3>
+                <p><span style={{ fontWeight: 'bold', color: '#333' }}>Sets:</span> {log.sets}</p>
+                <p><span style={{ fontWeight: 'bold', color: '#333' }}>Reps:</span> {log.reps}</p>
+                <p><span style={{ fontWeight: 'bold', color: '#333' }}>Weight:</span> {log.weight} lbs</p>
+              </div>
+            ))
+          )
+        ) : (
+          <p style={{ color: 'red', fontSize: '16px', textAlign: 'center' }}>No workout data available for today</p>
         )}
       </div>
   
@@ -1008,42 +1012,22 @@ const chartOptions = {
           </div>
         </div>
 
-        {/* Cards Row */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center' }}>
-          {selectedDate && groupedWorkouts2[selectedDate].map((log, index) => (
-            <div key={index} style={{ backgroundColor: '#e0f7e0', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)', padding: '15px', width: 'calc(25% - 16px)', minWidth: '200px', transition: 'transform 0.2s ease', textAlign: 'center' }} onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.02)')} onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}>
-              <p style={{ fontWeight: 'bold', fontSize: '18px', color: '#2b2b2b', marginBottom: '8px' }}>{log.exercise}</p>
+        {/* Cards Row or No Data Message */}
+        {selectedDate && groupedWorkouts2[selectedDate]?.length > 0 ? (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center' }}>
+            {groupedWorkouts2[selectedDate].map((log, index) => (
+              <div key={index} style={{ backgroundColor: '#e0f7e0', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)', padding: '15px', width: 'calc(25% - 16px)', minWidth: '200px', transition: 'transform 0.2s ease', textAlign: 'center' }} onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.02)')} onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}>
+                <p style={{ fontWeight: 'bold', fontSize: '18px', color: '#2b2b2b', marginBottom: '8px' }}>{log.exercise}</p>
                 <p><span style={{ fontWeight: 'bold', color: '#333' }}>Sets:</span> {log.sets}</p>
                 <p><span style={{ fontWeight: 'bold', color: '#333' }}>Reps:</span> {log.reps}</p>
                 <p><span style={{ fontWeight: 'bold', color: '#333' }}>Weight:</span> {log.weight} lbs</p>
               </div>
             ))}
           </div>
-        </div>
-
-      {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', borderRadius: '15px', backgroundColor: '#f9f9f9', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', marginBottom: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '15px' }}>
-          <h2 style={{ fontSize: '24px', color: '#333' }}>Workout History</h2>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <label style={{ fontSize: '16px', color: '#555', marginRight: '8px' }}>Select Date:</label>
-            <select onChange={(e) => setSelectedDate(e.target.value)} value={selectedDate} style={{ padding: '8px', fontSize: '16px', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#fff', transition: 'background-color 0.3s ease' }} onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')} onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#fff')}>
-              {Object.keys(groupedWorkouts2).map((date) => (
-                <option key={date} value={date}>{date}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center' }}>
-          {selectedDate && groupedWorkouts2[selectedDate].map((log, index) => (
-            <div key={index} style={{ backgroundColor: '#e0f7e0', borderRadius: '8px', boxShadow: '0 1px 6px rgba(0, 0, 0, 0.1)', padding: '15px', width: 'calc(25% - 16px)', minWidth: '200px', transition: 'transform 0.2s ease', textAlign: 'center' }} onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.02)')} onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}>
-              <p style={{ fontWeight: 'bold', fontSize: '18px', color: '#2b2b2b', marginBottom: '8px' }}>{log.exercise}</p>
-              <p><span style={{ fontWeight: 'bold', color: '#333' }}>Sets:</span> {log.sets}</p>
-              <p><span style={{ fontWeight: 'bold', color: '#333' }}>Reps:</span> {log.reps}</p>
-              <p><span style={{ fontWeight: 'bold', color: '#333' }}>Weight:</span> {log.weight} lbs</p>
-            </div>
-          ))}
-        </div>
-      </div> */}
+        ) : (
+          <p style={{ color: 'red', fontSize: '16px', textAlign: 'center' }}>No workout data available for the selected date</p>
+        )}
+      </div>
   
       {/* Modal for adding workouts */}
       <WorkoutLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleWorkoutSubmit} />

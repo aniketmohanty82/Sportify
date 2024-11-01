@@ -1,4 +1,4 @@
-// App.js
+// src/App.js
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
@@ -8,12 +8,15 @@ import Navbar from './components/Navbar';
 import LogIn from './pages/LogIn';
 import Registration from './pages/Registration';
 import Sports from './pages/Sports';
-import ProtectedRoute from './components/ProtectedRoute'; // Import the ProtectedRoute component
+import ProtectedRoute from './components/ProtectedRoute';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import Workout from './pages/Workout';
 import RunPage from './pages/RunPage';
+import EditAccount from './pages/EditAccount';
+import AccountDeleted from './pages/AccountDeleted'; // Import the AccountDeleted component
+
 const App = () => {
   return (
     <Router>
@@ -25,10 +28,8 @@ const App = () => {
 const AppContent = () => {
   const location = useLocation();
 
-  // Define paths where the Navbar should be hidden
-  const hideNavbarPaths = ['/login', '/register'];
+  const hideNavbarPaths = ['/login', '/register', '/account-deleted'];
 
-  // Check if the current path is in the hideNavbarPaths array
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
 
   return (
@@ -37,7 +38,6 @@ const AppContent = () => {
       <div style={{ flex: 1, padding: '20px' }}>
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* Protect the /tracker route */}
           <Route
             path="/tracker"
             element={
@@ -78,11 +78,22 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/edit-account"
+            element={
+              <ProtectedRoute>
+                <EditAccount />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/account-deleted" // Added route for account deletion confirmation
+            element={<AccountDeleted />}
+          />
           <Route path="/login" element={<LogIn />} />
           <Route path="/register" element={<Registration />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          {/* Add more routes here */}
         </Routes>
       </div>
     </div>

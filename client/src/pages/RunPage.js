@@ -150,7 +150,7 @@ const RunPage = () => {
 
   useEffect(() => {
     fetchRuns();
-    //fetchDarkModeSetting()
+    fetchDarkModeSetting()
   }, []);
 
   const filterRunsByTimeFrame = (runs, timeFrame) => {

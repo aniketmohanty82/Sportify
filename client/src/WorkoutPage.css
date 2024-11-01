@@ -1,100 +1,177 @@
+/* Workout Page */
 .workout-page {
-    padding: 20px;
-    text-align: center;
-  }
-  
-  .workout-page-title {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  .open-modal-btn {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .open-modal-btn:hover {
-    background-color: #45a049;
-  }
-  
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 300px;
-  }
-  
-  .title {
-    margin-bottom: 20px;
-  }
-  
-  .form-field {
-    margin-bottom: 15px;
-  }
-  
-  .input, .select {
-    width: 100%;
-    padding: 8px;
-    font-size: 16px;
-  }
-  
-  .btn {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-  }
-  
-  .btn:hover {
-    background-color: #45a049;
-  }
-  
-  .workout-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-  
-  .workout-table th, .workout-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-  
-  .workout-table th {
-    background-color: #f2f2f2;
-    text-align: left;
-  }
-  
-  .workout-row {
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .workout-row:hover {
-    background-color: #f0f0f0;
-  }
-  
-  .workout-table td {
-    padding: 8px;
-    text-align: left;
-  }
-  
+  padding: 20px;
+  text-align: center;
+}
+
+/* Modal Button */
+.open-modal-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.open-modal-btn:hover {
+  background-color: #45a049;
+  transform: scale(1.03);
+}
+
+/* Today's Workout Section */
+.todays-workout {
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.todays-workout h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Grid layout for Today's Workout Cards */
+.exercise-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
+/* Exercise Card */
+.exercise-card {
+  background-color: #e0f7e0; /* Light green for the cards */
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  width: calc(33.333% - 16px); /* 3 cards per row, adjustable for responsiveness */
+  min-width: 200px; /* Ensures a minimum width */
+  transition: transform 0.2s ease;
+}
+
+.exercise-card:hover {
+  transform: scale(1.02);
+}
+
+.exercise-card h3 {
+  font-size: 18px;
+  color: #2b2b2b;
+  margin-bottom: 8px;
+  font-weight: bold;
+  text-transform: capitalize;
+  text-align: center;
+}
+
+.exercise-details {
+  font-size: 15px;
+  color: #555;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.exercise-details span {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Workout History Section */
+.workout-history {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 15px;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 8px rgba(26, 166, 75, 0.4);
+  max-width: 800px;
+  margin: auto;
+}
+
+.workout-history h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.date-selection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.date-selection label {
+  font-size: 16px;
+  color: #555;
+  margin-right: 8px;
+}
+
+.date-selection select {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  transition: background-color 0.3s ease;
+}
+
+.date-selection select:hover {
+  background-color: #f9f9f9;
+}
+
+/* Grid layout for History Cards */
+.history-exercise-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
+/* History Exercise Card */
+.history-exercise-card {
+  background-color: #e0f7e0; /* Light green for history cards */
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  width: calc(33.333% - 16px); /* 3 cards per row, flexible */
+  min-width: 200px;
+  transition: transform 0.2s ease;
+}
+
+.history-exercise-card:hover {
+  transform: scale(1.02);
+}
+
+.history-exercise-card p {
+  margin: 4px 0;
+  line-height: 1.4;
+  font-size: 15px;
+  color: #333;
+  text-align: center;
+}
+
+.history-exercise-card .exercise-title {
+  font-weight: bold;
+  font-size: 18px;
+  color: #2b2b2b;
+}
+
+/* Dropdown Label */
+.dropdown-label {
+  font-size: 16px;
+  color: #555;
+  margin-right: 10px;
+}
+
+/* Modal improvements */
+.modal-content {
+  max-width: 400px;
+  width: 90%;
+  padding: 25px;
+}

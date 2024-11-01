@@ -15,45 +15,43 @@ const WorkoutLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
       exercise: '',
       sets: '',
       reps: '',
+      weight: '',
     },
     onSubmit: async (values) => {
-      const { exercise, sets, reps } = values;
+      const { exercise, sets, reps, weight } = values;
     
       if (!exercise) {
         alert('Please enter an exercise.');
         return;
       }
     
-      if (Number(sets) <= 0) { // Ensure sets is a number
+      if (Number(sets) <= 0) { 
         alert('Please enter a valid number of sets.');
         return;
       }
     
-      if (Number(reps) <= 0) { // Ensure reps is a number
+      if (Number(reps) <= 0) { 
         alert('Please enter a valid number of reps.');
+        return;
+      }
+
+      if (Number(weight) <= 0) { 
+        alert('Please enter a valid weight.');
         return;
       }
     
       try {
-        console.log('Form data prepared for submission:', {
+        onSubmit({
           userId: localStorage.getItem('userId'),
           exercise,
           sets: Number(sets),
           reps: Number(reps),
+          weight,
           date: new Date(),
         });
-        // Submit the form data to the backend or handle it appropriately
-        onSubmit({
-          userId: localStorage.getItem('userId'),
-          exercise,
-          sets: Number(sets), // Convert sets to a number
-          reps: Number(reps), // Convert reps to a number
-          date: new Date(), // Add the current date
-        });
     
-        // Clear the form after submission
         reset();
-        onClose(); // Close the modal after submission
+        onClose();
       } catch (error) {
         console.error('Error submitting workout log:', error);
         onError();
@@ -63,12 +61,11 @@ const WorkoutLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
 
   useEffect(() => {
     if (!isOpen) {
-      // Reset the component state when closed
       reset();
     }
   }, [isOpen, reset]);
 
-  if (!isOpen) return null; // Render nothing if the modal is not open
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -86,7 +83,7 @@ const WorkoutLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
             id="sets"
             name="sets"
             type="number"
-            min="1" // Prevent negative values
+            min="1"
             placeholder="Enter number of sets..."
           />
           <Field
@@ -94,10 +91,19 @@ const WorkoutLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
             id="reps"
             name="reps"
             type="number"
-            min="1" // Prevent negative values
+            min="1"
             placeholder="Enter number of reps..."
           />
-          <button type="submit" className="btn">Log Workout</button>
+          <Field
+            label="Weight (lbs)"
+            id="weight"
+            name="weight"
+            type="number"
+            min="1"
+            placeholder="Enter weight..."
+          />
+
+          <button type="submit" className="btn">Log Exercise</button>
         </form>
       </div>
     </div>

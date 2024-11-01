@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import { useNavigate } from 'react-router-dom'; 
-import '../HomePage.css'; // Ensure this CSS file has the necessary styles
+import { Paper, Box, Typography, Button } from '@mui/material';
+import { green } from '@mui/material/colors';
+import { useNavigate } from 'react-router-dom';
+import '../HomePage.css';
 
 const HomePage = () => {
   const [workouts, setWorkouts] = useState([]);
   const [totalCalories, setTotalCalories] = useState(0);
   const [mealLogs, setMealLogs] = useState([]);
-  const [dailyCalorieGoal, setDailyCalorieGoal] = useState(2500); // Adjust daily goal
+  const [dailyCalorieGoal, setDailyCalorieGoal] = useState(2500);
   const [caloriePercentage, setCaloriePercentage] = useState(0);
   const navigate = useNavigate();
 
@@ -18,9 +19,7 @@ const HomePage = () => {
         const token = localStorage.getItem('token');
         const response = await fetch('http://localhost:5001/api/workouts', {
           method: 'GET',
-          headers: {
-            'x-auth-token': token,
-          },
+          headers: { 'x-auth-token': token },
         });
 
         if (response.ok) {
@@ -38,9 +37,7 @@ const HomePage = () => {
       try {
         const token = localStorage.getItem('token');
         const response = await fetch('http://localhost:5001/api/meals', {
-          headers: {
-            'x-auth-token': token,
-          },
+          headers: { 'x-auth-token': token },
         });
 
         if (response.ok) {
@@ -62,15 +59,63 @@ const HomePage = () => {
   }, []);
 
   useEffect(() => {
-    calculateTotalCalories()
-  }, [mealLogs]); // This effect depends on mealLogs
+    calculateTotalCalories();
+  }, [mealLogs]);
 
   const calculateTotalCalories = () => {
-    console.log(mealLogs)
     const totalCalories = mealLogs.reduce((acc, meal) => acc + (meal.nutrients || 0), 0);
     const percentage = Math.min((totalCalories / dailyCalorieGoal) * 100, 100);
     setTotalCalories(totalCalories);
     setCaloriePercentage(percentage);
+  };
+
+  const premierLeagueGames = [
+    { teams: ['Manchester United', 'Chelsea'], scores: [2, 1] },
+    { teams: ['Liverpool', 'Arsenal'], scores: [1, 1] },
+  ];
+
+  const Nba = [
+    { teams: ['Spurs', 'Mavs'], scores: [100, 110] },
+    { teams: ['Bucks', 'Celtics'], scores: [80, 125] },
+  ];
+
+  const renderMatch = (game, index) => {
+    const winner = game.scores[0] > game.scores[1] ? game.teams[0] : game.scores[0] === game.scores[1] ? null : game.teams[1];
+    return (
+      <Paper key={index} elevation={3} sx={{ p: 1, m: 1, minWidth: '200px' }}>
+        <Typography variant="h6">Match {index + 1}</Typography>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography>{game.teams[0]}</Typography>
+          <Box display="flex" alignItems="center">
+            <Typography>{game.scores[0]}</Typography>
+            <Box
+              sx={{
+                bgcolor: game.teams[0] === winner ? green[500] : 'transparent',
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                ml: 1,
+              }}
+            />
+          </Box>
+        </Box>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography>{game.teams[1]}</Typography>
+          <Box display="flex" alignItems="center">
+            <Typography>{game.scores[1]}</Typography>
+            <Box
+              sx={{
+                bgcolor: game.teams[1] === winner ? green[500] : 'transparent',
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                ml: 1,
+              }}
+            />
+          </Box>
+        </Box>
+      </Paper>
+    );
   };
 
   return (
@@ -80,28 +125,50 @@ const HomePage = () => {
       </header>
       <div className="content-container">
 
-        {/* Main Content Area */}
         <main className="main-content">
-          <section className="favorites-section">
-            <h2>Your Favorites</h2>
-            <h3>Soccer scores:</h3>
-            <p>Spurs 1 - 1 Chelsea</p>
-            <p>City 1 - 1 Arsenal</p>
-            <h3>Basketball scores:</h3>
-            <p>Lakers 100 - 100 Bucks</p>
-            <p>Jazz 100 - 100 Pacers</p>
+        <section className="favorites-section" style={{ marginBottom: '10px', backgroundColor: '#f9f9f9', padding: '10px', borderRadius: '10px', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                overflowX: 'auto',
+                p: 1,
+                border: '1px solid #e0e0e0',
+                borderRadius: 1,
+                backgroundColor: '#fff',
+                '&::-webkit-scrollbar': { display: 'none' },
+                mb: 1,
+              }}
+            >
+              {premierLeagueGames.map((game, index) => renderMatch(game, index))}
+            </Box>
+          </section>
+
+          <section className="favorites-section" style={{ marginBottom: '10px', backgroundColor: '#f9f9f9', padding: '10px', borderRadius: '10px', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                overflowX: 'auto',
+                p: 1,
+                border: '1px solid #e0e0e0',
+                borderRadius: 1,
+                backgroundColor: '#fff',
+                '&::-webkit-scrollbar': { display: 'none' },
+                mb: 1,
+              }}
+            >
+              {Nba.map((game, index) => renderMatch(game, index))}
+            </Box>
           </section>
 
           <div className="dashboard-widgets">
-            {/* Calories Widget */}
             <div className="widget calorie-widget">
               <h3>Calories</h3>
-              <div style={{ width: 100, height: 100 }}>
+              <div className="progress-bar">
                 <CircularProgressbar
                   value={caloriePercentage}
                   text={`${Math.round(caloriePercentage)}%`}
                   styles={buildStyles({
-                    textSize: '16px',
+                    textSize: '14px',
                     pathColor: `rgba(26, 166, 75, 1)`,
                     textColor: '#000',
                     trailColor: '#d6d6d6',
@@ -111,7 +178,6 @@ const HomePage = () => {
               </div>
             </div>
 
-            {/* Tasks Widget */}
             <div className="widget tasks-widget">
               <h3>Tasks</h3>
               <ul>
@@ -121,7 +187,6 @@ const HomePage = () => {
               </ul>
             </div>
 
-            {/* Workouts Widget */}
             <div className="widget workouts-widget">
               <h3>Workouts</h3>
               <div className="workouts-list">
@@ -139,8 +204,7 @@ const HomePage = () => {
           </div>
         </main>
 
-        {/* Right Sidebar */}
-        <aside className="sidebar right-sidebar">
+        <aside className="sidebar">
           <section className="news-section">
             <h2>News</h2>
             <ul>
@@ -151,9 +215,9 @@ const HomePage = () => {
           </section>
           <section className="shortcuts-section">
             <h2>Shortcuts</h2>
-            <button>Add a food item</button>
-            <button>Add a Task</button>
-            <button>Toggle theme</button>
+            <Button className="shortcut-button">Add a food item</Button>
+            <Button className="shortcut-button">Add a Task</Button>
+            <Button className="shortcut-button">Toggle theme</Button>
           </section>
         </aside>
       </div>

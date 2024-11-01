@@ -10,20 +10,9 @@ const router = express.Router();
 // @access  Private
 router.post(
   '/logworkout',
-  // [
-  //   [
-  //     check('exercise', 'Exercise name is required').not().isEmpty(),
-  //     check('sets', 'Sets must be a number greater than 0').isInt({ min: 1 }),
-  //     check('reps', 'Reps must be a number greater than 0').isInt({ min: 1 })
-  //   ]
-  // ],
   async (req, res) => {
-    //const errors = validationResult(req);
-    // if (!errors.isEmpty()) {
-    //   return res.status(400).json({ errors: errors.array() });
-    // }
 
-    const { exercise, sets, reps, userId } = req.body;
+    const { exercise, sets, reps, userId, weight } = req.body;
 
     try {
       // Create a new workout log
@@ -31,6 +20,7 @@ router.post(
         exercise,
         sets,
         reps,
+        weight,
         date: new Date(), // Store the current date
         userId,
       });
@@ -45,7 +35,7 @@ router.post(
 );
 
 // @route   GET api/workouts
-// @desc    Get all workouts for a user
+// @desc    Get all workouts for a user for the day
 // @access  Private
 router.get('/', auth, async (req, res) => {
   try {
@@ -60,6 +50,21 @@ router.get('/', auth, async (req, res) => {
           $gte: startOfDay,  // Greater than or equal to start of day
           $lt: endOfDay      // Less than end of day
     }
+  }).sort({ date: -1 });
+    res.json(workouts);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// @route   GET api/workouts/all
+// @desc    Get all workouts for a user
+// @access  Private
+router.get('/all', auth, async (req, res) => {
+  try {
+    const workouts = await Workout.find({
+      userId: req.user.id,  // Filter by the current user's ID
   }).sort({ date: -1 });
     res.json(workouts);
   } catch (err) {

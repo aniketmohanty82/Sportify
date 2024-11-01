@@ -1,27 +1,28 @@
-// models/User.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  username: { type: String, required: true, unique: true},
+  googleId: { type: String },
+  firstName: { type: String },
+  lastName: { type: String },
+  username: { type: String, unique: true },
   email: {
     type: String,
     required: true,
-    unique: true, // Ensures unique emails
+    unique: true,
   },
-  password: { type: String, required: true },
-  timezone: { type: String, default: 'UTC' }, // Adding the timezone field with a default value
+  password: { type: String }, 
+  avatar: { type: String },
+  timezone: { type: String, default: 'UTC' },
   resetPasswordToken: String,
   resetPasswordExpires: Date,
 });
 
-// Hash password before saving
 userSchema.pre('save', async function (next) {
   const user = this;
   try {
     if (!user.isModified('password')) return next();
+    if (!user.password) return next(); // Skip if no password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     return next();

@@ -34,14 +34,12 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      {/* User info */}
       <div className="navbar__top">
         <div className="navbar__user">
           <img src={logo} alt="User" className="navbar__user-pic" />
           <h3 className="navbar__user-name">{username}</h3>
         </div>
 
-        {/* Navigation Links */}
         <nav className="navbar__nav">
           <Link to="/" className="navbar__link">
             <FaHome className="navbar__icon" />

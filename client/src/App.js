@@ -1,5 +1,3 @@
-// App.js
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
@@ -8,7 +6,7 @@ import Navbar from './components/Navbar';
 import LogIn from './pages/LogIn';
 import Registration from './pages/Registration';
 import Sports from './pages/Sports';
-import ProtectedRoute from './components/ProtectedRoute'; // Import the ProtectedRoute component
+import ProtectedRoute from './components/ProtectedRoute';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
@@ -25,10 +23,8 @@ const App = () => {
 const AppContent = () => {
   const location = useLocation();
 
-  // Define paths where the Navbar should be hidden
   const hideNavbarPaths = ['/login', '/register'];
 
-  // Check if the current path is in the hideNavbarPaths array
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
 
   return (
@@ -37,7 +33,6 @@ const AppContent = () => {
       <div style={{ flex: 1, padding: '20px' }}>
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* Protect the /tracker route */}
           <Route
             path="/tracker"
             element={
@@ -74,7 +69,6 @@ const AppContent = () => {
           <Route path="/register" element={<Registration />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          {/* Add more routes here */}
         </Routes>
       </div>
     </div>

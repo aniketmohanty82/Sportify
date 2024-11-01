@@ -1,38 +1,37 @@
-// routes/users.js
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const { OAuth2Client } = require('google-auth-library');
+
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
-// Password Reset Request Route
+require('dotenv').config();
+
+const client = new OAuth2Client('561537019638-8r5obepso26lld6cn7dq51o4334qs1g5.apps.googleusercontent.com');
+
 router.post('/forgot-password', async (req, res) => {
   const { email } = req.body;
 
   try {
-    // Find the user by email
     const user = await User.findOne({ email });
     if (!user)
       return res.status(400).json({ message: 'No account with that email found' });
 
-    // Generate a reset token
     const token = crypto.randomBytes(20).toString('hex');
 
-    // Set token and expiration on the user object
     user.resetPasswordToken = token;
-    user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
+    user.resetPasswordExpires = Date.now() + 3600000;
 
     await user.save();
 
-    // Send email with reset link
     const resetLink = `http://localhost:3000/reset-password/${token}`;
 
-    // Configure nodemailer
     const transporter = nodemailer.createTransport({
-      service: 'Gmail', // e.g., Gmail, or your email service
+      service: 'Gmail',
       auth: {
         user: 'sai38281@gmail.com',
         pass: 'damewsgosgeqnids',
@@ -63,12 +62,10 @@ If you did not request this, please ignore this email.\n`,
   }
 });
 
-// Token Validation Route
 router.get('/reset-password/:token', async (req, res) => {
   try {
     const { token } = req.params;
 
-    // Find user with matching token and check if it's not expired
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() },
@@ -77,7 +74,6 @@ router.get('/reset-password/:token', async (req, res) => {
     if (!user)
       return res.status(400).json({ message: 'Password reset token is invalid or has expired' });
 
-    // Token is valid
     res.status(200).json({ message: 'Token is valid' });
   } catch (err) {
     console.error('Error in reset-password token validation:', err);
@@ -85,13 +81,11 @@ router.get('/reset-password/:token', async (req, res) => {
   }
 });
 
-// Password Update Route
 router.post('/reset-password/:token', async (req, res) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
 
-    // Find user with matching token and check if it's not expired
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() },
@@ -100,8 +94,7 @@ router.post('/reset-password/:token', async (req, res) => {
     if (!user)
       return res.status(400).json({ message: 'Password reset token is invalid or has expired' });
 
-    // Update password
-    user.password = password; // This will trigger the pre-save hook to hash the password
+    user.password = password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
 
@@ -115,17 +108,14 @@ router.post('/reset-password/:token', async (req, res) => {
 });
 
 
-// Register New User
 router.post('/register', async (req, res) => {
   try {
     const { firstName, lastName, username, email, password, timezone } = req.body;
 
-    // Validate input
     if (!firstName || !lastName || !username || !email || !password) {
       return res.status(400).json({ message: 'Please enter all fields' });
     }
 
-    // Check for existing user
     const userExists = await User.findOne({ email });
     if (userExists)
       return res.status(400).json({ message: 'Email already registered' });
@@ -134,17 +124,15 @@ router.post('/register', async (req, res) => {
     if (usernameExists)
       return res.status(400).json({ message: 'Username already in use.' });
 
-    // Create new user with timezone
     const newUser = new User({
       firstName,
       lastName,
       username,
       email,
       password,
-      timezone // Save the timezone
+      timezone
     });
 
-    // Save user to DB
     const savedUser = await newUser.save();
     res.status(201).json({
       message: 'User registered successfully',
@@ -156,38 +144,36 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login Route
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({ message: 'Please enter all fields' });
     }
 
-    // Check if user exists
     const user = await User.findOne({ email });
     if (!user)
       return res.status(400).json({ message: 'User does not exist' });
 
-    // Compare password
+    if (!user.password) {
+      return res.status(400).json({ message: 'User registered via Google. Please use Google Sign-In.' });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(400).json({ message: 'Invalid credentials' });
 
-    // Create JWT payload
     const payload = {
       user: {
         id: user.id,
       },
     };
 
-    // Sign token with expiration time
     jwt.sign(
       payload,
-      process.env.JWT_SECRET || 'your_jwt_secret', // Ensure you have JWT_SECRET in your .env
-      { expiresIn: '1h' }, // Token expires in 1 hour
+      process.env.JWT_SECRET || 'your_jwt_secret',
+      { expiresIn: '1h' },
       (err, token) => {
         if (err) throw err;
         res.json({
@@ -197,7 +183,8 @@ router.post('/login', async (req, res) => {
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
-            userName: user.username,
+            username: user.username,
+            timezone: user.timezone,
           },
         });
       }
@@ -208,23 +195,19 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Update user's time zone
 router.put('/update-timezone', async (req, res) => {
   try {
     const { userId, timezone } = req.body;
 
-    // Validate input
     if (!userId || !timezone) {
       return res.status(400).json({ message: 'Please provide userId and timezone' });
     }
 
-    // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Update the time zone
     user.timezone = timezone;
     await user.save();
 
@@ -235,27 +218,82 @@ router.put('/update-timezone', async (req, res) => {
   }
 });
 
-// Fetch user's time zone
 router.get('/timezone', async (req, res) => {
   try {
-    const { userId } = req.query;  // Expecting userId in query parameters
+    const { userId } = req.query;
 
-    // Validate input
     if (!userId) {
       return res.status(400).json({ message: 'Please provide userId' });
     }
 
-    // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Return the user's time zone
     res.status(200).json({ timezone: user.timezone });
   } catch (err) {
     console.error('Error fetching time zone:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.post('/google-login', async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: '561537019638-8r5obepso26lld6cn7dq51o4334qs1g5.apps.googleusercontent.com',
+    });
+    const payload = ticket.getPayload();
+
+    const { sub: googleId, email, name, picture } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      const [firstName, ...lastNameParts] = name.split(' ');
+      const lastName = lastNameParts.join(' ');
+      user = new User({
+        googleId,
+        email,
+        firstName,
+        lastName,
+        username: email.split('@')[0],
+        avatar: picture,
+        timezone: 'UTC',
+      });
+      await user.save();
+    } else {
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.avatar = picture;
+        await user.save();
+      }
+    }
+
+    const jwtToken = jwt.sign(
+      { user: { id: user._id } },
+      process.env.JWT_SECRET || 'your_jwt_secret',
+      { expiresIn: '1h' }
+    );
+
+    res.json({
+      token: jwtToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        avatar: user.avatar,
+        timezone: user.timezone,
+      },
+    });
+  } catch (error) {
+    console.error('Error during Google authentication:', error);
+    res.status(401).json({ message: 'Google authentication failed' });
   }
 });
 

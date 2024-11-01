@@ -7,6 +7,9 @@ import { green } from '@mui/material/colors';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Global, css } from '@emotion/react';
 
+
+const timezone = localStorage.getItem('timeZone');
+
 const vibrateKeyframe = (
   <Global
     styles={css`
@@ -150,7 +153,12 @@ const BasketballFixturesModal = ({ open, handleClose, fixtures }) => {
 
                   {/* Date */}
                   <Typography>
-                    {new Date(fixture.date).toLocaleDateString()}
+                    {new Date(fixture.date).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      timeZone: timezone === 'UTC' ? 'Etc/UTC' : 'America/New_York'
+                    })}
                   </Typography>
 
                   {/* Time */}
@@ -158,7 +166,8 @@ const BasketballFixturesModal = ({ open, handleClose, fixtures }) => {
                     {new Date(fixture.date).toLocaleTimeString('en-US', {
                       hour: 'numeric',
                       minute: '2-digit',
-                      timeZone: 'America/New_York'
+                      hour12: true,
+                      timeZone: timezone === 'UTC' ? 'Etc/UTC' : 'America/New_York'
                     })}
                   </Typography>
 
@@ -296,7 +305,12 @@ const FixturesModal = ({ open, handleClose, fixtures }) => {
 
                   {/* Date */}
                   <Typography>
-                    {new Date(fixture.date).toLocaleDateString()}
+                    {new Date(fixture.date).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      timeZone: timezone === 'UTC' ? 'Etc/UTC' : 'America/New_York'
+                    })}
                   </Typography>
 
                   {/* Time */}
@@ -304,9 +318,11 @@ const FixturesModal = ({ open, handleClose, fixtures }) => {
                     {new Date(fixture.date).toLocaleTimeString('en-US', {
                       hour: 'numeric',
                       minute: '2-digit',
-                      timeZone: 'America/New_York'
+                      hour12: true,
+                      timeZone: timezone === 'UTC' ? 'Etc/UTC' : 'America/New_York'
                     })}
                   </Typography>
+
 
                   {/* Location */}
                   <Typography>

@@ -46,8 +46,6 @@ app.get('/api/basketball_fixtures/:leagueId', async (req, res) => {
 
         const data = await response.json();
 
-        console.log(data);
-
         // Filter games from today onwards and transform the response
         const fixtures = data.response
             .filter(game => {
@@ -76,7 +74,6 @@ app.get('/api/basketball_fixtures/:leagueId', async (req, res) => {
                 status: game.status.long
             }))
             .sort((a, b) => new Date(a.date) - new Date(b.date));  // Sort by date
-        console.log(fixtures);
         res.json(fixtures);
     } catch (error) {
         console.error('Error:', error);

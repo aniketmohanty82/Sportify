@@ -198,6 +198,7 @@ router.post('/login', async (req, res) => {
             firstName: user.firstName,
             lastName: user.lastName,
             userName: user.username,
+            timeZone: user.timezone,
           },
         });
       }

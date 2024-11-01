@@ -21,39 +21,215 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .catch(err => console.log(err));
 
 // Routes for fetching sports data
+// Basketball Fixtures List
+app.get('/api/basketball_fixtures/:leagueId', async (req, res) => {
+    try {
+        const leagueId = req.params.leagueId;
+
+        // Get current date in EST
+        const estDate = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
+        const today = new Date(estDate);
+        today.setHours(0, 0, 0, 0);  // Set to start of day
+
+        // Determine season format based on league ID
+        const season = leagueId === "120" ? "2024" : "2024-2025";
+
+        const response = await fetch(
+            `https://api-basketball.p.rapidapi.com/games?season=${season}&league=${leagueId}`,
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        console.log(data);
+
+        // Filter games from today onwards and transform the response
+        const fixtures = data.response
+            .filter(game => {
+                const gameDate = new Date(game.date);
+                return gameDate >= today;
+            })
+            .map(game => ({
+                fixture_id: game.id,
+                date: game.date,
+                time: game.time,
+                venue: game.venue,
+                teams: {
+                    home: {
+                        name: game.teams.home.name,
+                        logo: game.teams.home.logo
+                    },
+                    away: {
+                        name: game.teams.away.name,
+                        logo: game.teams.away.logo
+                    }
+                },
+                league: {
+                    name: game.league.name,
+                    logo: game.league.logo
+                },
+                status: game.status.long
+            }))
+            .sort((a, b) => new Date(a.date) - new Date(b.date));  // Sort by date
+        console.log(fixtures);
+        res.json(fixtures);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Error fetching fixtures');
+    }
+});
+// Soccer Fixtures List
+app.get('/api/fixtures/:leagueId', async (req, res) => {
+    try {
+        const leagueId = req.params.leagueId;
+        const today = new Date().toISOString().split('T')[0];  // Format: YYYY-MM-DD
+
+        const response = await fetch(
+            `https://api-football-v1.p.rapidapi.com/v3/fixtures?league=${leagueId}&season=2024&from=${today}&to=2025-06-01`,
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        // Transform the response to only include needed fields
+        const fixtures = data.response.map(fixture => ({
+            fixture_id: fixture.fixture.id,
+            date: fixture.fixture.date,
+            venue: {
+                name: fixture.fixture.venue.name,
+                city: fixture.fixture.venue.city
+            },
+            teams: {
+                home: {
+                    name: fixture.teams.home.name,
+                    logo: fixture.teams.home.logo
+                },
+                away: {
+                    name: fixture.teams.away.name,
+                    logo: fixture.teams.away.logo
+                }
+            },
+            status: fixture.fixture.status.long
+        }));
+
+        res.json(fixtures);
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Error fetching fixtures');
+    }
+});
+
+app.get('/api/fixture_details/:id', async (req, res) => {
+    try {
+        const fixtureId = req.params.id;
+        const response = await fetch(
+            `https://api-football-v1.p.rapidapi.com/v3/fixtures?id=${fixtureId}`,
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
+            }
+        );
+
+        const data = await response.json();
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
+app.get('/api/basketball_fixture_details/:id', async (req, res) => {
+    try {
+        const fixtureId = req.params.id;
+        const response = await fetch(
+            `https://api-basketball.p.rapidapi.com/games?id=${fixtureId}`,
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        // No need to transform the data, just send it as is
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+// '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
 app.get('/api/premier_league', async (req, res) => {
     try {
         const currentDate = new Date();
-        const dayOfWeek = currentDate.getDay(); // 0 for Sunday, 1 for Monday, etc.
-        
-        const lastSunday = new Date(currentDate);
-        lastSunday.setDate(currentDate.getDate() - dayOfWeek);
-        
-        const lastSaturday = new Date(lastSunday);
-        lastSaturday.setDate(lastSunday.getDate() - 1);
-        
-        const lastMonday = new Date(lastSunday);
-        lastMonday.setDate(lastSunday.getDate() - 6);
+        const startDate = '2024-08-01'; // Season start date
+        const todayStr = currentDate.toISOString().split('T')[0];
 
-        const dates = [lastSaturday, lastSunday, lastMonday].map(date => date.toISOString().split('T')[0]);
-
-        const games = [];
-
-        for (const date of dates) {
-            const response = await fetch(`https://serpapi.com/search.json?q=premier+league+games+${date}&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97`);
-            const data = await response.json();
-            if (data.sports_results && data.sports_results.games) {
-                games.push(...data.sports_results.games);
+        const response = await fetch(
+            `https://api-football-v1.p.rapidapi.com/v3/fixtures?league=39&season=2024&from=${startDate}&to=${todayStr}`,
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
             }
-        }
+        );
 
-        const parsedGames = games.map(game => ({
-            date: game.date,
-            teams: game.teams.map(team => team.name),
-            scores: game.teams.map(team => team.score),
-            status: game.status
+        const data = await response.json();
+
+        // Find the latest round from completed matches
+        const latestRound = data.response.reduce((maxRound, match) => {
+            if (match.fixture.status.short === "FT") {
+                const roundNumber = parseInt(match.league.round.split(' - ')[1]);
+                return roundNumber > maxRound ? roundNumber : maxRound;
+            }
+            return maxRound;
+        }, 0);
+
+        // Filter matches for the latest round
+        const latestRoundMatches = data.response.filter(match =>
+            match.league.round === `Regular Season - ${latestRound}`
+        );
+
+        const parsedGames = latestRoundMatches.map(game => ({
+            date: game.fixture.date,
+            teams: [
+                game.teams.home.name,
+                game.teams.away.name
+            ],
+            scores: [
+                game.goals.home,
+                game.goals.away
+            ],
+            team_logos: [
+                game.teams.home.logo,
+                game.teams.away.logo
+            ],
+            team_ids: [
+                game.teams.home.id,
+                game.teams.away.id
+            ],
+            fixture_id: game.fixture.id,
+            status: game.fixture.status.long,
+            venue: game.fixture.venue.name,
+            round: game.league.round,
+            referee: game.fixture.referee,
+
         }));
-
         res.json(parsedGames);
     } catch (err) {
         console.error(err);
@@ -62,41 +238,105 @@ app.get('/api/premier_league', async (req, res) => {
 });
 
 
-// test
-app.get('/api/test', async (req, res) => {
+// MLS
+app.get('/api/test_live', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=uefa+champions+league+games+on+today&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
+        const response = await fetch(
+            'https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all&league=135&season=2024',
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
+            }
+        );
+
         const data = await response.json();
 
-        // Check if the API returned an error
-        if (data.error) {
-            console.error('API Error:', data.error);
-            return res.status(500).json({ message: "Error fetching data from API" });
-        }
+        if (data.response && data.response.length > 0) {
+            const liveGames = data.response.filter(game =>
+                game.fixture.status.short === "1H" ||
+                game.fixture.status.short === "2H" ||
+                game.fixture.status.short === "HT"
+            );
 
-        // Check if sports_results exists
-        if (!data.sports_results || !data.sports_results.games) {
-            return res.json({ message: "No games data available" });
-        }
+            if (liveGames.length > 0) {
+                const parsedGames = liveGames.map(game => ({
+                    teams: [
+                        game.teams.home.name,
+                        game.teams.away.name
+                    ],
+                    scores: [
+                        game.goals.home,
+                        game.goals.away
+                    ],
+                    in_game_time: game.fixture.status.elapsed,
+                    fixture_id: game.fixture.id,
+                }));
 
-        const liveGames = data.sports_results.games
-            .filter(game => game.status && game.status.includes("Live"))
-            .map(game => ({
-                teams: game.teams.map(team => team.name),
-                scores: game.teams.map(team => team.score),
-                minute: game.status.match(/\d+/)?.[0] || 'N/A',  // Extract minute from the status string, use 'N/A' if not found
-                status: game.status
-            }));
-
-        // Check if live games exist and return them
-        if (liveGames.length > 0) {
-            res.json(liveGames);
+                res.json(parsedGames);
+            } else {
+                res.json({ message: "No live games are being played right now" });
+            }
         } else {
-            res.json({ message: "No live games right now" });
+            res.json({ message: "No teams are playing right now" });
         }
     } catch (err) {
-        console.error('Error:', err);
-        res.status(500).json({ message: "Server error", error: err.message });
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
+
+
+
+
+// test
+app.get('/api/ucl_live', async (req, res) => {
+    try {
+        const response = await fetch(
+            'https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all&league=2&season=2024',
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.response && data.response.length > 0) {
+            const liveGames = data.response.filter(game =>
+                game.fixture.status.short === "1H" ||
+                game.fixture.status.short === "2H" ||
+                game.fixture.status.short === "HT"
+            );
+
+            if (liveGames.length > 0) {
+                const parsedGames = liveGames.map(game => ({
+                    teams: [
+                        game.teams.home.name,
+                        game.teams.away.name
+                    ],
+                    scores: [
+                        game.goals.home,
+                        game.goals.away
+                    ],
+                    in_game_time: game.fixture.status.elapsed,
+                    fixture_id: game.fixture.id,
+                }));
+
+                res.json(parsedGames);
+            } else {
+                res.json({ message: "No live games are being played right now" });
+            }
+        } else {
+            res.json({ message: "No teams are playing right now" });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
     }
 });
 
@@ -104,43 +344,63 @@ app.get('/api/test', async (req, res) => {
 app.get('/api/ucl', async (req, res) => {
     try {
         const currentDate = new Date();
-        const dayOfWeek = currentDate.getDay();
+        const startDate = '2024-08-01'; // Season start date
+        const todayStr = currentDate.toISOString().split('T')[0];
 
-        // Calculate last Wednesday, Tuesday, and Thursday
-        const lastWednesday = new Date(currentDate);
-        lastWednesday.setDate(currentDate.getDate() - ((dayOfWeek + 4) % 7));
-
-        const lastTuesday = new Date(currentDate);
-        lastTuesday.setDate(currentDate.getDate() - ((dayOfWeek + 5) % 7));
-
-        const lastThursday = new Date(currentDate);
-        lastThursday.setDate(currentDate.getDate() - ((dayOfWeek + 3) % 7));
-
-        const dates = [lastTuesday, lastWednesday, lastThursday].map(date => date.toISOString().split('T')[0]);
-        console.log(dates);
-
-        const allGames = [];
-
-        for (const date of dates) {
-            const response = await fetch(`https://serpapi.com/search.json?q=uefa+champions+league+games+${date}&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97`);
-            const data = await response.json();
-            if (data.sports_results && data.sports_results.games) {
-                allGames.push(...data.sports_results.games);
+        const response = await fetch(
+            `https://api-football-v1.p.rapidapi.com/v3/fixtures?league=2&season=2024&from=${startDate}&to=${todayStr}`,
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
             }
-        }
+        );
 
-        const parsedGames = allGames.map(game => ({
-            date: game.date,
-            teams: game.teams.map(team => team.name),
-            scores: game.teams.map(team => team.score),
-            status: game.status
+        const data = await response.json();
+
+        // Find the latest round from completed matches
+        const latestRound = data.response.reduce((maxRound, match) => {
+            if (match.fixture.status.short === "FT") {
+                const roundNumber = parseInt(match.league.round.split(' - ')[1]);
+                return roundNumber > maxRound ? roundNumber : maxRound;
+            }
+            return maxRound;
+        }, 0);
+
+        // Filter matches for the latest round
+        const latestRoundMatches = data.response.filter(match =>
+            match.league.round === `League Stage - ${latestRound}`
+        );
+
+        // have to add knockouts here eventually
+
+        const parsedGames = latestRoundMatches.map(game => ({
+            date: game.fixture.date,
+            teams: [
+                game.teams.home.name,
+                game.teams.away.name
+            ],
+            scores: [
+                game.goals.home,
+                game.goals.away
+            ],
+            team_logos: [
+                game.teams.home.logo,
+                game.teams.away.logo
+            ],
+            team_ids: [
+                game.teams.home.id,
+                game.teams.away.id
+            ],
+            fixture_id: game.fixture.id,
+            status: game.fixture.status.long,
+            venue: game.fixture.venue.name,
+            round: game.league.round,
+            referee: game.fixture.referee,
+
         }));
-
-        if (parsedGames.length > 0) {
-            res.json(parsedGames);
-        } else {
-            res.json({ message: "No games found for the past Tuesday, Wednesday, and Thursday" });
-        }
+        res.json(parsedGames);
     } catch (err) {
         console.error(err);
         res.status(500).send('Server error');
@@ -151,18 +411,88 @@ app.get('/api/ucl', async (req, res) => {
 // premier league games on today
 app.get('/api/premier_league_live', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=premier+league+games+on+today&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
+        const response = await fetch(
+            'https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all&league=39&season=2024',
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
+            }
+        );
+
         const data = await response.json();
 
-        if (data.sports_results && data.sports_results.game_spotlight) {
-            const game = data.sports_results.game_spotlight;
-            if (game.status === 'Live') {
-                const parsedGame = {
-                    teams: game.teams.map(team => team.name),
-                    scores: game.teams.map(team => team.score),
-                    in_game_time: game.in_game_time.minute,
-                };
-                res.json(parsedGame);
+        if (data.response && data.response.length > 0) {
+            const liveGames = data.response.filter(game =>
+                game.fixture.status.short === "1H" ||
+                game.fixture.status.short === "2H" ||
+                game.fixture.status.short === "HT"
+            );
+
+            if (liveGames.length > 0) {
+                const parsedGames = liveGames.map(game => ({
+                    teams: [
+                        game.teams.home.name,
+                        game.teams.away.name
+                    ],
+                    scores: [
+                        game.goals.home,
+                        game.goals.away
+                    ],
+                    in_game_time: game.fixture.status.elapsed,
+                    fixture_id: game.fixture.id,
+                }));
+
+                res.json(parsedGames);
+            } else {
+                res.json({ message: "No live games are being played right now" });
+            }
+        } else {
+            res.json({ message: "No teams are playing right now" });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
+app.get('/api/bundesliga_live', async (req, res) => {
+    try {
+        const response = await fetch(
+            'https://api-football-v1.p.rapidapi.com/v3/fixtures?live=all&league=78&season=2024',
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.response && data.response.length > 0) {
+            const liveGames = data.response.filter(game =>
+                game.fixture.status.short === "1H" ||
+                game.fixture.status.short === "2H" ||
+                game.fixture.status.short === "HT"
+            );
+
+            if (liveGames.length > 0) {
+                const parsedGames = liveGames.map(game => ({
+                    teams: [
+                        game.teams.home.name,
+                        game.teams.away.name
+                    ],
+                    scores: [
+                        game.goals.home,
+                        game.goals.away
+                    ],
+                    in_game_time: game.fixture.status.elapsed,
+                    fixture_id: game.fixture.id,
+                }));
+
+                res.json(parsedGames);
             } else {
                 res.json({ message: "No live games are being played right now" });
             }
@@ -178,39 +508,60 @@ app.get('/api/premier_league_live', async (req, res) => {
 app.get('/api/bundesliga', async (req, res) => {
     try {
         const currentDate = new Date();
-        const dayOfWeek = currentDate.getDay();
+        const startDate = '2024-08-01'; // Season start date
+        const todayStr = currentDate.toISOString().split('T')[0];
 
-        const lastSunday = new Date(currentDate);
-        lastSunday.setDate(currentDate.getDate() - dayOfWeek);
-
-        const lastSaturday = new Date(lastSunday);
-        lastSaturday.setDate(lastSunday.getDate() - 1);
-
-        const lastFriday = new Date(lastSunday);
-        lastFriday.setDate(lastSunday.getDate() - 2);
-
-        const today = new Date();
-        const dates = [lastFriday, lastSaturday, lastSunday]
-            .filter(date => date <= today)
-            .map(date => date.toISOString().split('T')[0]);
-
-        const allGames = [];
-
-        for (const date of dates) {
-            const response = await fetch(`https://serpapi.com/search.json?q=bundesliga+games+${date}&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97`);
-            const data = await response.json();
-            if (data.sports_results && data.sports_results.games) {
-                allGames.push(...data.sports_results.games);
+        const response = await fetch(
+            `https://api-football-v1.p.rapidapi.com/v3/fixtures?league=78&season=2024&from=${startDate}&to=${todayStr}`,
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
             }
-        }
+        );
 
-        const parsedGames = allGames.map(game => ({
-            date: game.date,
-            teams: game.teams.map(team => team.name),
-            scores: game.teams.map(team => team.score),
-            status: game.status
+        const data = await response.json();
+
+        // Find the latest round from completed matches
+        const latestRound = data.response.reduce((maxRound, match) => {
+            if (match.fixture.status.short === "FT") {
+                const roundNumber = parseInt(match.league.round.split(' - ')[1]);
+                return roundNumber > maxRound ? roundNumber : maxRound;
+            }
+            return maxRound;
+        }, 0);
+
+        // Filter matches for the latest round
+        const latestRoundMatches = data.response.filter(match =>
+            match.league.round === `Regular Season - ${latestRound}`
+        );
+
+        const parsedGames = latestRoundMatches.map(game => ({
+            date: game.fixture.date,
+            teams: [
+                game.teams.home.name,
+                game.teams.away.name
+            ],
+            scores: [
+                game.goals.home,
+                game.goals.away
+            ],
+            team_logos: [
+                game.teams.home.logo,
+                game.teams.away.logo
+            ],
+            team_ids: [
+                game.teams.home.id,
+                game.teams.away.id
+            ],
+            fixture_id: game.fixture.id,
+            status: game.fixture.status.long,
+            venue: game.fixture.venue.name,
+            round: game.league.round,
+            referee: game.fixture.referee,
+
         }));
-
         res.json(parsedGames);
     } catch (err) {
         console.error(err);
@@ -220,14 +571,59 @@ app.get('/api/bundesliga', async (req, res) => {
 
 app.get('/api/nba', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=nba+finals+2023%2F2024+games&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
-        const data = await response.json();
-        const games = data.sports_results.games;
-        const parsedGames = games.map(game => ({
-            teams: game.teams.map(team => team.name),
-            scores: game.teams.map(team => team.score)
-        }));
-        res.json(parsedGames);
+        // Get current date and previous two days
+        const dates = [];
+        for (let i = 0; i < 3; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            dates.push(date.toISOString().split('T')[0]);
+        }
+
+        const allGames = [];
+
+        // Make API calls for each date
+        for (const date of dates) {
+            const response = await fetch(
+                `https://api-basketball.p.rapidapi.com/games?timezone=ET&season=2024-2025&league=12&date=${date}`,
+                {
+                    headers: {
+                        'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
+                        'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    }
+                }
+            );
+
+            const data = await response.json();
+
+            if (data.response) {
+                // Filter for finished games (both FT and AOT status)
+                const finishedGames = data.response.filter(game =>
+                    game.status.short === "FT" || game.status.short === "AOT"
+                ).map(game => ({
+                    teams: [
+                        game.teams.home.name,
+                        game.teams.away.name
+                    ],
+                    scores: [
+                        game.scores.home.total,
+                        game.scores.away.total
+                    ],
+                    status: game.status.long,
+                    date: game.date,
+                    venue: game.venue,
+                    fixture_id: game.id
+                }));
+
+                allGames.push(...finishedGames);
+            }
+        }
+
+        if (allGames.length > 0) {
+            //console.log(allGames);
+            res.json(allGames);
+        } else {
+            res.json({ message: "No finished games in the past three days" });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send('Server error');
@@ -236,16 +632,39 @@ app.get('/api/nba', async (req, res) => {
 
 app.get('/api/nba_live', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=NBA+games+on+today&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
+        // Get current date in ET and convert to UTC
+        const etDate = new Date();
+        const utcDate = new Date(etDate.toLocaleString('en-US', { timeZone: 'UTC' }));
+        const formattedDate = utcDate.toISOString().split('T')[0];
+
+        const response = await fetch(
+            `https://api-basketball.p.rapidapi.com/games?timezone=ET&season=2024-2025&league=12&date=${formattedDate}`,
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
+            }
+        );
+
         const data = await response.json();
 
-        if (data.sports_results && data.sports_results.games) {
-            const liveGames = data.sports_results.games.filter(game => game.status && (game.status.includes("Q") || game.status.includes("Halftime")))
-                .map(game => ({
-                    teams: game.teams.map(team => team.name),
-                    scores: game.teams.map(team => team.score),
-                    status: game.status
-                }));
+        if (data.response && data.response.length > 0) {
+            const liveGames = data.response.filter(game =>
+                game.status.short.includes('Q') ||
+                game.status.long.includes('Half')
+            ).map(game => ({
+                teams: [
+                    game.teams.home.name,
+                    game.teams.away.name
+                ],
+                scores: [
+                    game.scores.home.total,
+                    game.scores.away.total
+                ],
+                in_game_time: `${game.status.long}${game.status.timer ? ` - ${game.status.timer}:00` : ''}`,
+                fixture_id: game.id
+            }));
 
             if (liveGames.length > 0) {
                 res.json(liveGames);
@@ -261,16 +680,62 @@ app.get('/api/nba_live', async (req, res) => {
     }
 });
 
+// change to tue, wed, thu, fri
 app.get('/api/euroleague', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+2023%2F2024&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
-        const data = await response.json();
-        const games = data.sports_results.games;
-        const parsedGames = games.map(game => ({
-            teams: game.teams.map(team => team.name),
-            scores: game.teams.map(team => team.score)
-        }));
-        res.json(parsedGames);
+        // Get current date and previous two days
+        const dates = [];
+        for (let i = 0; i < 3; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            dates.push(date.toISOString().split('T')[0]);
+        }
+
+        const allGames = [];
+
+        // Make API calls for each date
+        for (const date of dates) {
+            const response = await fetch(
+                `https://api-basketball.p.rapidapi.com/games?timezone=ET&season=2024&league=120&date=${date}`,
+                {
+                    headers: {
+                        'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
+                        'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    }
+                }
+            );
+
+            const data = await response.json();
+
+            if (data.response) {
+                // Filter for finished games (both FT and AOT status)
+                const finishedGames = data.response.filter(game =>
+                    game.status.short === "FT" || game.status.short === "AOT"
+                ).map(game => ({
+                    teams: [
+                        game.teams.home.name,
+                        game.teams.away.name
+                    ],
+                    scores: [
+                        game.scores.home.total,
+                        game.scores.away.total
+                    ],
+                    status: game.status.long,
+                    date: game.date,
+                    venue: game.venue,
+                    fixture_id: game.id
+                }));
+
+                allGames.push(...finishedGames);
+            }
+        }
+
+        if (allGames.length > 0) {
+            // console.log(allGames);
+            res.json(allGames);
+        } else {
+            res.json({ message: "No finished games in the past three days" });
+        }
     } catch (err) {
         console.error(err);
         res.status(500).send('Server error');
@@ -279,16 +744,39 @@ app.get('/api/euroleague', async (req, res) => {
 
 app.get('/api/euroleague_live', async (req, res) => {
     try {
-        const response = await fetch('https://serpapi.com/search.json?q=euroleague+games+on+today&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
+        // Get current date in ET and convert to UTC
+        const etDate = new Date();
+        const utcDate = new Date(etDate.toLocaleString('en-US', { timeZone: 'UTC' }));
+        const formattedDate = utcDate.toISOString().split('T')[0];
+
+        const response = await fetch(
+            `https://api-basketball.p.rapidapi.com/games?timezone=ET&season=2024&league=120&date=${formattedDate}`,
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
+                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                }
+            }
+        );
+
         const data = await response.json();
 
-        if (data.sports_results && data.sports_results.games) {
-            const liveGames = data.sports_results.games.filter(game => game.status && (game.status.includes("Q") || game.status.includes("Halftime")))
-                .map(game => ({
-                    teams: game.teams.map(team => team.name),
-                    scores: game.teams.map(team => team.score),
-                    status: game.status
-                }));
+        if (data.response && data.response.length > 0) {
+            const liveGames = data.response.filter(game =>
+                game.status.short.includes('Q') ||
+                game.status.long.includes('Half')
+            ).map(game => ({
+                teams: [
+                    game.teams.home.name,
+                    game.teams.away.name
+                ],
+                scores: [
+                    game.scores.home.total,
+                    game.scores.away.total
+                ],
+                in_game_time: `${game.status.long}${game.status.timer ? ` - ${game.status.timer}:00` : ''}`,
+                fixture_id: game.id
+            }));
 
             if (liveGames.length > 0) {
                 res.json(liveGames);
@@ -304,28 +792,6 @@ app.get('/api/euroleague_live', async (req, res) => {
     }
 });
 
-app.get('/api/wnba', async (req, res) => {
-    try {
-        const response = await fetch('https://serpapi.com/search.json?q=wnba+games+on+today&location=indianapolis,+indiana,+united+states&api_key=7a3a7c728b90a1b0180fc7f419675ca3be9f915794400b74787cc71cfec19a97');
-        const data = await response.json();
-
-        if (data.sports_results.game_spotlight && data.sports_results.game_spotlight.status === 'Live') {
-            const game = data.sports_results.game_spotlight;
-            const parsedGame = {
-                teams: game.teams.map(team => team.name),
-                scores: game.teams.map(team => team.score),
-                in_game_time: game.in_game_time.minute,
-            };
-            console.log(parsedGame)
-            res.json(parsedGame);
-        } else {
-            res.json({ message: "No teams are playing right now" });
-        }
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
-    }
-});
 
 // Meal logging routes
 const MealLog = require('./models/MealLog');

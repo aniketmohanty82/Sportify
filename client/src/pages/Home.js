@@ -1,9 +1,12 @@
+// HomePage.js
+
 import React, { useEffect, useState } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import { Paper, Box, Typography, Button } from '@mui/material';
 import { green } from '@mui/material/colors';
 import { useNavigate } from 'react-router-dom';
 import '../HomePage.css';
+import 'react-circular-progressbar/dist/styles.css';
 
 const HomePage = () => {
   const [workouts, setWorkouts] = useState([]);
@@ -63,8 +66,14 @@ const HomePage = () => {
   }, [mealLogs]);
 
   const calculateTotalCalories = () => {
-    const totalCalories = mealLogs.reduce((acc, meal) => acc + (meal.nutrients || 0), 0);
-    const percentage = Math.min((totalCalories / dailyCalorieGoal) * 100, 100);
+    const totalCalories = mealLogs.reduce(
+      (acc, meal) => acc + (meal.nutrients || 0),
+      0
+    );
+    const percentage = Math.min(
+      (totalCalories / dailyCalorieGoal) * 100,
+      100
+    );
     setTotalCalories(totalCalories);
     setCaloriePercentage(percentage);
   };
@@ -74,44 +83,37 @@ const HomePage = () => {
     { teams: ['Liverpool', 'Arsenal'], scores: [1, 1] },
   ];
 
-  const Nba = [
-    { teams: ['Spurs', 'Mavs'], scores: [100, 110] },
+  const nbaGames = [
+    { teams: ['Spurs', 'Mavericks'], scores: [100, 110] },
     { teams: ['Bucks', 'Celtics'], scores: [80, 125] },
   ];
 
   const renderMatch = (game, index) => {
-    const winner = game.scores[0] > game.scores[1] ? game.teams[0] : game.scores[0] === game.scores[1] ? null : game.teams[1];
+    const winner =
+      game.scores[0] > game.scores[1]
+        ? game.teams[0]
+        : game.scores[0] === game.scores[1]
+        ? null
+        : game.teams[1];
     return (
-      <Paper key={index} elevation={3} sx={{ p: 1, m: 1, minWidth: '200px' }}>
-        <Typography variant="h6">Match {index + 1}</Typography>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography>{game.teams[0]}</Typography>
-          <Box display="flex" alignItems="center">
+      <Paper
+        key={index}
+        elevation={3}
+        className="match-card"
+      >
+        <Typography variant="h6" className="match-title">
+          {game.teams[0]} vs {game.teams[1]}
+        </Typography>
+        <Box className="match-details">
+          <Box className="team-score">
+            <Typography>{game.teams[0]}</Typography>
             <Typography>{game.scores[0]}</Typography>
-            <Box
-              sx={{
-                bgcolor: game.teams[0] === winner ? green[500] : 'transparent',
-                width: 10,
-                height: 10,
-                borderRadius: '50%',
-                ml: 1,
-              }}
-            />
+            {winner === game.teams[0] && <span className="winner-dot" />}
           </Box>
-        </Box>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography>{game.teams[1]}</Typography>
-          <Box display="flex" alignItems="center">
+          <Box className="team-score">
+            <Typography>{game.teams[1]}</Typography>
             <Typography>{game.scores[1]}</Typography>
-            <Box
-              sx={{
-                bgcolor: game.teams[1] === winner ? green[500] : 'transparent',
-                width: 10,
-                height: 10,
-                borderRadius: '50%',
-                ml: 1,
-              }}
-            />
+            {winner === game.teams[1] && <span className="winner-dot" />}
           </Box>
         </Box>
       </Paper>
@@ -124,42 +126,27 @@ const HomePage = () => {
         <h1>Hey, Dhruv! Welcome Back!</h1>
       </header>
       <div className="content-container">
-
         <main className="main-content">
-        <section className="favorites-section" style={{ marginBottom: '10px', backgroundColor: '#f9f9f9', padding: '10px', borderRadius: '10px', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
-            <Box
-              sx={{
-                display: 'flex',
-                overflowX: 'auto',
-                p: 1,
-                border: '1px solid #e0e0e0',
-                borderRadius: 1,
-                backgroundColor: '#fff',
-                '&::-webkit-scrollbar': { display: 'none' },
-                mb: 1,
-              }}
-            >
+          {/* Favorites Sections */}
+          <section className="favorites-section">
+            <Typography variant="h5" className="section-title">
+              PL Highlights
+            </Typography>
+            <Box className="matches-container">
               {premierLeagueGames.map((game, index) => renderMatch(game, index))}
             </Box>
           </section>
 
-          <section className="favorites-section" style={{ marginBottom: '10px', backgroundColor: '#f9f9f9', padding: '10px', borderRadius: '10px', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
-            <Box
-              sx={{
-                display: 'flex',
-                overflowX: 'auto',
-                p: 1,
-                border: '1px solid #e0e0e0',
-                borderRadius: 1,
-                backgroundColor: '#fff',
-                '&::-webkit-scrollbar': { display: 'none' },
-                mb: 1,
-              }}
-            >
-              {Nba.map((game, index) => renderMatch(game, index))}
+          <section className="favorites-section">
+            <Typography variant="h5" className="section-title">
+              NBA Highlights
+            </Typography>
+            <Box className="matches-container">
+              {nbaGames.map((game, index) => renderMatch(game, index))}
             </Box>
           </section>
 
+          {/* Dashboard Widgets */}
           <div className="dashboard-widgets">
             <div className="widget calorie-widget">
               <h3>Calories</h3>
@@ -174,7 +161,9 @@ const HomePage = () => {
                     trailColor: '#d6d6d6',
                   })}
                 />
-                <p>{totalCalories} / {dailyCalorieGoal} Calories</p>
+                <p>
+                  {totalCalories} / {dailyCalorieGoal} Calories
+                </p>
               </div>
             </div>
 

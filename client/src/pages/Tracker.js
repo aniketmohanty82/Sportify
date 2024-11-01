@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MealLogForm from '../components/MealLogForm';
-import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
+import ConfirmDeleteModal from '../components/ConfirmDeleteMealModal';
 import EditMealModal from '../components/EditMealModal';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';

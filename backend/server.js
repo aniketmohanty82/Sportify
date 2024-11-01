@@ -425,6 +425,8 @@ app.delete('/api/meals/:id', async (req, res) => {
 // User routes and protected routes
 const workoutsRouter = require('./routes/workouts');
 app.use('/api/workouts', workoutsRouter); // Workout routes
+const runsRouter = require('./routes/runs');
+app.use('/api/runs', runsRouter); // Run routes
 const usersRouter = require('./routes/users');
 app.use('/users', usersRouter);
 

@@ -58,6 +58,7 @@ const LogIn = () => {
       localStorage.setItem('userId', res.data.user.id);
       localStorage.setItem('userName', res.data.user.userName);
       localStorage.setItem('timeZone', res.data.user.timeZone);
+      localStorage.setItem('darkMode', res.data.user.darkMode);
 
       navigate('/tracker');
     } catch (err) {

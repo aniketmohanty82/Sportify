@@ -111,7 +111,7 @@ router.post('/reset-password/:token', async (req, res) => {
 
 router.post('/register', async (req, res) => {
   try {
-    const { firstName, lastName, username, email, password, timezone } = req.body;
+    const { firstName, lastName, username, email, password, timezone, darkMode } = req.body;
 
     if (!firstName || !lastName || !username || !email || !password) {
       return res.status(400).json({ message: 'Please enter all fields' });
@@ -131,13 +131,14 @@ router.post('/register', async (req, res) => {
       username,
       email,
       password,
-      timezone
+      timezone,
+      darkMode
     });
 
     const savedUser = await newUser.save();
     res.status(201).json({
       message: 'User registered successfully',
-      user: { id: savedUser._id, email: savedUser.email, username: savedUser.username, timezone: 'UTC' },
+      user: { id: savedUser._id, email: savedUser.email, username: savedUser.username, timezone: 'UTC', darkMode: 'false' },
     });
   } catch (err) {
     console.error(err);
@@ -186,6 +187,7 @@ router.post('/login', async (req, res) => {
             lastName: user.lastName,
             userName: user.username,
             timeZone: user.timezone,
+            darkMode: user.darkMode
           },
         });
       }
@@ -245,6 +247,7 @@ router.put('/update/:id', auth, async (req, res) => {
         username: user.username,
         email: user.email,
         timezone: user.timezone,
+        darkMode: user.darkMode
       },
     });
   } catch (err) {
@@ -291,6 +294,49 @@ router.get('/timezone', async (req, res) => {
     }
 
     res.status(200).json({ timezone: user.timezone });
+  } catch (err) {
+    console.error('Error fetching time zone:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.put('/update-darkMode', async (req, res) => {
+  try {
+    const { userId, darkMode } = req.body;
+
+    if (!userId || !darkMode) {
+      return res.status(400).json({ message: 'Please provide userId and darkMode' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.darkMode = darkMode;
+    await user.save();
+
+    res.status(200).json({ message: 'Timezone updated successfully', darkMode: user.darkMode });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.get('/darkMode', async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'Please provide userId' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ darkMode: user.darkMode });
   } catch (err) {
     console.error('Error fetching time zone:', err);
     res.status(500).json({ message: 'Server error' });

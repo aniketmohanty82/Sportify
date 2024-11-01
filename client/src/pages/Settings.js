@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Settings.css';
+import axios from 'axios';
 
 const Settings = () => {
   const [userData, setUserData] = useState({
@@ -18,6 +19,7 @@ const Settings = () => {
   const userId = localStorage.getItem('userId');
   const token = localStorage.getItem('token'); // Retrieve the token from localStorage
   const navigate = useNavigate();
+  const [darkMode, setDarkMode] = useState(false);
 
   // State for controlling the delete confirmation modal
   const [showModal, setShowModal] = useState(false);
@@ -50,7 +52,48 @@ const Settings = () => {
       }
     };
     fetchUserProfile();
+    fetchDarkModeSetting()
   }, [userId, token]);
+
+  const fetchDarkModeSetting = async () => {
+    try {
+      const response = await fetch(`http://localhost:5001/users/darkMode?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token, // Include token if authentication is needed
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch dark mode setting');
+      }
+
+      const data = await response.json();
+      setDarkMode(data.darkMode);
+    } catch (error) {
+      console.error('Error fetching dark mode setting:', error);
+    }
+  };
+
+  const toggleDarkMode = async () => {
+    try {
+      // Toggle dark mode locally
+      const updatedDarkMode = !darkMode; // Toggle from the previous state
+      setDarkMode(updatedDarkMode)
+
+      // Save the updated dark mode setting on the server
+      await fetch(`http://localhost:5001/users/update-darkMode`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token, // Include the token in headers
+        }, body: JSON.stringify({ userId, darkMode: updatedDarkMode }),
+      });
+    } catch (error) {
+      console.error('Error updating dark mode:', error);
+    }
+  };
 
   const handleTimeZoneSave = async (timeZone) => {
     try {
@@ -135,7 +178,7 @@ const Settings = () => {
 
   return (
     <div className="settings-container">
-      <h2>Account Settings</h2>
+      <h2>{darkMode ? "Account Settings" : null}</h2>
       {message && <p className="success-message">{message}</p>}
       {error && <p className="error-message">{error}</p>}
 
@@ -162,6 +205,24 @@ const Settings = () => {
           <label>Time Zone:</label>
           <span>{userData.timeZoneUser}</span>
         </div>
+      </div>
+
+      {/* Dark Mode Toggle Button */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+        <button
+          onClick={toggleDarkMode}
+          className="button toggle-button"
+          style={{
+            backgroundColor: darkMode ? '#1aa64b' : '#ddd',
+            color: darkMode ? '#fff' : '#333',
+            border: 'none',
+            borderRadius: '5px',
+            padding: '10px',
+            cursor: 'pointer',
+          }}
+        >
+          {darkMode ? 'Light Mode' : 'Dark Mode'}
+        </button>
       </div>
 
       {/* Time Zone Selector */}

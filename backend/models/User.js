@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String }, 
   avatar: { type: String },
   timezone: { type: String, default: 'UTC' },
+  darkMode: {type: Boolean, default: false},
   resetPasswordToken: String,
   resetPasswordExpires: Date,
 });

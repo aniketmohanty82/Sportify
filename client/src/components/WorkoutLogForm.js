@@ -1,3 +1,4 @@
+/*client/src/components/WorkoutLogForm.js*/
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-cool-form';
 import '../MealLogForm.css'; // Import the CSS file for styling

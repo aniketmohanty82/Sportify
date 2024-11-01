@@ -1,3 +1,4 @@
+/*backend/routes/workouts.js*/
 const express = require('express');
 const { check, validationResult } = require('express-validator');
 const auth = require('../middleware/auth'); // Assuming you have an auth middleware

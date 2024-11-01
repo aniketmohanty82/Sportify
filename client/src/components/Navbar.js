@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'; // Import useState and useEffect
 import { Link, useNavigate } from 'react-router-dom'; 
-import { FaHome, FaTasks, FaChartPie, FaCog, FaSignOutAlt, FaRunning } from 'react-icons/fa';
+import { FaHome, FaTasks, FaChartPie, FaCog, FaSignOutAlt, FaRunning, FaFutbol, FaDumbbell } from 'react-icons/fa';
 import '../Navbar.css';
 import logo from '../assets/logo-no-background.png';
 
@@ -48,15 +48,15 @@ const Navbar = () => {
             Home
           </Link>
           <Link to="/sports" className="navbar__link">
-            <FaRunning className="navbar__icon" />
+            <FaFutbol className="navbar__icon" />
             Sports
           </Link>
           <Link to="/workout" className="navbar__link">
-            <FaTasks className="navbar__icon" />
+            <FaDumbbell className="navbar__icon" />
             Workout
           </Link>
           <Link to="/runs" className="navbar__link">
-            <FaTasks className="navbar__icon" />
+            <FaRunning className="navbar__icon" />
             Runs
           </Link>
           <Link to="/tasks" className="navbar__link">

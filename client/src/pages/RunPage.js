@@ -161,7 +161,7 @@ const RunPage = () => {
         </button>
       </div>
 
-      <div style={{ padding: '20px', borderRadius: '15px', backgroundColor: '#f9f9f9', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
+      <div style={{ padding: '10px 20px', marginBottom: '20px', borderRadius: '15px', backgroundColor: '#f9f9f9', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
         {/* Time Frame Selector */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
           <select value={timeFrame} onChange={(e) => setTimeFrame(e.target.value)} style={{ padding: '10px', fontSize: '16px', borderRadius: '5px' }}>

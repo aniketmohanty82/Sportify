@@ -40,7 +40,7 @@ const LogIn = () => {
       console.log(res.data.user)
       console.log(localStorage.getItem('userName'))
 
-      navigate('/tracker');
+      navigate('/runs');
 
     } catch (err) {
       console.error(err.response.data);
@@ -60,7 +60,7 @@ const LogIn = () => {
       localStorage.setItem('timeZone', res.data.user.timeZone);
       localStorage.setItem('darkMode', res.data.user.darkMode);
 
-      navigate('/tracker');
+      navigate('/runs');
     } catch (err) {
       console.error(err);
       setMessage('Google login failed');

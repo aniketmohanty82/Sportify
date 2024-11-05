@@ -885,6 +885,116 @@ app.delete('/api/meals/:id', async (req, res) => {
     }
 });
 
+const { Parser } = require('json2csv');
+const PDFDocument = require('pdfkit');
+
+// @route   GET api/exports/calories
+// @desc    Export calorie summaries as PDF or CSV
+// @access  Private
+app.get('/api/calories/export', auth, async (req, res) => {
+  const { format, timeframe } = req.query; // Get format (pdf/csv) and timeframe (daily/weekly/monthly)
+
+  if (!format || !timeframe) {
+    return res.status(400).json({ msg: 'Please specify both format and timeframe.' });
+  }
+
+  try {
+    // Determine date range based on the timeframe
+    const currentDate = new Date();
+    let startDate;
+    if (timeframe === 'daily') {
+      startDate = new Date(currentDate);
+      startDate.setHours(0, 0, 0, 0);
+    } else if (timeframe === 'weekly') {
+      startDate = new Date(currentDate);
+      startDate.setDate(currentDate.getDate() - 7);
+    } else if (timeframe === 'monthly') {
+      startDate = new Date(currentDate);
+      startDate.setMonth(currentDate.getMonth() - 1);
+    } else {
+      return res.status(400).json({ msg: 'Invalid timeframe. Choose "daily", "weekly", or "monthly".' });
+    }
+
+    // Find meals within the date range
+    const mealLogs = await MealLog.find({
+      userId: req.user.id,
+      date: { $gte: startDate, $lt: currentDate },
+    }).sort({ date: -1 });
+
+    // Group meals by date and calculate total calories and nutrients for each day
+    const groupedData = mealLogs.reduce((acc, meal) => {
+      const date = meal.date.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+      if (!acc[date]) {
+        acc[date] = {
+          date,
+          totalCalories: 0,
+          totalProtein: 0,
+          totalCarbs: 0,
+          totalFats: 0,
+          totalFiber: 0,
+          totalSodium: 0,
+        };
+      }
+      acc[date].totalCalories += meal.nutrients;
+      acc[date].totalProtein += meal.protein;
+      acc[date].totalCarbs += meal.carbs;
+      acc[date].totalFats += meal.fats;
+      acc[date].totalFiber += meal.fiber;
+      acc[date].totalSodium += meal.sodium;
+      return acc;
+    }, {});
+
+    const summaryData = Object.values(groupedData); // Convert grouped data to an array
+
+    // Export as CSV
+    if (format === 'csv') {
+      const fields = ['date', 'totalCalories', 'totalProtein', 'totalCarbs', 'totalFats', 'totalFiber', 'totalSodium'];
+      const json2csvParser = new Parser({ fields });
+      const csv = json2csvParser.parse(summaryData);
+      res.header('Content-Type', 'text/csv');
+      res.attachment(`calorie_summary_${timeframe}.csv`);
+      return res.send(csv);
+    }
+
+    // Export as PDF
+    if (format === 'pdf') {
+      const doc = new PDFDocument();
+      res.setHeader('Content-Disposition', `attachment; filename=calorie_summary_${timeframe}.pdf`);
+      res.setHeader('Content-Type', 'application/pdf');
+      doc.pipe(res);
+
+      // PDF Title
+      doc.fontSize(20).text(`Calorie Summary - ${timeframe.charAt(0).toUpperCase() + timeframe.slice(1)}`, {
+        align: 'center',
+      });
+
+      // Populate PDF with data
+      summaryData.forEach((item) => {
+        doc
+          .fontSize(16)
+          .text(`Date: ${item.date}`, { underline: true, lineGap: 5 });
+        
+        doc
+          .fontSize(12)
+          .text(`Total Calories: ${item.totalCalories}`, { lineGap: 2 })
+          .text(`Protein: ${item.totalProtein}g`, { lineGap: 2 })
+          .text(`Carbs: ${item.totalCarbs}g`, { lineGap: 2 })
+          .text(`Fats: ${item.totalFats}g`, { lineGap: 2 })
+          .text(`Fiber: ${item.totalFiber}g`, { lineGap: 2 })
+          .text(`Sodium: ${item.totalSodium}mg`, { lineGap: 5 });
+          
+        doc.moveDown();
+      });
+
+      doc.end();
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Server error while exporting calorie data');
+  }
+});
+
+
 // User routes and protected routes
 const workoutsRouter = require('./routes/workouts');
 app.use('/api/workouts', workoutsRouter); // Workout routes

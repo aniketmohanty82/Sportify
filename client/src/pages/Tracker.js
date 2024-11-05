@@ -10,6 +10,7 @@ import '../App.css';
 import '../MealLogs.css';
 import CaloriesChart from '../components/CalorieChart'; // Adjust the path as need
 import { AiOutlinePlus, AiOutlineInfoCircle } from 'react-icons/ai';
+import RecommendedExercises from '../components/RecommendedExercises';
 
 
 const TrackerPage = () => {
@@ -34,6 +35,139 @@ const TrackerPage = () => {
   const [showInfo, setShowInfo] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
 
+  const [timeframe, setTimeframe] = useState(''); // Initialize as empty to ensure selection
+  const [format, setFormat] = useState(''); // Initialize as empty to ensure selection
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const exercises = [
+    // Beginner Exercises
+    {
+        name: "Walking",
+        calories_per_minute: 3.5,
+        fitnessLevel: "beginner",
+        description: "A light cardio exercise ideal for beginners. Helps burn calories steadily and is easy on joints."
+    },
+    {
+        name: "Stretching",
+        calories_per_minute: 2,
+        fitnessLevel: "beginner",
+        description: "Increases flexibility and is perfect for cooling down or warming up. Suitable for any fitness level."
+    },
+    {
+        name: "Light Yoga",
+        calories_per_minute: 3,
+        fitnessLevel: "beginner",
+        description: "A gentle form of yoga that helps improve flexibility and mental focus. Ideal for stress relief and relaxation."
+    },
+    {
+        name: "Stationary Cycling (low intensity)",
+        calories_per_minute: 4,
+        fitnessLevel: "beginner",
+        description: "A low-impact cycling workout for beginners, suitable for building endurance without high strain on muscles."
+    },
+    {
+        name: "Bodyweight Squats",
+        calories_per_minute: 5,
+        fitnessLevel: "beginner",
+        description: "A basic lower-body workout to strengthen legs and glutes. Good for beginners with controlled movements."
+    },
+
+    // Intermediate Exercises
+    {
+        name: "Jogging",
+        calories_per_minute: 7,
+        fitnessLevel: "intermediate",
+        description: "Moderate-intensity exercise for stamina. Burns calories efficiently and improves cardiovascular health."
+    },
+    {
+        name: "Elliptical Trainer",
+        calories_per_minute: 6.5,
+        fitnessLevel: "intermediate",
+        description: "A low-impact cardio workout that targets various muscle groups and boosts stamina. Great for moderate fitness."
+    },
+    {
+        name: "Swimming",
+        calories_per_minute: 8,
+        fitnessLevel: "intermediate",
+        description: "A full-body exercise that is gentle on the joints, burns calories effectively, and strengthens multiple muscle groups."
+    },
+    {
+        name: "Rowing Machine",
+        calories_per_minute: 8,
+        fitnessLevel: "intermediate",
+        description: "Cardio and strength exercise for building upper body endurance, stamina, and core strength."
+    },
+    {
+        name: "Bodyweight Circuit (squats, push-ups, lunges)",
+        calories_per_minute: 7.5,
+        fitnessLevel: "intermediate",
+        description: "A set of bodyweight exercises combined to create an effective calorie-burning circuit workout."
+    },
+
+    // Advanced Exercises
+    {
+        name: "Running",
+        calories_per_minute: 10,
+        fitnessLevel: "advanced",
+        description: "High-intensity exercise for advanced levels. Increases calorie burn and cardiovascular endurance significantly."
+    },
+    {
+        name: "Jump Rope",
+        calories_per_minute: 12,
+        fitnessLevel: "advanced",
+        description: "A high-calorie-burning workout that improves coordination, agility, and cardiovascular endurance."
+    },
+    {
+        name: "HIIT (High-Intensity Interval Training)",
+        calories_per_minute: 14,
+        fitnessLevel: "advanced",
+        description: "Alternating between high and low intensity, this workout is intense and efficient for calorie burning."
+    },
+    {
+        name: "Kettlebell Swings",
+        calories_per_minute: 13,
+        fitnessLevel: "advanced",
+        description: "A compound movement targeting multiple muscle groups. Excellent for strength and endurance."
+    },
+    {
+        name: "Stair Climber",
+        calories_per_minute: 11,
+        fitnessLevel: "advanced",
+        description: "Intense lower-body workout for calorie burn and leg strengthening. Mimics climbing stairs for muscle endurance."
+    },
+    
+    // Mixed Level Exercises
+    {
+        name: "Hiking",
+        calories_per_minute: 6,
+        fitnessLevel: "beginner, intermediate",
+        description: "An outdoor activity that combines cardio with low-impact strength training. Suitable for most fitness levels."
+    },
+    {
+        name: "Dancing",
+        calories_per_minute: 5,
+        fitnessLevel: "beginner, intermediate",
+        description: "A fun, moderate-intensity workout that combines cardio with coordination. Suitable for beginners and intermediates."
+    },
+    {
+        name: "Pilates",
+        calories_per_minute: 4.5,
+        fitnessLevel: "beginner, intermediate",
+        description: "Focuses on core strength, flexibility, and control. Suitable for beginners and intermediates looking for stability."
+    },
+    {
+        name: "Boxing",
+        calories_per_minute: 9,
+        fitnessLevel: "intermediate, advanced",
+        description: "A high-intensity workout that combines strength and cardio. Burns calories quickly and improves hand-eye coordination."
+    },
+    {
+        name: "Circuit Training",
+        calories_per_minute: 9,
+        fitnessLevel: "intermediate, advanced",
+        description: "Combines cardio and strength exercises in a series, helping build endurance and burn calories."
+    }
+];
   // Daily calorie goal - max
   const dailyCalorieGoal = 2000;
 
@@ -412,6 +546,52 @@ const TrackerPage = () => {
     return Math.min((nutrientAmount / maxAmount) * 100, 100); // Ensure the progress doesn't exceed 100%
   };
 
+  // Function to handle the export request
+  const handleExport = async () => {
+    if (!timeframe || !format) {
+      alert('Please select both a timeframe and format before exporting.');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(`http://localhost:5001/api/exports/calories?format=${format}&timeframe=${timeframe}`, {
+        headers: {
+          'x-auth-token': token,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+      const fileUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.setAttribute('download', `calorie_summary_${timeframe}.${format}`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Error exporting calorie summary:', error);
+      alert('Failed to export calorie summary');
+    }
+  };
+
+  const buttonStyle = {
+    padding: '10px 20px',
+    fontSize: '16px',
+    backgroundColor: '#28a745',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    marginRight: '10px',
+    marginBottom: '10px',
+  };
+
   return (
     <div className="tracker-page">
       {successMessage && (
@@ -425,50 +605,130 @@ const TrackerPage = () => {
           <p><button onClick={handleUndoDelete}>Undo</button></p>
         </div>
     )}
+<div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '15px',
+        padding: '10px 20px',
+        borderRadius: '15px',
+        backgroundColor: '#f9f9f9',
+        boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+      }}
+    >
+      {/* Add New Meal Button */}
+      <button
+        title="Add New"
+        className="group flex items-center cursor-pointer outline-none hover:shadow-lg duration-300 transition-transform transform hover:scale-105"
+        onClick={handleOpenModal}
+        style={{
+          backgroundColor: '#1aa64b',
+          color: '#fff',
+          padding: '10px 15px',
+          borderRadius: '10px',
+          border: 'none',
+          fontSize: '16px',
+          fontWeight: 'bold',
+        }}
+      >
+        <AiOutlinePlus
+          size={24}
+          className="stroke-zinc-400 fill-none group-hover:fill-zinc-800 group-active:stroke-zinc-200 group-active:fill-zinc-600 group-active:duration-0 duration-300"
+        />
+        <span style={{ marginLeft: '8px' }}>Add a meal</span>
+      </button>
 
-    {/* Top row with date and add button */}
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'space-between', 
-      alignItems: 'center', 
-      marginBottom: '15px', 
-      padding: '10px 20px', 
-      borderRadius: '15px', 
-      backgroundColor: '#f9f9f9', 
-      boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
-      }}>
-        {/* Current Date Display */}
-        <h2 style={{ 
-          fontSize: '24px', 
-          color: '#333', 
-          fontFamily: 'Open Sans, sans-serif',
-        }}>
-          {new Date().toLocaleDateString()}
-        </h2>
-  
-        {/* Add New Meal Button */}
+      {/* Export Button with Dropdown */}
+      <div style={{ position: 'relative' }}>
         <button
-          title="Add New"
+          title="Export"
           className="group flex items-center cursor-pointer outline-none hover:shadow-lg duration-300 transition-transform transform hover:scale-105"
-          onClick={handleOpenModal}
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           style={{
-            backgroundColor: '#1aa64b', 
-            color: '#fff', 
-            padding: '10px 15px', 
-            borderRadius: '10px', 
-            border: 'none', 
-            fontSize: '16px', 
-            fontWeight: 'bold', 
+            backgroundColor: '#1aa64b',
+            color: '#fff',
+            padding: '10px 15px',
+            borderRadius: '10px',
+            border: 'none',
+            fontSize: '16px',
+            fontWeight: 'bold',
           }}
         >
-          <AiOutlinePlus
-            size={24} 
-            className="stroke-zinc-400 fill-none group-hover:fill-zinc-800 group-active:stroke-zinc-200 group-active:fill-zinc-600 group-active:duration-0 duration-300"
-          />
-          <span style={{ marginLeft: '8px' }}>Add a meal</span>
+          <span style={{ marginRight: '8px' }}>Export</span>
         </button>
+
+        {/* Dropdown Menu */}
+        {isDropdownOpen && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '50px',
+              right: '0',
+              backgroundColor: '#fff',
+              boxShadow: '0 0 8px rgba(0, 0, 0, 0.15)',
+              borderRadius: '10px',
+              padding: '10px',
+              zIndex: 10,
+            }}
+          >
+            <div style={{ marginBottom: '10px' }}>
+              <label htmlFor="timeframe" style={{ display: 'block', marginBottom: '5px' }}>Select Timeframe:</label>
+              <select
+                id="timeframe"
+                value={timeframe}
+                onChange={(e) => setTimeframe(e.target.value)}
+                style={{ padding: '8px', width: '100%' }}
+              >
+                <option value="">-- Select Timeframe --</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: '10px' }}>
+              <label htmlFor="format" style={{ display: 'block', marginBottom: '5px' }}>Select Format:</label>
+              <select
+                id="format"
+                value={format}
+                onChange={(e) => setFormat(e.target.value)}
+                style={{ padding: '8px', width: '100%' }}
+              >
+                <option value="">-- Select Format --</option>
+                <option value="csv">CSV</option>
+                <option value="pdf">PDF</option>
+              </select>
+            </div>
+
+            <button
+              onClick={() => {
+                handleExport();
+                setIsDropdownOpen(false); // Close dropdown after export
+              }}
+              style={{
+                width: '100%',
+                padding: '10px',
+                backgroundColor: '#1aa64b',
+                color: '#fff',
+                borderRadius: '5px',
+                border: 'none',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
+            >
+              Export
+            </button>
+          </div>
+        )}
       </div>
-  
+    </div>
+    
+    <RecommendedExercises 
+        totalCalories={totalCalories} 
+        dailyCalorieGoal={dailyCalorieGoal} 
+        exercises={exercises} 
+      />
       {/* Calorie Tracking Section */}
       <div style={{ 
         padding: '20px', 

@@ -7,6 +7,10 @@ import { green } from '@mui/material/colors';
 import { useNavigate } from 'react-router-dom';
 import '../HomePage.css';
 import 'react-circular-progressbar/dist/styles.css';
+import { AiOutlinePlus } from 'react-icons/ai';
+import MealLogForm from '../components/MealLogForm';
+import WorkoutLogForm from '../components/WorkoutLogForm';
+import RunLogForm from '../components/RunLogForm';
 
 const HomePage = () => {
   const [workouts, setWorkouts] = useState([]);
@@ -15,48 +19,51 @@ const HomePage = () => {
   const [dailyCalorieGoal, setDailyCalorieGoal] = useState(2500);
   const [caloriePercentage, setCaloriePercentage] = useState(0);
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const fetchWorkouts = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5001/api/workouts', {
+        method: 'GET',
+        headers: { 'x-auth-token': token },
+      });
+
+      if (response.ok) {
+        const workoutLogs = await response.json();
+        setWorkouts(workoutLogs);
+      } else {
+        console.error('Failed to fetch workouts');
+      }
+    } catch (error) {
+      console.error('Error fetching workouts:', error);
+    }
+  };
+
+  const fetchMealLogs = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5001/api/meals', {
+        headers: { 'x-auth-token': token },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMealLogs(data);
+        calculateTotalCalories();
+      } else if (response.status === 401) {
+        navigate('/login');
+      } else {
+        console.error('Failed to fetch meal logs');
+      }
+    } catch (error) {
+      console.error('Error fetching meal logs:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchWorkouts = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5001/api/workouts', {
-          method: 'GET',
-          headers: { 'x-auth-token': token },
-        });
-
-        if (response.ok) {
-          const workoutLogs = await response.json();
-          setWorkouts(workoutLogs);
-        } else {
-          console.error('Failed to fetch workouts');
-        }
-      } catch (error) {
-        console.error('Error fetching workouts:', error);
-      }
-    };
-
-    const fetchMealLogs = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5001/api/meals', {
-          headers: { 'x-auth-token': token },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setMealLogs(data);
-          calculateTotalCalories();
-        } else if (response.status === 401) {
-          navigate('/login');
-        } else {
-          console.error('Failed to fetch meal logs');
-        }
-      } catch (error) {
-        console.error('Error fetching meal logs:', error);
-      }
-    };
-
     fetchWorkouts();
     fetchMealLogs();
   }, []);
@@ -87,6 +94,102 @@ const HomePage = () => {
     { teams: ['Spurs', 'Mavericks'], scores: [100, 110] },
     { teams: ['Bucks', 'Celtics'], scores: [80, 125] },
   ];
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleFormSubmit = async (data) => {
+    console.log('Meal logged:', data);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5001/api/meals/logmeal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token, // Include the token in the headers
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        await fetchMealLogs();
+      } else if (response.status === 401) {
+        // Unauthorized, redirect to login
+        navigate('/login');
+      } else {
+        console.error('Failed to log meal');
+      }
+    } catch (error) {
+      console.error('Error logging meal:', error);
+    }
+  };
+
+  const handleOpenModalWorkout = () => {
+    setIsWorkoutModalOpen(true);
+  };
+
+  const handleCloseModalWorkout = () => {
+    setIsWorkoutModalOpen(false);
+  };
+
+  const handleWorkoutSubmit = async (data) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await fetch('http://localhost:5001/api/workouts/logworkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.statusText}`);
+      }
+
+      await fetchWorkouts();
+    } catch (error) {
+      console.error('Error logging workout:', error);
+    }
+  };
+
+  const logRun = async (data) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("No token found. Please log in again.");
+      }
+
+      const response = await fetch('http://localhost:5001/api/runs/logrun', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error logging run: ${errorText}`);
+      }
+      setIsFormOpen(false);
+    } catch (error) {
+      console.error('Error logging run:', error.message);
+      alert(error.message);
+    }
+  };
+
 
   const renderMatch = (game, index) => {
     const winner =
@@ -167,15 +270,6 @@ const HomePage = () => {
               </div>
             </div>
 
-            <div className="widget tasks-widget">
-              <h3>Tasks</h3>
-              <ul>
-                <li>Sample Task 1</li>
-                <li>Sample Task 2</li>
-                <li>Sample Task 3</li>
-              </ul>
-            </div>
-
             <div className="widget workouts-widget">
               <h3>Workouts</h3>
               <div className="workouts-list">
@@ -194,21 +288,86 @@ const HomePage = () => {
         </main>
 
         <aside className="sidebar">
-          <section className="news-section">
-            <h2>News</h2>
-            <ul>
-              <li>Sample News 1</li>
-              <li>Sample News 2</li>
-              <li>Sample News 3</li>
-            </ul>
-          </section>
           <section className="shortcuts-section">
             <h2>Shortcuts</h2>
-            <Button className="shortcut-button">Add a food item</Button>
-            <Button className="shortcut-button">Add a Task</Button>
-            <Button className="shortcut-button">Toggle theme</Button>
+             {/* Add New Meal Button */}
+      <button
+        title="Add New"
+        className="group flex items-center cursor-pointer outline-none hover:shadow-lg duration-300 transition-transform transform hover:scale-105"
+        onClick={handleOpenModal}
+        onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+        onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+        style={{
+          backgroundColor: '#1aa64b',
+          color: '#fff',
+          padding: '10px 15px',
+          borderRadius: '10px',
+          border: 'none',
+          fontSize: '16px',
+          fontWeight: 'bold',
+        }}
+      >
+        <AiOutlinePlus
+          size={24}
+          className="stroke-zinc-400 fill-none group-hover:fill-zinc-800 group-active:stroke-zinc-200 group-active:fill-zinc-600 group-active:duration-0 duration-300"
+        />
+        <span style={{ marginLeft: '8px' }}>Add a meal</span>
+      </button>
+      <button
+        title="Add New Exercise"
+        style={{
+          backgroundColor: '#1aa64b',
+          color: '#fff',
+          padding: '10px 15px',
+          borderRadius: '10px',
+          border: 'none',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          transition: 'transform 0.2s ease',
+        }}
+        onClick={handleOpenModalWorkout}
+        onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+        onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+      >
+        <AiOutlinePlus size={24} />
+        <span style={{ marginLeft: '8px' }}>Add an Exercise</span>
+      </button>
+      <button
+        title="Add New Run"
+        style={{
+          backgroundColor: '#1aa64b',
+          color: '#fff',
+          padding: '10px 15px',
+          borderRadius: '10px',
+          border: 'none',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          transition: 'transform 0.2s ease',
+        }}
+        onClick={() => setIsFormOpen(true)}
+        onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+        onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+      >
+        <AiOutlinePlus size={24} />
+        <span style={{ marginLeft: '8px' }}>Add a run</span>
+      </button>
           </section>
         </aside>
+
+        <MealLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} onError={handleCloseModal} />
+        <WorkoutLogForm isOpen={isWorkoutModalOpen} onClose={handleCloseModalWorkout} onSubmit={handleWorkoutSubmit} />
+        <RunLogForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={logRun}
+        darkMode={false}
+      />
       </div>
     </div>
   );

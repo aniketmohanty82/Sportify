@@ -21,7 +21,259 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .catch(err => console.log(err));
 
 // Routes for fetching sports data
-// Basketball Fixtures List
+app.get('/api/basketball_team_statistics/:teamId', async (req, res) => {
+    try {
+        const teamId = req.params.teamId; // Correct parameter name
+
+        const response = await fetch(
+            `https://api-basketball.p.rapidapi.com/statistics?season=2024-2025&league=12&team=${teamId}`, // Use the correct parameter
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-basketball.p.rapidapi.com', // Match the host value
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.response) {
+            return res.status(404).json({ message: 'Team data not found' });
+        }
+
+        res.status(200).json(data.response); // Send the entire response for use on the frontend
+    } catch (err) {
+        console.error('Error fetching basketball team statistics:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+app.get('/api/team_statistics/:teamId', async (req, res) => {
+    try {
+        const teamId = req.params.teamId;
+
+        const response = await fetch(
+            `https://api-football-v1.p.rapidapi.com/v3/teams/statistics?league=39&season=2024&team=${teamId}`,
+            {
+                headers: {
+                    'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.response) {
+            return res.status(404).json({ message: 'Team data not found' });
+        }
+
+        const teamStatistics = data.response;
+        
+        // Extract required fields
+        const result = {
+            team: {
+                id: teamStatistics.team.id,
+                name: teamStatistics.team.name,
+                logo: teamStatistics.team.logo
+            },
+            form: teamStatistics.form,
+            fixtures: teamStatistics.fixtures,
+            goals: teamStatistics.goals,
+            lineups: teamStatistics.lineups,
+            cards: teamStatistics.cards
+        };
+
+        res.status(200).json(result);
+    } catch (err) {
+        console.error('Error fetching team statistics:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+
+
+// Cricket Live:
+app.get('/api/cricket_live', async (req, res) => {
+    try {
+        // Fetch live data from the Cricbuzz API
+        const response = await fetch(
+            'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live',
+            {
+                method: 'GET',
+                headers: {
+                    'x-rapidapi-host': 'cricbuzz-cricket.p.rapidapi.com',
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49',
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        const domesticLiveMatches = [];
+        const internationalLiveMatches = [];
+
+        // Iterate through match types
+        data.typeMatches.forEach(typeMatch => {
+            const matchType = typeMatch.matchType; // 'League' for Domestic, 'International' for International
+
+            typeMatch.seriesMatches.forEach(series => {
+                if (series.seriesAdWrapper) {
+                    series.seriesAdWrapper.matches.forEach(match => {
+                        const matchInfo = match.matchInfo;
+                        const matchScore = match.matchScore;
+
+                        // Extract team details
+                        const team1 = matchInfo.team1.teamName;
+                        const team2 = matchInfo.team2.teamName;
+
+                        // Format scores
+                        let score = '';
+                        if (matchInfo.matchFormat === 'TEST') {
+                            const team1Inngs1 = matchScore?.team1Score?.inngs1 || {};
+                            const team1Inngs2 = matchScore?.team1Score?.inngs2 || {};
+                            const team2Inngs1 = matchScore?.team2Score?.inngs1 || {};
+                            const team2Inngs2 = matchScore?.team2Score?.inngs2 || {};
+
+                            score = `${team1Inngs1.runs || 0}/${team1Inngs1.wickets || 0}`;
+                            if (team1Inngs2.runs) {
+                                score += ` & ${team1Inngs2.runs}/${team1Inngs2.wickets || 0}`;
+                            }
+                            score += ` vs ${team2Inngs1.runs || 0}/${team2Inngs1.wickets || 0}`;
+                            if (team2Inngs2.runs) {
+                                score += ` & ${team2Inngs2.runs}/${team2Inngs2.wickets || 0}`;
+                            }
+                        } else {
+                            const team1Score = matchScore?.team1Score?.inngs1 || {};
+                            const team2Score = matchScore?.team2Score?.inngs1 || {};
+
+                            score = `${team1Score.runs || 0}/${team1Score.wickets || 0} vs ${team2Score.runs || 0}/${team2Score.wickets || 0}`;
+                        }
+
+                        // Construct match details
+                        const matchDetails = {
+                            matchId: matchInfo.matchId,
+                            seriesName: matchInfo.seriesName,
+                            matchDesc: matchInfo.matchDesc,
+                            teams: `${team1} vs ${team2}`,
+                            score: score,
+                            status: matchInfo.status,
+                            state: matchInfo.state,
+                            venue: `${matchInfo.venueInfo.ground}, ${matchInfo.venueInfo.city}`,
+                        };
+
+                        // Categorize into Domestic or International
+                        if (matchType === 'International') {
+                            internationalLiveMatches.push(matchDetails);
+                        } else if (matchType === 'League') {
+                            domesticLiveMatches.push(matchDetails);
+                        }
+                    });
+                }
+            });
+        });
+
+        res.json({
+            domesticLiveMatches,
+            internationalLiveMatches,
+        });
+    } catch (err) {
+        console.error('Error fetching live cricket matches:', err);
+        res.status(500).send('Server error');
+    }
+});
+
+// Cricket
+app.get('/api/cricket', async (req, res) => {
+    try {
+        // Fetch data from the Cricbuzz Cricket API
+        const response = await fetch(
+            'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/recent',
+            {
+                method: 'GET',
+                headers: {
+                    'x-rapidapi-host': 'cricbuzz-cricket.p.rapidapi.com',
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        const domesticMatches = [];
+        const internationalMatches = [];
+
+        // Iterate through match types
+        data.typeMatches.forEach(typeMatch => {
+            const matchType = typeMatch.matchType; // 'League' for Domestic, 'International' for International
+
+            typeMatch.seriesMatches.forEach(series => {
+                if (series.seriesAdWrapper) {
+                    series.seriesAdWrapper.matches.forEach(match => {
+                        const matchInfo = match.matchInfo;
+                        const matchScore = match.matchScore;
+
+                        // Get team details
+                        const team1 = matchInfo.team1.teamName;
+                        const team2 = matchInfo.team2.teamName;
+
+                        // Format scores
+                        let score = '';
+                        if (matchInfo.matchFormat === 'TEST') {
+                            const team1Inngs1 = matchScore?.team1Score?.inngs1 || {};
+                            const team1Inngs2 = matchScore?.team1Score?.inngs2 || {};
+                            const team2Inngs1 = matchScore?.team2Score?.inngs1 || {};
+                            const team2Inngs2 = matchScore?.team2Score?.inngs2 || {};
+
+                            score = `${team1Inngs1.runs || 0}\\${team1Inngs1.wickets || 0}`;
+                            if (team1Inngs2.runs) {
+                                score += ` & ${team1Inngs2.runs}\\${team1Inngs2.wickets || 0}`;
+                            }
+                            score += ` vs ${team2Inngs1.runs || 0}\\${team2Inngs1.wickets || 0}`;
+                            if (team2Inngs2.runs) {
+                                score += ` & ${team2Inngs2.runs}\\${team2Inngs2.wickets || 0}`;
+                            }
+                        } else {
+                            const team1Score = matchScore?.team1Score?.inngs1 || {};
+                            const team2Score = matchScore?.team2Score?.inngs1 || {};
+
+                            score = `${team1Score.runs || 0}\\${team1Score.wickets || 0} vs ${team2Score.runs || 0}\\${team2Score.wickets || 0}`;
+                        }
+
+                        // Match details
+                        const matchDetails = {
+                            matchId: matchInfo.matchId,
+                            seriesName: matchInfo.seriesName,
+                            matchDesc: matchInfo.matchDesc,
+                            teams: `${team1} vs ${team2}`,
+                            score: score,
+                            status: matchInfo.status
+                        };
+
+                        // Categorize into Domestic or International
+                        if (matchType === 'International') {
+                            internationalMatches.push(matchDetails);
+                        } else if (matchType === 'League') {
+                            domesticMatches.push(matchDetails);
+                        }
+                    });
+                }
+            });
+        });
+
+        res.json({
+            domestic: domesticMatches,
+            international: internationalMatches
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
 app.get('/api/basketball_fixtures/:leagueId', async (req, res) => {
     try {
         const leagueId = req.params.leagueId;
@@ -39,7 +291,7 @@ app.get('/api/basketball_fixtures/:leagueId', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );
@@ -91,7 +343,7 @@ app.get('/api/fixtures/:leagueId', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );
@@ -134,7 +386,7 @@ app.get('/api/fixture_details/:id', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );
@@ -155,7 +407,7 @@ app.get('/api/basketball_fixture_details/:id', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );
@@ -169,7 +421,7 @@ app.get('/api/basketball_fixture_details/:id', async (req, res) => {
         res.status(500).send('Server error');
     }
 });
-// '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+// 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
 app.get('/api/premier_league', async (req, res) => {
     try {
         const currentDate = new Date();
@@ -181,7 +433,7 @@ app.get('/api/premier_league', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );
@@ -243,7 +495,7 @@ app.get('/api/test_live', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );
@@ -296,7 +548,7 @@ app.get('/api/ucl_live', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );
@@ -349,7 +601,7 @@ app.get('/api/ucl', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );
@@ -413,7 +665,7 @@ app.get('/api/premier_league_live', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );
@@ -461,7 +713,7 @@ app.get('/api/bundesliga_live', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );
@@ -513,7 +765,7 @@ app.get('/api/bundesliga', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );
@@ -585,7 +837,7 @@ app.get('/api/nba', async (req, res) => {
                 {
                     headers: {
                         'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
-                        'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                        'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                     }
                 }
             );
@@ -639,7 +891,7 @@ app.get('/api/nba_live', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );
@@ -697,7 +949,7 @@ app.get('/api/euroleague', async (req, res) => {
                 {
                     headers: {
                         'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
-                        'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                        'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                     }
                 }
             );
@@ -751,7 +1003,7 @@ app.get('/api/euroleague_live', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
-                    'x-rapidapi-key': '7e8649a2b4msh4a666a2f44b749ap1ddf50jsn1a277cc3521f'
+                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
                 }
             }
         );

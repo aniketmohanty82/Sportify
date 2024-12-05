@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema({
   avatar: { type: String },
   timezone: { type: String, default: 'UTC' },
   darkMode: {type: Boolean, default: false},
+  favoriteSoccerTeam: {type: String, default: 'Arsenal'},
+  favoriteSoccerTeamId: {type: Number, deafult: 42},
+  favoriteBasketballTeam: {type: String, default: 'Los Angeles Lakers'},
+  favoriteBasketballTeamId: {type: Number, default: '145'}, 
   resetPasswordToken: String,
   resetPasswordExpires: Date,
 });

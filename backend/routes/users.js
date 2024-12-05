@@ -111,7 +111,7 @@ router.post('/reset-password/:token', async (req, res) => {
 
 router.post('/register', async (req, res) => {
   try {
-    const { firstName, lastName, username, email, password, timezone, darkMode } = req.body;
+    const { firstName, lastName, username, email, password, timezone, darkMode, favoriteSoccerTeam, favoriteSoccerTeamId, favoriteBasketballTeam, favoriteBasketballTeamId } = req.body;
 
     if (!firstName || !lastName || !username || !email || !password) {
       return res.status(400).json({ message: 'Please enter all fields' });
@@ -132,13 +132,17 @@ router.post('/register', async (req, res) => {
       email,
       password,
       timezone,
-      darkMode
+      darkMode,
+      favoriteSoccerTeam,
+      favoriteSoccerTeamId,
+      favoriteBasketballTeam,
+      favoriteBasketballTeamId,
     });
 
     const savedUser = await newUser.save();
     res.status(201).json({
       message: 'User registered successfully',
-      user: { id: savedUser._id, email: savedUser.email, username: savedUser.username, timezone: 'UTC', darkMode: 'false' },
+      user: { id: savedUser._id, email: savedUser.email, username: savedUser.username, timezone: 'UTC', darkMode: 'false', favoriteSoccerTeam: 'Arsenal', favoriteSoccerTeamId: 42, favoriteBasketballTeam: 'Los Angeles Lakers', favoriteBasketballTeamId: 145 },
     });
   } catch (err) {
     console.error(err);
@@ -187,7 +191,11 @@ router.post('/login', async (req, res) => {
             lastName: user.lastName,
             userName: user.username,
             timeZone: user.timezone,
-            darkMode: user.darkMode
+            darkMode: user.darkMode,
+            favoriteSoccerTeam: user.favoriteSoccerTeam,
+            favoriteSoccerTeamId: user.favoriteSoccerTeamId,
+            favoriteBasketballTeam: user.favoriteBasketballTeam,
+            favoriteBasketballTeamId: user.favoriteBasketballTeamId,
           },
         });
       }
@@ -247,7 +255,11 @@ router.put('/update/:id', auth, async (req, res) => {
         username: user.username,
         email: user.email,
         timezone: user.timezone,
-        darkMode: user.darkMode
+        darkMode: user.darkMode,
+        favoriteSoccerTeam: user.favoriteSoccerTeam,
+        favoriteSoccerTeamId: user.favoriteSoccerTeamId,
+        favoriteBasketballTeam: user.favoriteBasketballTeam,
+        favoriteBasketballTeamId: user.favoriteBasketballTeamId,
       },
     });
   } catch (err) {
@@ -256,6 +268,105 @@ router.put('/update/:id', auth, async (req, res) => {
   }
 });
 
+// Get favorite basketball team
+router.get('/basketballTeam', async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'Please provide userId' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ favoriteBasketballTeam: user.favoriteBasketballTeam || 'Los Angeles Lakers', favoriteBasketballTeamId: user.favoriteBasketballTeamId || 145}); // Return team or default to 'Arsenal'
+  } catch (err) {
+    console.error('Error fetching favorite basketball team:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update favorite basketball team
+router.put('/update-favoriteBasketballTeam', async (req, res) => {
+  try {
+    const { userId, favoriteBasketballTeam, favoriteBasketballTeamId } = req.body; 
+
+    if (!userId || !favoriteBasketballTeam || !favoriteBasketballTeamId) { 
+      return res.status(400).json({ message: 'Please provide userId, favoriteBasketballTeam, and favoriteBasketballTeamId' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.favoriteBasketballTeam = favoriteBasketballTeam || 'Los Angeles Lakers'; 
+    user.favoriteBasketballTeamId = favoriteBasketballTeamId || 145; 
+    await user.save();
+
+    res.status(200).json({ 
+      message: 'Favorite basketball team updated successfully', 
+      favoriteBasketballTeam: user.favoriteBasketballTeam,
+      favoriteBasketballTeamId: user.favoriteBasketballTeamId,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update favorite soccer team
+router.put('/update-favoriteSoccerTeam', async (req, res) => {
+  try {
+    const { userId, favoriteSoccerTeam, favoriteSoccerTeamId } = req.body; // Add favoriteSoccerTeamId here
+
+    if (!userId || !favoriteSoccerTeam || !favoriteSoccerTeamId) { // Validate favoriteSoccerTeamId
+      return res.status(400).json({ message: 'Please provide userId, favoriteSoccerTeam, and favoriteSoccerTeamId' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.favoriteSoccerTeam = favoriteSoccerTeam || 'Arsenal'; // Set the team or default to 'Arsenal'
+    user.favoriteSoccerTeamId = favoriteSoccerTeamId || 42; // Set the team ID or default to 42
+    await user.save();
+
+    res.status(200).json({ 
+      message: 'Favorite soccer team updated successfully', 
+      favoriteSoccerTeam: user.favoriteSoccerTeam,
+      favoriteSoccerTeamId: user.favoriteSoccerTeamId,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get favorite soccer team
+router.get('/soccerTeam', async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'Please provide userId' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ favoriteSoccerTeam: user.favoriteSoccerTeam || 'Arsenal', favoriteSoccerTeamId: user.favoriteSoccerTeamId || 42}); // Return team or default to 'Arsenal'
+  } catch (err) {
+    console.error('Error fetching favorite soccer team:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 router.put('/update-timezone', async (req, res) => {
   try {
@@ -368,6 +479,10 @@ router.post('/google-login', async (req, res) => {
         username: email.split('@')[0],
         avatar: picture,
         timezone: 'UTC',
+        favoriteSoccerTeam: 'Arsenal',
+        favoriteSoccerTeamId: 42,
+        favoriteBasketballTeam: 'Los Angeles Lakers',
+        favoriteBasketballTeamId: 145,
       });
       await user.save();
     } else {
@@ -394,6 +509,10 @@ router.post('/google-login', async (req, res) => {
         username: user.username,
         avatar: user.avatar,
         timezone: user.timezone,
+        favoriteSoccerTeam: user.favoriteSoccerTeam,
+        favoriteSoccerTeamId: user.favoriteSoccerTeamId,
+        favoriteBasketballTeam: user.favoriteBasketballTeam,
+        favoriteBasketballTeamId: user.favoriteBasketballTeamId,
       },
     });
   } catch (error) {
@@ -419,6 +538,10 @@ router.get('/:userId', async (req, res) => {
       username: user.username,
       email: user.email,
       timezone: user.timezone,
+      favoriteSoccerTeam: user.favoriteSoccerTeam,
+      favoriteSoccerTeamId: user.favoriteSoccerTeamId,
+      favoriteBasketballTeam: user.favoriteBasketballTeam,
+      favoriteBasketballTeamId: user.favoriteBasketballTeamId,
     });
   } catch (error) {
     console.error('Error fetching user data:', error);

@@ -11,7 +11,12 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userName');
-    localStorage.removeItem('timeZone')
+    localStorage.removeItem('timeZone');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('favoriteSoccerTeam');
+    localStorage.removeItem('favoriteSoccerTeamId');
+    localStorage.removeItem('favoriteBasketballTeam');
+    localStorage.removeItem('favoriteBasketballTeamId');
     navigate('/login');
   };
 

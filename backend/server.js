@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const fetch = require('node-fetch')
 const auth = require('./middleware/auth'); // Import the auth middleware
+const QuizResult = require('./models/QuizResult');
 
 dotenv.config();
 
@@ -1041,6 +1042,31 @@ app.get('/api/euroleague_live', async (req, res) => {
     }
 });
 
+// server.js
+
+app.post('/api/quiz/logresult', auth, async (req, res) => {
+    try {
+      const { result, answers } = req.body;
+      const userId = req.user.id; // Get userId from auth middleware
+  
+      // Validate input
+      if (!result || !answers) {
+        return res.status(400).json({ message: 'Result and answers are required.' });
+      }
+  
+      const quizResult = new QuizResult({
+        userId,
+        result,
+        answers,
+      });
+  
+      await quizResult.save();
+      res.status(201).json({ message: 'Quiz result logged successfully', data: quizResult });
+    } catch (error) {
+      console.error('Error logging quiz result', error);
+      res.status(500).json({ message: 'Error logging quiz result', error });
+    }
+  });  
 
 // Meal logging routes
 const MealLog = require('./models/MealLog');

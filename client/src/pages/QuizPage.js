@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import '../QuizPage.css'; // Adjust the path as needed
+import axios from 'axios';
+import athleteData from '../assets/athletes.json'; // Import athletes JSON
 
 const QuizPage = () => {
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // Index of the current question
-  const [answers, setAnswers] = useState({}); // User's answers
-  const [isSubmitted, setIsSubmitted] = useState(false); // Submission state
-  const [result, setResult] = useState(''); // To store the result athlete
-
-  // Include dark mode state if applicable
-  const [darkMode, setDarkMode] = useState(false); // Replace with your actual dark mode state
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [result, setResult] = useState('');
+  const [resultDescription, setResultDescription] = useState('');
+  const [resultImage, setResultImage] = useState('');
+  const [darkMode, setDarkMode] = useState(false);
 
   const quizData = [
     {
@@ -19,8 +21,8 @@ const QuizPage = () => {
         b: "Overcoming challenges and proving doubters wrong",
         c: "Contributing to a team’s success",
         d: "Mastery of skill and personal growth",
-        e: "Pushing physical and mental limits"
-      }
+        e: "Pushing physical and mental limits",
+      },
     },
     {
       id: 2,
@@ -30,8 +32,8 @@ const QuizPage = () => {
         b: "Strategic and calculated",
         c: "Fast-paced and exciting",
         d: "Endurance-based and disciplined",
-        e: "Technically precise and graceful"
-      }
+        e: "Technically precise and graceful",
+      },
     },
     {
       id: 3,
@@ -41,8 +43,8 @@ const QuizPage = () => {
         b: "Analyze and learn from it patiently",
         c: "View it as a minor setback in a larger journey",
         d: "Turn it into a lesson for the whole team",
-        e: "Stay calm and focus on what I can control"
-      }
+        e: "Stay calm and focus on what I can control",
+      },
     },
     {
       id: 4,
@@ -52,8 +54,8 @@ const QuizPage = () => {
         b: "Focused and goal-oriented",
         c: "Hard-working and collaborative",
         d: "Creative and inspired",
-        e: "Passionate with a flair for the dramatic"
-      }
+        e: "Passionate with a flair for the dramatic",
+      },
     },
     {
       id: 5,
@@ -63,8 +65,8 @@ const QuizPage = () => {
         b: "Inspiring others through resilience and skill",
         c: "Pioneering new ways to approach my field",
         d: "As a team player who changed the game",
-        e: "Consistently delivering excellence"
-      }
+        e: "Consistently delivering excellence",
+      },
     },
     {
       id: 6,
@@ -74,8 +76,8 @@ const QuizPage = () => {
         b: "Confidence and swagger get the job done",
         c: "Discipline and strategy keep me steady",
         d: "Resilience and creativity drive me",
-        e: "Balance and humility make me better"
-      }
+        e: "Balance and humility make me better",
+      },
     },
     {
       id: 7,
@@ -85,8 +87,8 @@ const QuizPage = () => {
         b: "Focused, quiet competition",
         c: "Collaborative and team-driven",
         d: "Balanced between spotlight and solitude",
-        e: "Any scenario where I can shine individually"
-      }
+        e: "Any scenario where I can shine individually",
+      },
     },
     {
       id: 8,
@@ -96,8 +98,8 @@ const QuizPage = () => {
         b: "Intensity and pushing boundaries",
         c: "Endurance and consistency",
         d: "Creative and adaptive",
-        e: "Hard work and a results-oriented focus"
-      }
+        e: "Hard work and a results-oriented focus",
+      },
     },
     {
       id: 9,
@@ -107,8 +109,8 @@ const QuizPage = () => {
         b: "Inspirational",
         c: "Visionary",
         d: "Strategic",
-        e: "Charismatic"
-      }
+        e: "Charismatic",
+      },
     },
     {
       id: 10,
@@ -118,10 +120,12 @@ const QuizPage = () => {
         b: "Tactical and skill-based team sports",
         c: "Strategic endurance challenges",
         d: "Creative and artistic sports",
-        e: "Dynamic and fast-paced sports"
-      }
-    }
+        e: "Dynamic and fast-paced sports",
+      },
+    },
   ];
+
+  const currentQuestion = quizData[currentQuestionIndex];
 
   const weights = {
     1: {
@@ -196,13 +200,8 @@ const QuizPage = () => {
     },
   };
 
-  const currentQuestion = quizData[currentQuestionIndex];
-
   const handleOptionChange = (e) => {
-    setAnswers({
-      ...answers,
-      [currentQuestion.id]: e.target.value,
-    });
+    setAnswers({ ...answers, [currentQuestion.id]: e.target.value });
   };
 
   const handleNextQuestion = () => {
@@ -217,30 +216,18 @@ const QuizPage = () => {
     }
   };
 
-  const handleSubmit = () => {
-    // Calculate the results
-    const totalScores = {}; // To store the total scores for each athlete
-
-    // Loop through the answers
-    for (const questionId in answers) {
-      const selectedOption = answers[questionId];
-      const questionWeights = weights[questionId][selectedOption];
-
-      // Add the weights to the total scores
-      for (const athlete in questionWeights) {
-        const weight = questionWeights[athlete];
-        if (totalScores[athlete]) {
-          totalScores[athlete] += weight;
-        } else {
-          totalScores[athlete] = weight;
-        }
+  const handleSubmit = async () => {
+    const totalScores = {};
+    Object.entries(answers).forEach(([questionId, answerKey]) => {
+      const questionWeights = weights[questionId];
+      const athleteScores = questionWeights[answerKey];
+      for (const athlete in athleteScores) {
+        totalScores[athlete] = (totalScores[athlete] || 0) + athleteScores[athlete];
       }
-    }
+    });
 
-    // Find the athlete with the highest total score
     let maxScore = 0;
     let bestAthlete = '';
-
     for (const athlete in totalScores) {
       if (totalScores[athlete] > maxScore) {
         maxScore = totalScores[athlete];
@@ -248,9 +235,22 @@ const QuizPage = () => {
       }
     }
 
-    // Set the result
     setResult(bestAthlete);
+    const athleteInfo = athleteData.find((athlete) => athlete.name === bestAthlete);
+    setResultDescription(athleteInfo ? athleteInfo.description : 'Description not found.');
+    setResultImage(athleteInfo ? athleteInfo.image : '');
     setIsSubmitted(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        'http://localhost:5001/api/quiz/logresult',
+        { result: bestAthlete, answers },
+        { headers: { 'x-auth-token': token } }
+      );
+    } catch (error) {
+      console.error('Error saving result:', error);
+    }
   };
 
   if (isSubmitted) {
@@ -260,10 +260,24 @@ const QuizPage = () => {
         <p>
           You are most similar to <strong>{result}</strong>!
         </p>
-        {/* You can display more information about the athlete here */}
+        {resultImage && (
+            <img 
+                src={resultImage} 
+                alt={result} 
+                style={{ 
+                width: '300px', 
+                height: 'auto', 
+                display: 'block', 
+                margin: '20px auto 0 auto' 
+                }} 
+            />
+        )}
+
+        <p>{resultDescription}</p>
       </div>
     );
   }
+  
 
   return (
     <div className={`quiz-container ${darkMode ? 'dark-mode' : ''}`}>
@@ -287,10 +301,7 @@ const QuizPage = () => {
       </form>
       <div className="navigation-buttons">
         {currentQuestionIndex > 0 && (
-          <button
-            onClick={handlePreviousQuestion}
-            className="button previous-button"
-          >
+          <button onClick={handlePreviousQuestion} className="button previous-button">
             Previous
           </button>
         )}
@@ -298,7 +309,7 @@ const QuizPage = () => {
           <button
             onClick={handleNextQuestion}
             className="button next-button"
-            disabled={!answers[currentQuestion.id]} // Disable if no answer selected
+            disabled={!answers[currentQuestion.id]}
           >
             Next
           </button>
@@ -307,7 +318,7 @@ const QuizPage = () => {
           <button
             onClick={handleSubmit}
             className="button submit-button"
-            disabled={!answers[currentQuestion.id]} // Disable if no answer selected
+            disabled={!answers[currentQuestion.id]}
           >
             Submit
           </button>

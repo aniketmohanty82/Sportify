@@ -16,6 +16,7 @@ import Workout from './pages/Workout';
 import RunPage from './pages/RunPage';
 import EditAccount from './pages/EditAccount';
 import AccountDeleted from './pages/AccountDeleted'; // Import the AccountDeleted component
+import QuizPage from './pages/QuizPage';
 
 const App = () => {
   return (
@@ -43,6 +44,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute>
                 <TrackerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quiz"
+            element={
+              <ProtectedRoute>
+                <QuizPage />
               </ProtectedRoute>
             }
           />

@@ -25,46 +25,33 @@ const RunPage = () => {
 
   const fetchDarkModeSetting = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/users/darkMode?userId=${userId}`, {
+      const response = await fetch(`https://sportifyapp.onrender.com/users/darkMode?userId=${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'x-auth-token': token, // Include token if authentication is needed
+          // Remove 'x-auth-token' if authentication is removed
         },
       });
-
       if (!response.ok) {
         throw new Error('Failed to fetch dark mode setting');
       }
-
       const data = await response.json();
       setDarkMode(data.darkMode);
-      console.log(darkMode)
     } catch (error) {
       console.error('Error fetching dark mode setting:', error);
     }
   };
-
-
+  
   // Fetch runs data from the backend
   const fetchRuns = async () => {
     setIsLoading(true);
     setFetchError(null);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error("No token found. Please log in again.");
-      }
-
-      const response = await fetch('https://sportifyapp.onrender.com/api/runs', {
-        headers: { 'x-auth-token': token },
-      });
-      
+      const response = await fetch('https://sportifyapp.onrender.com/api/runs');
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error fetching runs: ${errorText}`);
       }
-
       const runData = await response.json();
       setRuns(runData);
     } catch (error) {
@@ -74,6 +61,7 @@ const RunPage = () => {
       setIsLoading(false);
     }
   };
+  
 
   // Log a new run
   const logRun = async (data) => {

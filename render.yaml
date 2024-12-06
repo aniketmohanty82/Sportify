@@ -17,4 +17,4 @@ services:
     buildCommand: "npm run build"
     envVars:
       - key: REACT_APP_GOOGLE_CLIENT_ID
-        value: <your_google_client_id_here>
+        value: 561537019638-8r5obepso26lld6cn7dq51o4334qs1g5.apps.googleusercontent.com

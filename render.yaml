@@ -1,20 +1,10 @@
 services:
   - name: sportify-backend
     type: web
-    env: docker
+    env: node
     plan: free
-    dockerfilePath: backend/Dockerfile
+    buildCommand: "npm install"
+    startCommand: "npm start"
     envVars:
-      - key: PORT
-        value: 10000
       - key: MONGO_URI
         value: mongodb+srv://saiedupulapati4:jmzLsxDWeHqA6noc@cluster0.whqrr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-
-  - name: sportify-frontend
-    type: web
-    env: docker
-    plan: free
-    dockerfilePath: client/Dockerfile
-    envVars:
-      - key: REACT_APP_GOOGLE_CLIENT_ID
-        value: 561537019638-8r5obepso26lld6cn7dq51o4334qs1g5.apps.googleusercontent.com

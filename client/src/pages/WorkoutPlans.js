@@ -193,48 +193,52 @@ const WorkoutPlans = () => {
   return (
     <div className="workout-plans-container">
       <h1 className="title">Workout Plans</h1>
-
-      <div className="form-field">
-        <label htmlFor="sport-select" className="dropdown-label">
-          Select a Sport:
-        </label>
-        <select
-          id="sport-select"
-          value={sport}
-          onChange={(e) => setSport(e.target.value)}
-          className="select"
-        >
-          <option value="">--Choose--</option>
-          <option value="basketball">Basketball</option>
-          <option value="soccer">Soccer</option>
-          <option value="running">Running</option>
-          <option value="tennis">Tennis</option>
-          <option value="swimming">Swimming</option>
-          <option value="cycling">Cycling</option>
-        </select>
+  
+      {/* Sports Plans Section */}
+      <div className="sports-plans-section grey-box">
+        <h2 className="section-title">Explore Predefined Workout Plans</h2>
+        <div className="form-field">
+          <label htmlFor="sport-select" className="dropdown-label">
+            Select a Sport:
+          </label>
+          <select
+            id="sport-select"
+            value={sport}
+            onChange={(e) => setSport(e.target.value)}
+            className="select"
+          >
+            <option value="">--Choose--</option>
+            <option value="basketball">Basketball</option>
+            <option value="soccer">Soccer</option>
+            <option value="running">Running</option>
+            <option value="tennis">Tennis</option>
+            <option value="swimming">Swimming</option>
+            <option value="cycling">Cycling</option>
+          </select>
+        </div>
+  
+        <div className="exercise-grid">
+          {filteredPlans.length > 0 ? (
+            filteredPlans.map((plan, index) => (
+              <WorkoutPlanCard
+                key={index}
+                plan={plan}
+                onClick={() => handlePlanClick(plan)}
+              />
+            ))
+          ) : (
+            sport && (
+              <p className="no-plans-message">
+                No plans available for this sport. Check back later!
+              </p>
+            )
+          )}
+        </div>
       </div>
-
-      <div className="exercise-grid">
-        {filteredPlans.length > 0 ? (
-          filteredPlans.map((plan, index) => (
-            <WorkoutPlanCard
-              key={index}
-              plan={plan}
-              onClick={() => handlePlanClick(plan)}
-            />
-          ))
-        ) : (
-          sport && (
-            <p className="no-plans-message">
-              No plans available for this sport. Check back later!
-            </p>
-          )
-        )}
-      </div>
-
+  
       {/* AI Workout Section */}
-      <div className="ai-workout-section">
-        <h2>Ask AI for a Custom Workout</h2>
+      <div className="ai-workout-section grey-box">
+        <h2 className="section-title">Ask AI for a Custom Workout</h2>
         <input
           type="text"
           placeholder="Describe your workout needs (e.g., 30 minutes, no equipment, soccer)"
@@ -250,7 +254,7 @@ const WorkoutPlans = () => {
           {loading ? 'Generating...' : 'Generate Workout'}
         </button>
       </div>
-
+  
       {/* Display AI-Generated Workout */}
       {aiWorkoutPlan && (
         <WorkoutPlanModal
@@ -258,7 +262,7 @@ const WorkoutPlans = () => {
           onClose={() => setAiWorkoutPlan(null)}
         />
       )}
-
+  
       {selectedPlan && (
         <WorkoutPlanModal
           plan={selectedPlan}
@@ -266,7 +270,7 @@ const WorkoutPlans = () => {
         />
       )}
     </div>
-  );
+  );  
 };
 
 export default WorkoutPlans;

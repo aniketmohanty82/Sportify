@@ -24,27 +24,27 @@ const parseExercises = (description) => {
       currentCategory = {
         name: categoryMatch[1].trim(), // Category name (e.g., "Warm-up")
         duration: parseInt(categoryMatch[2], 10), // Duration in minutes
-        exercises: [],
       };
       return; // Skip to the next line after finding a category
     }
 
     // Match exercises like "- Jogging: 5 minutes of jogging to get the heart rate up"
-    const exerciseMatch = line.match(/-\s(.+?):\s(.+)/);
+    const exerciseMatch = line.match(/-\s(.+?):\s.*?(\d+)\sminutes/);
     if (exerciseMatch && currentCategory) {
       const exercise = {
-        name: exerciseMatch[1].trim(), // Exercise name (e.g., "Jogging")
-        details: exerciseMatch[2].trim(), // Exercise details
-        focus: currentCategory.name, // Attach the current category name
-        duration: currentCategory.duration, // Use category duration if available
+        name: exerciseMatch[1].trim(),
+        details: line,
+        focus: currentCategory.name,
+        duration: parseInt(exerciseMatch[2], 10),
       };
-      exercises.push(exercise); // Add to the exercises list
+      exercises.push(exercise);
     }
   });
 
-  console.log("Parsed Exercises:", exercises);
   return exercises;
 };
+
+
 
 // AI endpoint
 router.post("/workout", async (req, res) => {
@@ -75,7 +75,9 @@ router.post("/workout", async (req, res) => {
     
                     Strength Training (20):
                     - Push-ups: 3 sets of 12 reps
-                    - Squats: 3 sets of 15 reps`,
+                    - Squats: 3 sets of 15 reps
+                    
+                    Separate categories clearly, use newlines for better readability.`,
         },
       ],
       max_tokens: 300, // Increase the token limit for detailed responses

@@ -20,7 +20,9 @@ const WorkoutPlanModal = ({ plan, source = "predefined", onClose }) => {
             <p>
               <strong>Overview:</strong>
             </p>
-            <p>{description || "No description available."}</p>
+            {description.split("\n").map((line, index) => (
+              <p key={index}>{line}</p>
+            ))}
           </div>
   
           {/* Exercises Section */}

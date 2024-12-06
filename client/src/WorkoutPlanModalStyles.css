@@ -15,6 +15,8 @@
 /* Modal Content */
 .modal-content {
   background: #fff;
+  max-height: 80vh;
+  overflow-y: auto;
   width: 90%;
   max-width: 500px;
   border-radius: 10px;
@@ -57,7 +59,7 @@
 /* Exercises Section */
 .exercises-section h3 {
   font-size: 1.2em;
-  color: #f39c12;
+  color: #1aa64b;
   margin-bottom: 10px;
 }
 

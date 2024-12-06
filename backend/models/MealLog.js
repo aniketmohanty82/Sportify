@@ -41,6 +41,14 @@ const mealLogSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  sugar: {
+    type: Number,
+    required: true,
+  },
+  cholesterol: {
+    type: Number,
+    required: true,
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', // This indicates that userId references the User model

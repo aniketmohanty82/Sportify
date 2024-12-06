@@ -40,13 +40,22 @@ const TrackerPage = () => {
 
   const [mealLogsPast, setMealLogsPast] = useState([]);
   const [totalCalories, setTotalCalories] = useState(0);
+
+  //macro
   const [totalProtein, setTotalProtein] = useState(0);
-  const [totalFats, setTotalFats] = useState(0);
   const [totalCarbs, setTotalCarbs] = useState(0);
   const [totalFiber, setTotalFiber] = useState(0);
+  const [totalFats, setTotalFats] = useState(0);
+
+  //micro
+  const [totalCholesterol, setTotalCholesterol] = useState(0);
+  const [totalSodium, setTotalSodium] = useState(0);
+  const [totalSugar, setTotalSugar] = useState(0);
+
   const [lastSevenDaysCalories, setLastSevenDaysCalories] = useState([]);
   const [showInfo, setShowInfo] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
+  const [microWarningMessage, setMicroWarningMessage] = useState('');
 
   const [timeframe, setTimeframe] = useState(''); // Initialize as empty to ensure selection
   const [format, setFormat] = useState(''); // Initialize as empty to ensure selection
@@ -118,7 +127,6 @@ const TrackerPage = () => {
       },
       title: {
         display: false,
-        text: '',
       },
     },
     scales: {
@@ -126,6 +134,13 @@ const TrackerPage = () => {
         title: {
           display: true,
           text: 'Date',
+        },
+        ticks: {
+          maxTicksLimit: 15, // Show fewer labels
+          callback: (value) => {
+            const date = monthlyCalories[value]?.date || '';
+            return new Date(date).getDate(); // Show only the day number
+          },
         },
       },
       y: {
@@ -137,8 +152,7 @@ const TrackerPage = () => {
       },
     },
   };
-
-
+  
   const exercises = [
     // Beginner Exercises
     {
@@ -269,13 +283,18 @@ const TrackerPage = () => {
     }
 ];
   // Daily calorie goal - max
-  const dailyCalorieGoal = 2000;
+  const dailyCalorieGoal = localStorage.getItem('calorieGoal');
+  console.log(dailyCalorieGoal)
+  console.log(localStorage.getItem('calorieGoal'))
 
   // daily nutrient goals - max
   const maxDailyProtein = 100;
   const maxDailyCarbs = 250;
   const maxDailyFats = 70;
-  const maxDailyFiber = 30;  
+  const maxDailyFiber = 30; 
+  const maxDailySodium = 2300;
+  const maxDailySugar = 30;
+  const maxDailyCholesterol = 300;
  
   // Function to calculate percentage of the daily goal
   const caloriePercentage = Math.min((totalCalories / dailyCalorieGoal) * 100, 100);
@@ -286,6 +305,13 @@ const TrackerPage = () => {
     setTimeout(() => {
         setWarningMessage('');
     }, 10000); // Clear warning after 5 seconds
+  };
+
+  const showMicroWarningMessage = (message) => {
+    setMicroWarningMessage(message);
+    setTimeout(() => {
+      setMicroWarningMessage('');
+    }, 10000);
   };
 
   const handleInfoToggle = () => {
@@ -339,20 +365,30 @@ const TrackerPage = () => {
       return logDate === today;
     });
 
+    // Macronutrients
     const totalCalories = todayMeals.reduce((acc, meal) => acc + (meal.nutrients || 0), 0);
     const totalProtein = todayMeals.reduce((acc, meal) => acc + (meal.protein || 0), 0);
     const totalFats = todayMeals.reduce((acc, meal) => acc + (meal.fats || 0), 0);
     const totalCarbs = todayMeals.reduce((acc, meal) => acc + (meal.carbs || 0), 0);
     const totalFiber = todayMeals.reduce((acc, meal) => acc + (meal.fiber || 0), 0);
 
+    // Micronutrients
+    const totalCholesterol = todayMeals.reduce((acc, meal) => acc + (meal.cholesterol || 0), 0);
+    const totalSodium = todayMeals.reduce((acc, meal) => acc + (meal.sodium || 0), 0);
+    const totalSugar = todayMeals.reduce((acc, meal) => acc + (meal.sugar || 0), 0);
 
+    // Update state
     setTotalCalories(Math.round(totalCalories));
     setTotalProtein(Math.round(totalProtein));
     setTotalFats(Math.round(totalFats));
     setTotalCarbs(Math.round(totalCarbs));
     setTotalFiber(Math.round(totalFiber));
+    setTotalCholesterol(Math.round(totalCholesterol));
+    setTotalSodium(Math.round(totalSodium));
+    setTotalSugar(Math.round(totalSugar));
 
     let exceededNutrients = [];
+    let exceededMicroNutrients = [];
 
     // Check if any value exceeds the recommended daily limit
     if (totalProtein > maxDailyProtein) {
@@ -368,10 +404,24 @@ const TrackerPage = () => {
       exceededNutrients.push('Fiber');
     }
 
+    if (totalCholesterol > maxDailyCholesterol) {
+      exceededMicroNutrients.push('Cholesterol');
+    }
+    if (totalSodium > maxDailySodium) {
+      exceededMicroNutrients.push('Sodium');
+    }
+    if (totalSugar > maxDailySugar) {
+      exceededMicroNutrients.push('Sugar');
+    }
+
     // If there are any exceeded nutrients, display a combined warning message
     if (exceededNutrients.length > 0) {
       showWarningMessage(`${exceededNutrients.join(', ')} exceed daily limit!`);
       exceededNutrients = [];
+    }
+
+    if (exceededMicroNutrients.length > 0) {
+      showMicroWarningMessage(`${exceededMicroNutrients.join(', ')} exceed daily limit!`);
     }
   };
 
@@ -620,7 +670,6 @@ const TrackerPage = () => {
     setLastSevenDaysCalories(caloriesByDate);
   };
 
-
   useEffect(() => {
     fetchMealLogs();
     fetchMealLogsPast7Days();
@@ -645,8 +694,6 @@ const TrackerPage = () => {
       fetchMonthlySummary(selectedMonth, selectedYear);
     }
   }, [selectedMonth, selectedYear]);
-  
-  
 
   const getMealsByCategory = (category) => {
     return mealLogs.filter((log) => log.mealCategory === category);
@@ -1001,7 +1048,7 @@ const TrackerPage = () => {
         })}
       </div>
   
-      {/* Dynamic Table for Nutrient Progress Bars */}
+      {/* Dynamic Table for MACRONUTRIENT Progress Bars */}
       <div style={{
         padding: '20px', 
         borderRadius: '15px', 
@@ -1009,7 +1056,7 @@ const TrackerPage = () => {
         boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
         marginBottom: '20px',
       }}>
-        <h2 style={{ marginBottom: '15px' }}>Daily Nutrient Breakdown!</h2>
+        <h2 style={{ marginBottom: '15px' }}>Daily Macronutrient Breakdown</h2>
 
         {/* Warning Message with Info Button */}
         {warningMessage && (
@@ -1057,6 +1104,78 @@ const TrackerPage = () => {
             { label: 'Fats', value: totalFats, goal: 70, color: 'bg-warning' },
             { label: 'Carbs', value: totalCarbs, goal: 250, color: 'bg-info' },
             { label: 'Fibers', value: totalFiber, goal: 30, color: 'bg-danger' },
+          ].map(({ label, value, goal, color }) => (
+            <div className="progress-bar-wrapper" key={label} style={{ flex: '1 1 22%', margin: '10px' }}>
+              <label>{label}</label>
+              <div className="progress">
+                <div
+                  className={`progress-bar ${color}`}
+                  role="progressbar"
+                  style={{ width: `${calculateNutrientProgress(value, goal)}%` }}
+                >
+                  {value}g
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    {/* Dynamic Table for MICRONUTRIENT Progress Bars */}
+    <div style={{
+        padding: '20px', 
+        borderRadius: '15px', 
+        backgroundColor: '#f9f9f9', 
+        boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+        marginBottom: '20px',
+      }}>
+        <h2 style={{ marginBottom: '15px' }}>Daily Micronutrient Breakdown</h2>
+
+        {/* Warning Message with Info Button */}
+        {microWarningMessage && (
+          <div className="warning-message" style={{ 
+            backgroundColor: '#ffcccc', 
+            color: '#cc0000', 
+            padding: '10px', 
+            borderRadius: '8px', 
+            marginBottom: '20px', 
+            boxShadow: '0 0 5px rgba(204, 0, 0, 0.5)', 
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center', // Aligns the button with the text
+          }}>
+            <p style={{ margin: 0 }}>{microWarningMessage}</p>
+            <button onClick={handleInfoToggle}
+            style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#333' }}>
+              <AiOutlineInfoCircle size={20} />
+            </button>
+            {showInfo && (
+              <div style={{ marginTop: '5px', backgroundColor: '#fff', border: '5px solid #ccc',
+                            padding: '5px', borderRadius: '5px', position: 'absolute', zIndex: '100',
+                }}>
+                <p>Recommended Daily Values:</p>
+                <ul>
+                  <li>Cholesterol: {maxDailyCholesterol} mg {totalCholesterol - maxDailyCholesterol > 0 && `(Exceeded by: ${totalCholesterol - maxDailyCholesterol} mg)`}</li>
+                  <li>Sugar: {maxDailySugar} g {totalSugar - maxDailySugar > 0 && `(Exceeded by: ${totalSugar - maxDailySugar} g)`}</li>
+                  <li>Sodium: {maxDailySodium} mg {totalSodium - maxDailySodium > 0 && `(Exceeded by: ${totalSodium - maxDailySodium} mg)`}</li>
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Check if there's any data, if not show "No data available" */}
+        {(totalCholesterol === 0 && totalSodium === 0 && totalSugar === 0) ? (
+          <p style={{ textAlign: 'center', color: '#999', fontSize: '1.2em' }}>
+            No data available for today - begin by adding in a new meal! 
+          </p>
+        ) : (
+        <div className="nutrient-progress-bars" style={{ display: 'flex', justifyContent: 'space-between' }}>
+          {[
+            { label: 'Cholesterol', value: totalCholesterol, goal: 300, color: 'bg-success' },
+            { label: 'Sodium', value: totalSodium, goal: 2300, color: 'bg-info' },
+            { label: 'Sugar', value: totalSugar, goal: 30, color: 'bg-danger' },
           ].map(({ label, value, goal, color }) => (
             <div className="progress-bar-wrapper" key={label} style={{ flex: '1 1 22%', margin: '10px' }}>
               <label>{label}</label>

@@ -18,6 +18,8 @@ const Settings = () => {
   const [favoriteBasketballTeam, setFavoriteBasketballTeam] = useState(''); // Tracks the user's favorite basketball team
   const [favoriteBasketballTeamId, setFavoriteBasketballTeamId] = useState('');
   const [userTimeZone, setUserTimeZone] = useState('');
+  const [workoutGoal, setWorkoutGoal] = useState('');
+  const [calorieGoal, setCalorieGoal] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const userId = localStorage.getItem('userId');
@@ -45,12 +47,16 @@ const Settings = () => {
             username: data.username,
             email: data.email,
             timeZoneUser: data.timezone,
+            workoutGoal: data.workoutGoal,
+            calorieGoal: data.calorieGoal,
           });
           setUserTimeZone(data.timezone);
           setFavoriteSoccerTeam(data.favoriteSoccerTeam ?? 'Arsenal');
           setFavoriteSoccerTeamId(data.favoriteSoccerTeamId ?? 42);
           setFavoriteBasketballTeam(data.favoriteBasketballTeam ?? 'Los Angeles Lakers');
           setFavoriteBasketballTeamId(data.favoriteBasketballTeamId ?? 145);
+          setCalorieGoal(data.calorieGoal ?? 0)
+          setWorkoutGoal(data.workoutGoal ?? 0)
 
         } else {
           setError('Failed to fetch user profile information');
@@ -135,6 +141,55 @@ const Settings = () => {
       console.error(error);
     }
   };
+
+  const handleWorkoutGoalSave = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/users/update-workoutGoal', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, workoutGoal }), // Replace USER_ID dynamically
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMessage(data.message);
+        localStorage.removeItem('workoutGoal')
+        localStorage.setItem('workoutGoal', workoutGoal);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message);
+      }
+    } catch (err) {
+      setError('Failed to update workout goal.');
+    }
+  };
+
+  const handleCalorieGoalSave = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/users/update-calorieGoal', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId , calorieGoal }), // Replace USER_ID dynamically
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMessage(data.message);
+        localStorage.removeItem('calorieGoal')
+        localStorage.setItem('calorieGoal', calorieGoal);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message);
+      }
+    } catch (err) {
+      setError('Failed to update calorie goal.');
+    }
+  };
+
   const handleFavoriteBasketballTeamSave = async (team, teamId) => {
     try {
       // Update the state locally before API call
@@ -355,6 +410,14 @@ const Settings = () => {
           <label>Favorite Basketball Team:</label>
           <span>{favoriteBasketballTeam}</span>
         </div>
+        <div className="profile-item">
+          <label>Workout Goal (Sets):</label>
+          <span>{workoutGoal}</span>
+        </div>
+        <div className="profile-item">
+          <label>Calorie Goal:</label>
+          <span>{calorieGoal}</span>
+        </div>
 
       </div>
 
@@ -499,6 +562,50 @@ const Settings = () => {
             className="button cancel-button"
           >
             Cancel
+          </button>
+        </div>
+      </div>
+
+      {/* Section to Update Workout Goal */}
+      <div className="goal-form">
+        <h3>Set Your Workout Goal</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <input
+            type="text"
+            value={workoutGoal}
+            onChange={(e) => setWorkoutGoal(e.target.value)}
+            placeholder="Enter your workout goal"
+            className="button"
+            style={{ flex: 1, padding: '10px' }}
+          />
+          <button
+            type="button"
+            onClick={handleWorkoutGoalSave}
+            className="button save-button"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+
+      {/* Section to Update Calorie Goal */}
+      <div className="goal-form">
+        <h3>Set Your Calorie Goal</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <input
+            type="number"
+            value={calorieGoal}
+            onChange={(e) => setCalorieGoal(e.target.value)}
+            placeholder="Enter your calorie goal"
+            className="button"
+            style={{ flex: 1, padding: '10px' }}
+          />
+          <button
+            type="button"
+            onClick={handleCalorieGoalSave}
+            className="button save-button"
+          >
+            Save
           </button>
         </div>
       </div>

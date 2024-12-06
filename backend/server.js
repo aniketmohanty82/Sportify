@@ -1185,6 +1185,8 @@ app.get('/api/calories/export', auth, async (req, res) => {
           totalFats: 0,
           totalFiber: 0,
           totalSodium: 0,
+          totalSugar: 0,
+          totalCholesterol: 0,
         };
       }
       acc[date].totalCalories += meal.nutrients;
@@ -1193,6 +1195,8 @@ app.get('/api/calories/export', auth, async (req, res) => {
       acc[date].totalFats += meal.fats;
       acc[date].totalFiber += meal.fiber;
       acc[date].totalSodium += meal.sodium;
+      acc[date].totalSugar += meal.sugar;
+      acc[date].totalCholesterol += meal.cholesterol;
       return acc;
     }, {});
 
@@ -1200,7 +1204,7 @@ app.get('/api/calories/export', auth, async (req, res) => {
 
     // Export as CSV
     if (format === 'csv') {
-      const fields = ['date', 'totalCalories', 'totalProtein', 'totalCarbs', 'totalFats', 'totalFiber', 'totalSodium'];
+      const fields = ['date', 'totalCalories', 'totalProtein', 'totalCarbs', 'totalFats', 'totalFiber', 'totalSodium','totalSugar', 'totalCholesterol'];
       const json2csvParser = new Parser({ fields });
       const csv = json2csvParser.parse(summaryData);
       res.header('Content-Type', 'text/csv');
@@ -1233,6 +1237,8 @@ app.get('/api/calories/export', auth, async (req, res) => {
           .text(`Carbs: ${item.totalCarbs}g`, { lineGap: 2 })
           .text(`Fats: ${item.totalFats}g`, { lineGap: 2 })
           .text(`Fiber: ${item.totalFiber}g`, { lineGap: 2 })
+          .text(`Sugar: ${item.totalSugar}mg`, { lineGap: 2 })
+          .text(`Cholesterol: ${item.totalCholesterol}mg`, { lineGap: 2 })
           .text(`Sodium: ${item.totalSodium}mg`, { lineGap: 5 });
           
         doc.moveDown();

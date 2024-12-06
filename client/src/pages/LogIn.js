@@ -41,6 +41,8 @@ const LogIn = () => {
       localStorage.setItem('favoriteSoccerTeamId', res.data.user.favoriteSoccerTeamId);
       localStorage.setItem('favoriteBasketballTeam', res.data.user.favoriteBasketballTeam);
       localStorage.setItem('favoriteBasketballTeamId', res.data.user.favoriteBasketballTeamId);
+      localStorage.setItem('workoutGoal', res.data.user.workoutGoal);
+      localStorage.setItem('calorieGoal', res.data.user.calorieGoal);
       console.log(res.data.user)
       console.log(localStorage.getItem('userName'))
 

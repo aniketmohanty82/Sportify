@@ -71,6 +71,8 @@ const MealLogForm = ({ onSubmit, isOpen, onClose, onError }) => {
           fats: data.items[0].fat_total_g,
           fiber: data.items[0].fiber_g,
           sodium: data.items[0].sodium_mg,
+          sugar: data.items[0].sugar_g,
+          cholesterol: data.items[0].cholesterol_mg,
         });
 
         // Clear the form after submission

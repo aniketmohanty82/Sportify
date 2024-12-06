@@ -111,7 +111,7 @@ router.post('/reset-password/:token', async (req, res) => {
 
 router.post('/register', async (req, res) => {
   try {
-    const { firstName, lastName, username, email, password, timezone, darkMode, favoriteSoccerTeam, favoriteSoccerTeamId, favoriteBasketballTeam, favoriteBasketballTeamId } = req.body;
+    const { firstName, lastName, username, email, password, timezone, darkMode, favoriteSoccerTeam, favoriteSoccerTeamId, favoriteBasketballTeam, favoriteBasketballTeamId, workoutGoal, calorieGoal } = req.body;
 
     if (!firstName || !lastName || !username || !email || !password) {
       return res.status(400).json({ message: 'Please enter all fields' });
@@ -137,12 +137,14 @@ router.post('/register', async (req, res) => {
       favoriteSoccerTeamId,
       favoriteBasketballTeam,
       favoriteBasketballTeamId,
+      workoutGoal,
+      calorieGoal,
     });
 
     const savedUser = await newUser.save();
     res.status(201).json({
       message: 'User registered successfully',
-      user: { id: savedUser._id, email: savedUser.email, username: savedUser.username, timezone: 'UTC', darkMode: 'false', favoriteSoccerTeam: 'Arsenal', favoriteSoccerTeamId: 42, favoriteBasketballTeam: 'Los Angeles Lakers', favoriteBasketballTeamId: 145 },
+      user: { id: savedUser._id, email: savedUser.email, username: savedUser.username, timezone: 'UTC', darkMode: 'false', favoriteSoccerTeam: 'Arsenal', favoriteSoccerTeamId: 42, favoriteBasketballTeam: 'Los Angeles Lakers', favoriteBasketballTeamId: 145, workoutGoal: 0, calorieGoal: 0 },
     });
   } catch (err) {
     console.error(err);
@@ -196,6 +198,8 @@ router.post('/login', async (req, res) => {
             favoriteSoccerTeamId: user.favoriteSoccerTeamId,
             favoriteBasketballTeam: user.favoriteBasketballTeam,
             favoriteBasketballTeamId: user.favoriteBasketballTeamId,
+            workoutGoal: user.workoutGoal,
+            calorieGoal: user.calorieGoal
           },
         });
       }
@@ -260,6 +264,8 @@ router.put('/update/:id', auth, async (req, res) => {
         favoriteSoccerTeamId: user.favoriteSoccerTeamId,
         favoriteBasketballTeam: user.favoriteBasketballTeam,
         favoriteBasketballTeamId: user.favoriteBasketballTeamId,
+        workoutGoal: user.workoutGoal,
+        calorieGoal: user.calorieGoal,
       },
     });
   } catch (err) {
@@ -340,6 +346,60 @@ router.put('/update-favoriteSoccerTeam', async (req, res) => {
       message: 'Favorite soccer team updated successfully', 
       favoriteSoccerTeam: user.favoriteSoccerTeam,
       favoriteSoccerTeamId: user.favoriteSoccerTeamId,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update workout goal
+router.put('/update-workoutGoal', async (req, res) => {
+  try {
+    const { userId, workoutGoal } = req.body;
+
+    if (!userId || !workoutGoal) {
+      return res.status(400).json({ message: 'Please provide userId and workoutGoal' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.workoutGoal = workoutGoal; // Update the workout goal
+    await user.save();
+
+    res.status(200).json({
+      message: 'Workout goal updated successfully',
+      workoutGoal: user.workoutGoal,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update calorie goal
+router.put('/update-calorieGoal', async (req, res) => {
+  try {
+    const { userId, calorieGoal } = req.body;
+
+    if (!userId || !calorieGoal) {
+      return res.status(400).json({ message: 'Please provide userId and calorieGoal' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.calorieGoal = calorieGoal; // Update the calorie goal
+    await user.save();
+
+    res.status(200).json({
+      message: 'Calorie goal updated successfully',
+      calorieGoal: user.calorieGoal,
     });
   } catch (err) {
     console.error(err);
@@ -483,6 +543,8 @@ router.post('/google-login', async (req, res) => {
         favoriteSoccerTeamId: 42,
         favoriteBasketballTeam: 'Los Angeles Lakers',
         favoriteBasketballTeamId: 145,
+        workoutGoal: 0,
+        calorieGoal: 0
       });
       await user.save();
     } else {
@@ -513,6 +575,8 @@ router.post('/google-login', async (req, res) => {
         favoriteSoccerTeamId: user.favoriteSoccerTeamId,
         favoriteBasketballTeam: user.favoriteBasketballTeam,
         favoriteBasketballTeamId: user.favoriteBasketballTeamId,
+        workoutGoal: user.workoutGoal,
+        calorieGoal: user.calorieGoal
       },
     });
   } catch (error) {
@@ -542,6 +606,8 @@ router.get('/:userId', async (req, res) => {
       favoriteSoccerTeamId: user.favoriteSoccerTeamId,
       favoriteBasketballTeam: user.favoriteBasketballTeam,
       favoriteBasketballTeamId: user.favoriteBasketballTeamId,
+      workoutGoal: user.workoutGoal,
+      calorieGoal: user.calorieGoal,
     });
   } catch (error) {
     console.error('Error fetching user data:', error);

@@ -4,8 +4,9 @@ services:
     env: docker
     plan: free
     dockerfilePath: backend/Dockerfile
-    buildCommand: ""
     envVars:
+      - key: PORT
+        value: 10000
       - key: MONGO_URI
         value: mongodb+srv://saiedupulapati4:jmzLsxDWeHqA6noc@cluster0.whqrr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 
@@ -14,7 +15,6 @@ services:
     env: docker
     plan: free
     dockerfilePath: client/Dockerfile
-    buildCommand: "npm run build"
     envVars:
       - key: REACT_APP_GOOGLE_CLIENT_ID
         value: 561537019638-8r5obepso26lld6cn7dq51o4334qs1g5.apps.googleusercontent.com

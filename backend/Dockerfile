@@ -1,11 +1,19 @@
+# Use Node.js 16 as the base image
 FROM node:16
+
+# Set the working directory inside the container
 WORKDIR /usr/src/app
+
+# Copy only package.json and package-lock.json first for dependency installation
 COPY package*.json ./
+
+# Install dependencies
 RUN npm install
+
+# Copy all the application files into the container
 COPY . .
-# this is a random URI
-# ENV MONGO_URI=mongodb://mongodb:27017/mydatabase 
-ENV MONGO_URI=mongodb+srv://saiedupulapati4:jmzLsxDWeHqA6noc@cluster0.whqrr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+# Expose port 5001 for the backend service
 EXPOSE 5001
 
 # Command to run the app

@@ -212,7 +212,7 @@ const QuizPage = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5001/api/quiz/result', {
+        const response = await axios.get('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/quiz/result', {
           headers: { 'x-auth-token': token },
         });
   
@@ -301,7 +301,7 @@ const QuizPage = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        'http://localhost:5001/api/quiz/logresult',
+        'https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/quiz/logresult',
         { result: bestAthlete, answers },
         { headers: { 'x-auth-token': token } }
       );

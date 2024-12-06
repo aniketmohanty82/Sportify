@@ -34,7 +34,7 @@ const Settings = () => {
     // Fetch the user's profile information and time zone from the backend
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/users/${userId}`, {
+        const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/${userId}`, {
           headers: {
             'x-auth-token': token,
           },
@@ -72,7 +72,7 @@ const Settings = () => {
 
   const fetchDarkModeSetting = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/users/darkMode?userId=${userId}`, {
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/darkMode?userId=${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ const Settings = () => {
       console.log(updatedDarkMode)
 
       // Save the updated dark mode setting on the server
-      fetch(`http://localhost:5001/users/update-darkMode`, {
+      fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/update-darkMode`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ const Settings = () => {
   const handleTimeZoneSave = async (timeZone) => {
     try {
       setUserTimeZone(timeZone);
-      const response = await fetch('http://localhost:5001/users/update-timezone', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/update-timezone', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -144,7 +144,7 @@ const Settings = () => {
 
   const handleWorkoutGoalSave = async () => {
     try {
-      const response = await fetch('http://localhost:5001/users/update-workoutGoal', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/update-workoutGoal', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -168,7 +168,7 @@ const Settings = () => {
 
   const handleCalorieGoalSave = async () => {
     try {
-      const response = await fetch('http://localhost:5001/users/update-calorieGoal', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/update-calorieGoal', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -195,7 +195,7 @@ const Settings = () => {
       // Update the state locally before API call
       setFavoriteBasketballTeam(team);
   
-      const response = await fetch('http://localhost:5001/users/update-favoriteBasketballTeam', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/update-favoriteBasketballTeam', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -232,7 +232,7 @@ const Settings = () => {
       // Update the state locally before API call
       setFavoriteSoccerTeam(team);
   
-      const response = await fetch('http://localhost:5001/users/update-favoriteSoccerTeam', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/update-favoriteSoccerTeam', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -280,7 +280,7 @@ const Settings = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/users/${userId}`, {
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/${userId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

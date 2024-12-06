@@ -71,7 +71,7 @@ const Workout = () => {
 
   const fetchDarkModeSetting = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/users/darkMode?userId=${userId}`, {
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/darkMode?userId=${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ const Workout = () => {
         throw new Error("No token found. Please log in again.");
       }
 
-      const response = await fetch('http://localhost:5001/api/runs', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs', {
         headers: { 'x-auth-token': token },
       });
       
@@ -129,7 +129,7 @@ const Workout = () => {
         throw new Error("No token found. Please log in again.");
       }
 
-      const response = await fetch('http://localhost:5001/api/runs/logrun', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs/logrun', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ const Workout = () => {
   const editRun = async (updatedRun) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/runs/${updatedRun._id}`, {
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs/${updatedRun._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
         body: JSON.stringify(updatedRun),
@@ -178,7 +178,7 @@ const Workout = () => {
     console.log("Attempting to delete run with ID:", runId); // Check if the correct ID is being passed
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/runs/${runId}`, {
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs/${runId}`, {
         method: 'DELETE',
         headers: { 'x-auth-token': token },
       });
@@ -232,7 +232,7 @@ const Workout = () => {
   const fetchWorkouts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/workouts', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/workouts', {
         method: 'GET',
         headers: {
           'x-auth-token': token,
@@ -253,7 +253,7 @@ const Workout = () => {
   const fetchAllWorkouts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/workouts/all', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/workouts/all', {
         method: 'GET',
         headers: {
           'x-auth-token': token,
@@ -307,7 +307,7 @@ const Workout = () => {
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch('http://localhost:5001/api/workouts/logworkout', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/workouts/logworkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -570,7 +570,7 @@ const chartOptions = {
   
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/workouts/export?type=${type}&format=${format}`, {
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/workouts/export?type=${type}&format=${format}`, {
         headers: {
           'x-auth-token': token,
         },

@@ -25,7 +25,7 @@ const RunPage = () => {
 
   const fetchDarkModeSetting = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/users/darkMode?userId=${userId}`, {
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/darkMode?userId=${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ const RunPage = () => {
         throw new Error("No token found. Please log in again.");
       }
 
-      const response = await fetch('http://localhost:5001/api/runs', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs', {
         headers: { 'x-auth-token': token },
       });
       
@@ -83,7 +83,7 @@ const RunPage = () => {
         throw new Error("No token found. Please log in again.");
       }
 
-      const response = await fetch('http://localhost:5001/api/runs/logrun', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs/logrun', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ const RunPage = () => {
   const editRun = async (updatedRun) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/runs/${updatedRun._id}`, {
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs/${updatedRun._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
         body: JSON.stringify(updatedRun),
@@ -132,7 +132,7 @@ const RunPage = () => {
     console.log("Attempting to delete run with ID:", runId); // Check if the correct ID is being passed
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/runs/${runId}`, {
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs/${runId}`, {
         method: 'DELETE',
         headers: { 'x-auth-token': token },
       });

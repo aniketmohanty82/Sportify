@@ -14,7 +14,7 @@ const ResetPassword = () => {
     // Validate the token
     const validateToken = async () => {
       try {
-        await axios.get(`http://localhost:5001/users/reset-password/${token}`);
+        await axios.get(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/reset-password/${token}`);
         setIsValidToken(true);
       } catch (err) {
         console.error(err.response.data);
@@ -29,7 +29,7 @@ const ResetPassword = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(`http://localhost:5001/users/reset-password/${token}`, { password });
+      const res = await axios.post(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/reset-password/${token}`, { password });
       setMessage(res.data.message);
       // Optionally redirect to login page after a delay
       setTimeout(() => {

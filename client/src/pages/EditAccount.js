@@ -24,7 +24,7 @@ const EditAccount = () => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get(`http://localhost:5001/users/${userId}`, {
+        const res = await axios.get(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/${userId}`, {
           headers: {
             'x-auth-token': token,
           },
@@ -69,7 +69,7 @@ const EditAccount = () => {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.put(
-        `http://localhost:5001/users/update/${userId}`,
+        `https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/update/${userId}`,
         userData,
         {
           headers: {

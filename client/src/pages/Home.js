@@ -39,7 +39,7 @@ const HomePage = () => {
       if (!favoriteSoccerTeamId) return;
 
       try {
-        const response = await fetch(`http://localhost:5001/api/team_statistics/${favoriteSoccerTeamId}`);
+        const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/team_statistics/${favoriteSoccerTeamId}`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch team statistics');
@@ -61,7 +61,7 @@ const HomePage = () => {
       if (!favoriteBasketballTeamId) return;
 
       try {
-        const response = await fetch(`http://localhost:5001/api/basketball_team_statistics/${favoriteBasketballTeamId}`);
+        const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/basketball_team_statistics/${favoriteBasketballTeamId}`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch bteam statistics');
@@ -82,7 +82,7 @@ const HomePage = () => {
   const fetchWorkouts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/workouts', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/workouts', {
         method: 'GET',
         headers: { 'x-auth-token': token },
       });
@@ -101,7 +101,7 @@ const HomePage = () => {
   const fetchMealLogs = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/meals', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/meals', {
         headers: { 'x-auth-token': token },
       });
 
@@ -163,7 +163,7 @@ const HomePage = () => {
     console.log('Meal logged:', data);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/meals/logmeal', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/meals/logmeal', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -200,7 +200,7 @@ const HomePage = () => {
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch('http://localhost:5001/api/workouts/logworkout', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/workouts/logworkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -226,7 +226,7 @@ const HomePage = () => {
         throw new Error("No token found. Please log in again.");
       }
 
-      const response = await fetch('http://localhost:5001/api/runs/logrun', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs/logrun', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

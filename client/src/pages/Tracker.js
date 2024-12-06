@@ -88,7 +88,7 @@ const TrackerPage = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `http://localhost:5001/api/calories/monthly?month=${month}&year=${year}`,
+        `https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/calories/monthly?month=${month}&year=${year}`,
         { headers: { 'x-auth-token': token } }
       );
   
@@ -436,7 +436,7 @@ const TrackerPage = () => {
     console.log('Meal logged:', data);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/meals/logmeal', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/meals/logmeal', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -491,7 +491,7 @@ const TrackerPage = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/meals/${currentMeal._id}`, {
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/meals/${currentMeal._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -522,7 +522,7 @@ const TrackerPage = () => {
     console.log(currentMeal._id);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/meals/${currentMeal._id}`, {
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/meals/${currentMeal._id}`, {
         method: 'DELETE',
         headers: {
           'x-auth-token': token,
@@ -561,7 +561,7 @@ const TrackerPage = () => {
       // Restore the deleted meal by sending it back to your API or updating local state
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5001/api/meals/logmeal', {
+        const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/meals/logmeal', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -594,7 +594,7 @@ const TrackerPage = () => {
     fetchMealLogsPast7Days();
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/meals', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/meals', {
         headers: {
           'x-auth-token': token, // Include the token
         },
@@ -616,7 +616,7 @@ const TrackerPage = () => {
   const fetchMealLogsPast7Days = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/mealsPast', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/mealsPast', {
         headers: {
           'x-auth-token': token, // Include the token
         },
@@ -718,7 +718,7 @@ const TrackerPage = () => {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch(`http://localhost:5001/api/calories/export?format=${format}&timeframe=${timeframe}`, {
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/calories/export?format=${format}&timeframe=${timeframe}`, {
         headers: {
           'x-auth-token': token,
         },

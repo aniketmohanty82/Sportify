@@ -168,7 +168,7 @@ const WorkoutPlans = () => {
   const handleAIWorkoutSubmit = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5001/api/ai/workout', {
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/ai/workout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

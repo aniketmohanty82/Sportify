@@ -10,7 +10,7 @@ const ForgotPassword = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post('http://localhost:5001/users/forgot-password', { email });
+      const res = await axios.post('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/forgot-password', { email });
       setMessage(res.data.message);
     } catch (err) {
       console.error(err.response.data);

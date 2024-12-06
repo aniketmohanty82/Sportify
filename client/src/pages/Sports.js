@@ -817,7 +817,7 @@ function Sports() {
   // Soccer fixtures list
   const handleFixturesClick = async (leagueId) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/fixtures/${leagueId}`);
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/fixtures/${leagueId}`);
       const data = await response.json();
       setFixturesData(data);
       setFixturesModalOpen(true);
@@ -829,7 +829,7 @@ function Sports() {
   // Basketball fixtures list
   const handleBasketballFixturesClick = async (leagueId) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/basketball_fixtures/${leagueId}`);
+      const response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/basketball_fixtures/${leagueId}`);
       const data = await response.json();
       console.log("Basketball Fixtures Data:", data);  // For debugging
       setBasketballFixturesData(data);
@@ -843,7 +843,7 @@ function Sports() {
   useEffect(() => {
     if (page === 'cricket') {
       const fetchLiveCricketMatches = () => {
-        fetch('http://localhost:5001/api/cricket_live')
+        fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/cricket_live')
           .then(response => response.json())
           .then(data => {
             setDomesticLiveMatches(data.domesticLiveMatches || []);
@@ -871,7 +871,7 @@ function Sports() {
     if (page === 'cricket') {
       const fetchCricketMatches = async () => {
         try {
-          const response = await fetch('http://localhost:5001/api/cricket');
+          const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/cricket');
           const data = await response.json();
 
           setDomesticMatches(data.domestic || []);
@@ -890,7 +890,7 @@ function Sports() {
   // UCL live
   useEffect(() => {
     const fetchLiveGames = () => {
-      fetch('http://localhost:5001/api/ucl_live')
+      fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/ucl_live')
         .then(response => response.json())
         .then(data => setChampionsLeagueGamesLive(data))
         .catch(err => console.log(err));
@@ -905,7 +905,7 @@ function Sports() {
 
   useEffect(() => {
     const fetchLiveGames = () => {
-      fetch('http://localhost:5001/api/test_live')
+      fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/test_live')
         .then(response => response.json())
         .then(data => setserieAleagueGamesLive(data))
         .catch(err => console.log(err));
@@ -920,7 +920,7 @@ function Sports() {
 
   // Fetch UCL games
   useEffect(() => {
-    fetch('http://localhost:5001/api/ucl')
+    fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/ucl')
       .then(response => response.json())
       .then(data => setChampionsLeagueGames(data))
       .catch(err => console.log(err));
@@ -930,7 +930,7 @@ function Sports() {
   useEffect(() => {
     const timezone = localStorage.getItem('timeZone');
     console.log(timezone)
-    fetch('http://localhost:5001/api/premier_league')
+    fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/premier_league')
       .then(response => response.json())
       .then(data => setPremierLeagueGames(data))
       .catch(err => console.log(err));
@@ -938,7 +938,7 @@ function Sports() {
 
   // Fetch Premier League games live
   useEffect(() => {
-    fetch('http://localhost:5001/api/premier_league_live')
+    fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/premier_league_live')
       .then(response => response.json())
       .then(data => setPremierLeagueGamesLive(data))
       .catch(err => console.log(err));
@@ -946,7 +946,7 @@ function Sports() {
 
   // Fetch Bundesliga games
   useEffect(() => {
-    fetch('http://localhost:5001/api/bundesliga')
+    fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/bundesliga')
       .then(response => response.json())
       .then(data => setBundesligaGames(data))
       .catch(err => console.log(err));
@@ -955,7 +955,7 @@ function Sports() {
   //Bundesliga Live
   useEffect(() => {
     const fetchLiveGames = () => {
-      fetch('http://localhost:5001/api/bundesliga_live')
+      fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/bundesliga_live')
         .then(response => response.json())
         .then(data => setBundesligaGamesLive(data))
         .catch(err => console.log(err));
@@ -970,7 +970,7 @@ function Sports() {
 
   // Fetch NBA games
   useEffect(() => {
-    fetch('http://localhost:5001/api/nba')
+    fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/nba')
       .then(response => response.json())
       .then(data => setNBAGames(data))
       .catch(err => console.log(err));
@@ -978,7 +978,7 @@ function Sports() {
 
   useEffect(() => {
     const fetchLiveGames = () => {
-      fetch('http://localhost:5001/api/nba_live')
+      fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/nba_live')
         .then(response => response.json())
         .then(data => setNBAGamesLive(data))
         .catch(err => console.log(err));
@@ -993,7 +993,7 @@ function Sports() {
 
   // Fetch Euroleague games
   useEffect(() => {
-    fetch('http://localhost:5001/api/euroleague')
+    fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/euroleague')
       .then(response => response.json())
       .then(data => setEuroleagueGames(data))
       .catch(err => console.log(err));
@@ -1001,7 +1001,7 @@ function Sports() {
 
   useEffect(() => {
     const fetchLiveGames = () => {
-      fetch('http://localhost:5001/api/euroleague_live')
+      fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/euroleague_live')
         .then(response => response.json())
         .then(data => setEuroleagueGamesLive(data))
         .catch(err => console.log(err));
@@ -1029,9 +1029,9 @@ function Sports() {
 
       let response;
       if (sport === 'soccer') {
-        response = await fetch(`http://localhost:5001/api/fixture_details/${game.fixture_id}`);
+        response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/fixture_details/${game.fixture_id}`);
       } else if (sport === 'basketball') {
-        response = await fetch(`http://localhost:5001/api/basketball_fixture_details/${game.fixture_id}`);
+        response = await fetch(`https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/basketball_fixture_details/${game.fixture_id}`);
       }
 
       const data = await response.json();

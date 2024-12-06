@@ -50,11 +50,11 @@ async function checkCalorieThresholds() {
     // Skip if no calorieGoal set or zero
     if (!user.calorieGoal || user.calorieGoal === 0) continue;
 
-    // Check if we have already sent a notification today
-    if (user.lastCalorieNotificationDate && user.lastCalorieNotificationDate.toDateString() === now.toDateString()) {
-      // Notification already sent today, skip
-      continue;
-    }
+    // // Check if we have already sent a notification today
+    // if (user.lastCalorieNotificationDate && user.lastCalorieNotificationDate.toDateString() === now.toDateString()) {
+    //   // Notification already sent today, skip
+    //   continue;
+    // }
 
     // Calculate today's total calorie intake
     const mealLogs = await MealLog.find({

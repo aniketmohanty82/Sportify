@@ -19,4 +19,4 @@ EXPOSE 5001
 RUN ls -l /usr/src/app
 
 # Command to run the app
-CMD ["node", "backend/server.js"]
+CMD ["node", "server.js"]

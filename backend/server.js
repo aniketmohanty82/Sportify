@@ -1263,8 +1263,20 @@ app.get('/api/calories/export', auth, async (req, res) => {
       return acc;
     }, {});
 
-    const summaryData = Object.values(groupedData); // Convert grouped data to an array
-
+    //const summaryData = Object.values(groupedData); // Convert grouped data to an array
+        //const summaryData = Object.values(groupedData); // Convert grouped data to an array
+        const summaryData = Object.values(groupedData).map((item) => ({
+            date: item.date,
+            totalCalories: Number(item.totalCalories.toFixed(2)),
+            totalProtein: Number(item.totalProtein.toFixed(2)),
+            totalCarbs: Number(item.totalCarbs.toFixed(2)),
+            totalFats: Number(item.totalFats.toFixed(2)),
+            totalFiber: Number(item.totalFiber.toFixed(2)),
+            totalSodium: Number(item.totalSodium.toFixed(2)),
+            totalSugar: Number(item.totalSugar.toFixed(2)),
+            totalCholesterol: Number(item.totalCholesterol.toFixed(2)),
+          }));
+          
     // Export as CSV
     if (format === 'csv') {
       const fields = ['date', 'totalCalories', 'totalProtein', 'totalCarbs', 'totalFats', 'totalFiber', 'totalSodium','totalSugar', 'totalCholesterol'];

@@ -24,6 +24,7 @@ const HomePage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [soccerTeamData, setSoccerTeamData] = useState(null);
   const [basketballTeamData, setBasketballTeamData] = useState(null);
+  const [username, setUsername] = useState(localStorage.getItem('userName') || "Guest");
 
   const favoriteSoccerTeamId = localStorage.getItem('favoriteSoccerTeamId');
   const favoriteSoccerTeam = localStorage.getItem('favoriteSoccerTeam');
@@ -277,300 +278,226 @@ const HomePage = () => {
       </Paper>
     );
   };
-
+  
   return (
-    <div className="homepage-container">
-      <header className="header">
-        <h1>Hey, Dhruv! Welcome Back!</h1>
+    <div className="homepage-container" style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+      {/* Header */}
+      <header className="header" style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <h1 style={{ fontSize: '28px', color: '#ffffff' }}>Hey, {username}! Welcome Back!</h1>
       </header>
+  
       {/* Soccer Section */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '40px' }}>
-        <Typography variant="h5" className="section-subtitle" style={{ color: green[500] }}>
-          Soccer
-        </Typography>
+      <Card
+        elevation={3}
+        style={{
+          padding: '20px',
+          backgroundColor: '#f9f9f9',
+          borderRadius: '15px',
+          boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+          marginBottom: '20px',
+        }}
+      >
+        <Typography variant="h5" style={{ marginBottom: '10px', color: '#1aa64b' }}>Soccer</Typography>
         {soccerTeamData ? (
-          <Card elevation={3} sx={{ padding: '20px', backgroundColor: '#f9f9f9' }}>
-            {/* Horizontal Layout */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
-              {/* Team Information */}
-              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px', gap: '20px' }}>
-                  <Avatar
-                    src={soccerTeamData.team.logo}
-                    alt={soccerTeamData.team.name}
-                    sx={{ width: 80, height: 80 }}
-                  />
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: green[500] }}>
-                    {soccerTeamData.team.name}
-                  </Typography>
-                </Box>
-                <Typography variant="body2">Games Played: {soccerTeamData.fixtures.played.total}</Typography>
-                <Typography variant="body2">Wins: {soccerTeamData.fixtures.wins.total}</Typography>
-                <Typography variant="body2">Losses: {soccerTeamData.fixtures.loses.total}</Typography>
-                <Typography variant="body2">Draws: {soccerTeamData.fixtures.draws.total}</Typography>
-              </Box>
-
-              {/* Goals Section */}
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', textDecoration: 'underline', marginBottom: '10px' }}>
-                  Goals
-                </Typography>
-                <Typography variant="body2">
-                  Total Goals Scored: {soccerTeamData.goals.for.total.total}
-                </Typography>
-                <Typography variant="body2">
-                  Total Goals Conceded: {soccerTeamData.goals.against.total.total}
-                </Typography>
-                <Typography variant="body2">
-                  Avg Goals Scored/Game: {(
-                    soccerTeamData.goals.for.total.total /
-                    soccerTeamData.fixtures.played.total
-                  ).toFixed(2)}
-                </Typography>
-                <Typography variant="body2">
-                  Avg Goals Conceded/Game: {(
-                    soccerTeamData.goals.against.total.total /
-                    soccerTeamData.fixtures.played.total
-                  ).toFixed(2)}
-                </Typography>
-              </Box>
-
-              {/* Lineups Section */}
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', textDecoration: 'underline', marginBottom: '10px' }}>
-                  Common Lineups
-                </Typography>
-                {soccerTeamData.lineups.length > 0 ? (
-                  soccerTeamData.lineups.map((lineup, index) => (
-                    <Typography key={index} variant="body2">
-                      {lineup.formation} ({lineup.played} matches)
-                    </Typography>
-                  ))
-                ) : (
-                  <Typography variant="body2">No lineups data available.</Typography>
-                )}
-              </Box>
-
-              {/* Form Section */}
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', textDecoration: 'underline', marginBottom: '10px' }}>
-                  Form
-                </Typography>
-                <Box sx={{ display: 'flex', gap: '5px' }}>
-                  {soccerTeamData.form.split('').map((letter, index) => (
-                    <Typography
-                      key={index}
-                      sx={{
-                        fontWeight: 'bold',
-                        color: letter === 'W' ? green[500] : letter === 'L' ? 'red' : 'orange',
-                      }}
-                    >
-                      {letter}
-                    </Typography>
-                  ))}
-                </Box>
-              </Box>
-            </Box>
-          </Card>
-        ) : (
-          <Typography variant="body1" color="textSecondary">
-            No favorite soccer team data available.
-          </Typography>
-        )}
-      </Box>
-
-      {/* Basketball Section */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '40px' }}>
-        <Typography variant="h5" className="section-subtitle" style={{ color: green[500] }}>
-          Basketball
-        </Typography>
-        {basketballTeamData ? (
-          <Card elevation={3} sx={{ padding: '20px', backgroundColor: '#f9f9f9' }}>
-            {/* Horizontal Layout */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
-              {/* Team Information */}
-              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '20px', gap: '20px' }}>
-                  <Avatar
-                    src={basketballTeamData.team.logo}
-                    alt={basketballTeamData.team.name}
-                    sx={{ width: 80, height: 80 }}
-                  />
-                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: green[500] }}>
-                    {basketballTeamData.team.name}
-                  </Typography>
-                </Box>
-                <Typography variant="body2">
-                  Record: <span style={{ color: green[500] }}>{basketballTeamData.games.wins.all.total}</span> -
-                  <span style={{ color: 'red' }}>{basketballTeamData.games.loses.all.total}</span>
-                </Typography>
-              </Box>
-
-              {/* Win Percentage Section */}
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', textDecoration: 'underline', marginBottom: '10px' }}>
-                  Win Percentage
-                </Typography>
-                <Typography variant="body2">Home: {basketballTeamData.games.wins.home.percentage}</Typography>
-                <Typography variant="body2">Away: {basketballTeamData.games.wins.away.percentage}</Typography>
-              </Box>
-
-              {/* Average Points Section */}
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', textDecoration: 'underline', marginBottom: '10px' }}>
-                  Points
-                </Typography>
-                <Typography variant="body2">
-                  Avg Points Scored/Game: {basketballTeamData.points.for.average.all}
-                </Typography>
-                <Typography variant="body2">
-                  Avg Points Conceded/Game: {basketballTeamData.points.against.average.all}
-                </Typography>
-              </Box>
-            </Box>
-          </Card>
-        ) : (
-          <Typography variant="body1" color="textSecondary">
-            No favorite basketball team data available.
-          </Typography>
-        )}
-      </Box>
-
-
-
-      <div className="content-container">
-        <main className="main-content">
-          {/* Favorites Sections */}
-          <section className="favorites-section">
-            <Typography variant="h5" className="section-title">
-              PL Highlights
-            </Typography>
-            <Box className="matches-container">
-              {premierLeagueGames.map((game, index) => renderMatch(game, index))}
-            </Box>
-          </section>
-
-          <section className="favorites-section">
-            <Typography variant="h5" className="section-title">
-              NBA Highlights
-            </Typography>
-            <Box className="matches-container">
-              {nbaGames.map((game, index) => renderMatch(game, index))}
-            </Box>
-          </section>
-
-          {/* Dashboard Widgets */}
-          <div className="dashboard-widgets">
-            <div className="widget calorie-widget">
-              <h3>Calories</h3>
-              <div className="progress-bar">
-                <CircularProgressbar
-                  value={caloriePercentage}
-                  text={`${Math.round(caloriePercentage)}%`}
-                  styles={buildStyles({
-                    textSize: '14px',
-                    pathColor: `rgba(26, 166, 75, 1)`,
-                    textColor: '#000',
-                    trailColor: '#d6d6d6',
-                  })}
-                />
-                <p>
-                  {totalCalories} / {dailyCalorieGoal} Calories
-                </p>
-              </div>
-            </div>
-
-            <div className="widget workouts-widget">
-              <h3>Workouts</h3>
-              <div className="workouts-list">
-                <ul>
-                  {workouts.map((workout) => (
-                    <li key={workout._id}>
-                      <strong>Exercise:</strong> {workout.exercise} <br />
-                      <strong>Sets:</strong> {workout.sets} <br />
-                      <strong>Reps:</strong> {workout.reps} <br />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </main>
-
-        <aside className="sidebar">
-          <section className="shortcuts-section">
-            <h2>Shortcuts</h2>
-            {/* Add New Meal Button */}
-            <button
-              title="Add New"
-              className="group flex items-center cursor-pointer outline-none hover:shadow-lg duration-300 transition-transform transform hover:scale-105"
-              onClick={handleOpenModal}
-              onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-              onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-              style={{
-                backgroundColor: '#1aa64b',
-                color: '#fff',
-                padding: '10px 15px',
-                borderRadius: '10px',
-                border: 'none',
-                fontSize: '16px',
-                fontWeight: 'bold',
-              }}
-            >
-              <AiOutlinePlus
-                size={24}
-                className="stroke-zinc-400 fill-none group-hover:fill-zinc-800 group-active:stroke-zinc-200 group-active:fill-zinc-600 group-active:duration-0 duration-300"
+          <Box style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
+            {/* Team Information */}
+            <Box style={{ flex: 1 }}>
+              <Avatar
+                src={soccerTeamData.team.logo}
+                alt={soccerTeamData.team.name}
+                style={{ width: '80px', height: '80px', marginBottom: '10px' }}
               />
-              <span style={{ marginLeft: '8px' }}>Add a meal</span>
-            </button>
-            <button
-              title="Add New Exercise"
-              style={{
-                backgroundColor: '#1aa64b',
-                color: '#fff',
-                padding: '10px 15px',
-                borderRadius: '10px',
-                border: 'none',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                transition: 'transform 0.2s ease',
-              }}
-              onClick={handleOpenModalWorkout}
-              onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-              onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-            >
-              <AiOutlinePlus size={24} />
-              <span style={{ marginLeft: '8px' }}>Add an Exercise</span>
-            </button>
-            <button
-              title="Add New Run"
-              style={{
-                backgroundColor: '#1aa64b',
-                color: '#fff',
-                padding: '10px 15px',
-                borderRadius: '10px',
-                border: 'none',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                transition: 'transform 0.2s ease',
-              }}
-              onClick={() => setIsFormOpen(true)}
-              onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-              onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-            >
-              <AiOutlinePlus size={24} />
-              <span style={{ marginLeft: '8px' }}>Add a run</span>
-            </button>
-          </section>
-        </aside>
+              <Typography variant="h6" style={{ fontWeight: 'bold', color: '#1aa64b' }}>{soccerTeamData.team.name}</Typography>
+              <Typography>Games Played: {soccerTeamData.fixtures.played.total}</Typography>
+              <Typography>Wins: {soccerTeamData.fixtures.wins.total}</Typography>
+              <Typography>Losses: {soccerTeamData.fixtures.loses.total}</Typography>
+              <Typography>Draws: {soccerTeamData.fixtures.draws.total}</Typography>
+            </Box>
+  
+            {/* Goals Section */}
+            <Box style={{ flex: 1 }}>
+              <Typography variant="h6" style={{ fontWeight: 'bold', marginBottom: '10px' }}>Goals</Typography>
+              <Typography>Total Goals Scored: {soccerTeamData.goals.for.total.total}</Typography>
+              <Typography>Total Goals Conceded: {soccerTeamData.goals.against.total.total}</Typography>
+              <Typography>Avg Goals Scored/Game: {(
+                soccerTeamData.goals.for.total.total / soccerTeamData.fixtures.played.total
+              ).toFixed(2)}</Typography>
+              <Typography>Avg Goals Conceded/Game: {(
+                soccerTeamData.goals.against.total.total / soccerTeamData.fixtures.played.total
+              ).toFixed(2)}</Typography>
+            </Box>
+  
+            {/* Lineups Section */}
+            <Box style={{ flex: 1 }}>
+              <Typography variant="h6" style={{ fontWeight: 'bold', marginBottom: '10px' }}>Common Lineups</Typography>
+              {soccerTeamData.lineups.length > 0 ? (
+                soccerTeamData.lineups.map((lineup, index) => (
+                  <Typography key={index}>{lineup.formation} ({lineup.played} matches)</Typography>
+                ))
+              ) : (
+                <Typography>No lineups data available.</Typography>
+              )}
+            </Box>
+  
+            {/* Form Section */}
+            <Box style={{ flex: 1 }}>
+              <Typography variant="h6" style={{ fontWeight: 'bold', marginBottom: '10px' }}>Form</Typography>
+              <Box style={{ display: 'flex', gap: '5px' }}>
+                {soccerTeamData.form.split('').map((letter, index) => (
+                  <Typography
+                    key={index}
+                    style={{
+                      fontWeight: 'bold',
+                      color: letter === 'W' ? '#1aa64b' : letter === 'L' ? 'red' : 'orange',
+                    }}
+                  >
+                    {letter}
+                  </Typography>
+                ))}
+              </Box>
+            </Box>
+          </Box>
+        ) : (
+          <Typography>No soccer data available.</Typography>
+        )}
+      </Card>
+  
+      {/* Basketball Section */}
+      <Card
+        elevation={3}
+        style={{
+          padding: '20px',
+          backgroundColor: '#f9f9f9',
+          borderRadius: '15px',
+          boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+          marginBottom: '20px',
+        }}
+      >
+        <Typography variant="h5" style={{ marginBottom: '10px', color: '#1aa64b' }}>Basketball</Typography>
+        {basketballTeamData ? (
+          <Box style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
+            {/* Team Information */}
+            <Box style={{ flex: 1 }}>
+              <Avatar
+                src={basketballTeamData.team.logo}
+                alt={basketballTeamData.team.name}
+                style={{ width: '80px', height: '80px', marginBottom: '10px' }}
+              />
+              <Typography variant="h6" style={{ fontWeight: 'bold', color: '#1aa64b' }}>{basketballTeamData.team.name}</Typography>
+              <Typography>Record: {basketballTeamData.games.wins.all.total} - {basketballTeamData.games.loses.all.total}</Typography>
+            </Box>
+  
+            {/* Win Percentage */}
+            <Box style={{ flex: 1 }}>
+              <Typography variant="h6" style={{ fontWeight: 'bold', marginBottom: '10px' }}>Win Percentage</Typography>
+              <Typography>Home: {basketballTeamData.games.wins.home.percentage}</Typography>
+              <Typography>Away: {basketballTeamData.games.wins.away.percentage}</Typography>
+            </Box>
+  
+            {/* Points Section */}
+            <Box style={{ flex: 1 }}>
+              <Typography variant="h6" style={{ fontWeight: 'bold', marginBottom: '10px' }}>Points</Typography>
+              <Typography>Avg Points Scored/Game: {basketballTeamData.points.for.average.all}</Typography>
+              <Typography>Avg Points Conceded/Game: {basketballTeamData.points.against.average.all}</Typography>
+            </Box>
+          </Box>
+        ) : (
+          <Typography>No basketball data available.</Typography>
+        )}
+      </Card>
+  
+      {/* Bottom Widgets Section */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', height: '200px' }}>
+{/* Calories Widget */}
+<Card
+  elevation={3}
+  style={{
+    flex: 1,
+    padding: '20px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '15px',
+    boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }}
+>
+  <Typography
+    variant="h6"
+    style={{
+      textAlign: 'center',
+      color: '#1aa64b',
+      marginBottom: '10px',
+    }}
+  >
+    Calories
+  </Typography>
+  <div
+    style={{
+      width: '80px', // Adjusted size to fit the widget while keeping proportions
+      height: '80px', // Ensures a square progress bar
+      margin: '10px 0',
+    }}
+  >
+    <CircularProgressbar
+      value={caloriePercentage}
+      text={`${Math.round(caloriePercentage)}%`}
+      styles={buildStyles({
+        textSize: '12px', // Slightly smaller text to fit the resized progress bar
+        pathColor: `rgba(26, 166, 75, 1)`,
+        textColor: '#1aa64b',
+        trailColor: '#d6d6d6',
+      })}
+    />
+  </div>
+  <Typography
+    style={{
+      textAlign: 'center',
+      fontSize: '14px', // Reduced font size to maintain balance
+      marginTop: '10px',
+    }}
+  >
+    {totalCalories} / {dailyCalorieGoal} Calories
+  </Typography>
+</Card>
 
-        <MealLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} onError={handleCloseModal} />
+  
+        {/* Workouts Widget */}
+        <Card
+          elevation={3}
+          style={{
+            flex: 1,
+            padding: '20px',
+            backgroundColor: '#f9f9f9',
+            borderRadius: '15px',
+            boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+            overflowY: 'auto',
+          }}
+        >
+          <Typography variant="h6" style={{ textAlign: 'center', color: '#1aa64b' }}>Workouts</Typography>
+          {workouts.length > 0 ? (
+            <ul style={{ listStyleType: 'none', padding: '0', margin: '0' }}>
+              {workouts.map((workout) => (
+                <li key={workout._id} style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                  <strong>{workout.exercise}</strong>: {workout.sets} sets, {workout.reps} reps
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <Typography style={{ textAlign: 'center', color: '#666' }}>No workout data available.</Typography>
+          )}
+        </Card>
+  
+        {/* Shortcuts Section */}
+        <Card elevation={3} style={{ flex: 1, padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '15px', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
+          <Typography variant="h6" style={{ textAlign: 'center', color: '#1aa64b' }}>Shortcuts</Typography>
+          <button onClick={handleOpenModal} style={{ width: '100%', marginBottom: '10px' }}>Add a Meal</button>
+          <button onClick={handleOpenModalWorkout} style={{ width: '100%', marginBottom: '10px' }}>Add an Exercise</button>
+          <button onClick={() => setIsFormOpen(true)} style={{ width: '100%' }}>Add a Run</button>
+        </Card>
+      </div>
+      <MealLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} onError={handleCloseModal} />
         <WorkoutLogForm isOpen={isWorkoutModalOpen} onClose={handleCloseModalWorkout} onSubmit={handleWorkoutSubmit} />
         <RunLogForm
           isOpen={isFormOpen}
@@ -578,9 +505,10 @@ const HomePage = () => {
           onSubmit={logRun}
           darkMode={false}
         />
-      </div>
     </div>
   );
+  
+  
 };
 
 export default HomePage;

@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const fetch = require('node-fetch')
 const auth = require('./middleware/auth'); // Import the auth middleware
+const QuizResult = require('./models/QuizResult');
 
 dotenv.config();
 
@@ -1041,6 +1042,31 @@ app.get('/api/euroleague_live', async (req, res) => {
     }
 });
 
+// server.js
+
+app.post('/api/quiz/logresult', auth, async (req, res) => {
+    try {
+      const { result, answers } = req.body;
+      const userId = req.user.id; // Get userId from auth middleware
+  
+      // Validate input
+      if (!result || !answers) {
+        return res.status(400).json({ message: 'Result and answers are required.' });
+      }
+  
+      const quizResult = new QuizResult({
+        userId,
+        result,
+        answers,
+      });
+  
+      await quizResult.save();
+      res.status(201).json({ message: 'Quiz result logged successfully', data: quizResult });
+    } catch (error) {
+      console.error('Error logging quiz result', error);
+      res.status(500).json({ message: 'Error logging quiz result', error });
+    }
+  });  
 
 // Meal logging routes
 const MealLog = require('./models/MealLog');
@@ -1055,6 +1081,43 @@ app.post('/api/meals/logmeal', async (req, res) => {
         res.status(500).json({ message: "Error logging the meal", error });
     }
 });
+
+// Add this route to your server.js file
+
+app.get('/api/quiz/result', auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Find the most recent quiz result for this user
+    const quizResult = await QuizResult.findOne({ userId }).sort({ _id: -1 });
+
+    if (!quizResult) {
+      // User has not taken the quiz before
+      return res.status(200).json({ message: 'No quiz result found.' });
+    }
+
+    // If you stored description and image in the DB, you can return them directly.
+    // Otherwise, you can derive them from athleteData here, similar to what you do on the client side.
+    // For now, let's assume you just saved the result and answers.
+    // You can add `description` and `image` lookup logic from athleteData here if needed.
+
+    // Example:
+    const athleteInfo = require('./athletes.json').find(a => a.name === quizResult.result);
+    const description = athleteInfo ? athleteInfo.description : 'Description not found.';
+    const image = athleteInfo ? athleteInfo.image : '';
+
+    res.status(200).json({ 
+      result: quizResult.result, 
+      answers: quizResult.answers, 
+      description,
+      image
+    });
+  } catch (error) {
+    console.error('Error fetching quiz result', error);
+    res.status(500).json({ message: 'Error fetching quiz result', error });
+  }
+});
+
 
 app.get('/api/meals', auth, async (req, res) => {
     try {

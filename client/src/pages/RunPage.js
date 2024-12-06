@@ -47,11 +47,20 @@ const RunPage = () => {
     setIsLoading(true);
     setFetchError(null);
     try {
-      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs');
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("No token found. Please log in again.");
+      }
+
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs', {
+        headers: { 'x-auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjcyMTdjYzRhZjZkOTg0NGVkZjEwMDkyIn0sImlhdCI6MTczMzQ3OTU0MywiZXhwIjoxNzMzNDgzMTQzfQ.Bsc1W4K1MsS6Cmw6316cHN32w2HH42Ug6bENKurFEz0' },
+      });
+      
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error fetching runs: ${errorText}`);
       }
+
       const runData = await response.json();
       setRuns(runData);
     } catch (error) {
@@ -61,7 +70,6 @@ const RunPage = () => {
       setIsLoading(false);
     }
   };
-  
 
   // Log a new run
   const logRun = async (data) => {

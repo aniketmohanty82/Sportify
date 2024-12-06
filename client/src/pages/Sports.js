@@ -516,14 +516,14 @@ const BasketballMatchDetailsModal = ({ open, handleClose, matchData }) => {
 
           {/* Game Info */}
           <Box sx={{ mt: 3 }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+            <Typography variant="body2" sx={{ color: '#1aa64b', mb: 1 }}>
               {`Venue: ${matchData.venue}`}
             </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            <Typography variant="body2" sx={{ color: '#1aa64b' }}>
               {`Date: ${new Date(matchData.date).toLocaleDateString()}`}
             </Typography>
             <Typography variant="body2" sx={{
-              color: matchData.status.long.includes('Over Time') ? 'warning.main' : 'text.secondary',
+              color: matchData.status.long.includes('Over Time') ? 'warning.main' : '#1aa64b',
               mt: 1,
               fontWeight: 'bold'
             }}>
@@ -808,9 +808,11 @@ function Sports() {
   const [fixturesData, setFixturesData] = useState(null);
   const [basketballFixturesModalOpen, setBasketballFixturesModalOpen] = useState(false);
   const [basketballFixturesData, setBasketballFixturesData] = useState(null);
+  const [domesticMatches, setDomesticMatches] = useState([]);
+  const [internationalMatches, setInternationalMatches] = useState([]);
+  const [domesticLiveMatches, setDomesticLiveMatches] = useState([]);
+  const [internationalLiveMatches, setInternationalLiveMatches] = useState([]);
 
-  //test
-  const [wnbaGamesLive, setWNBAGamesLive] = useState([]);
 
   // Soccer fixtures list
   const handleFixturesClick = async (leagueId) => {
@@ -836,6 +838,54 @@ function Sports() {
       console.error('Error fetching basketball fixtures:', error);
     }
   };
+
+  // Cricket Live
+  useEffect(() => {
+    if (page === 'cricket') {
+      const fetchLiveCricketMatches = () => {
+        fetch('http://localhost:5001/api/cricket_live')
+          .then(response => response.json())
+          .then(data => {
+            setDomesticLiveMatches(data.domesticLiveMatches || []);
+            console.log('Domestic Live Matches:', data.domesticLiveMatches);
+
+            setInternationalLiveMatches(data.internationalLiveMatches || []);
+            console.log('International Live Matches:', data.internationalLiveMatches);
+          })
+          .catch(err => console.error('Error fetching live cricket matches:', err));
+      };
+
+      fetchLiveCricketMatches();
+
+      // Fetch live matches every 2 minutes
+      const intervalId = setInterval(fetchLiveCricketMatches, 120000);
+
+      // Cleanup interval on component unmount
+      return () => clearInterval(intervalId);
+    }
+  }, [page]);
+
+
+  // Cricket fixtures
+  useEffect(() => {
+    if (page === 'cricket') {
+      const fetchCricketMatches = async () => {
+        try {
+          const response = await fetch('http://localhost:5001/api/cricket');
+          const data = await response.json();
+
+          setDomesticMatches(data.domestic || []);
+          //console.log(domesticMatches);
+          setInternationalMatches(data.international || []);
+          //console.log(internationalMatches);
+        } catch (error) {
+          console.error('Error fetching cricket matches:', error);
+        }
+      };
+
+      fetchCricketMatches();
+    }
+  }, [page]);
 
   // UCL live
   useEffect(() => {
@@ -995,6 +1045,265 @@ function Sports() {
       console.error('Error fetching match details:', error);
     }
   };
+
+  const renderCricketMatch = (game, index, sport) => {
+    // Handle cricket-specific formatting
+    let homeScore, awayScore;
+    if (sport === "cricket") {
+      const scores = game.score.split(" vs "); // Split "104\\7 vs 110\\2"
+      homeScore = scores[0].replace("\\", "/"); // Format scores
+      awayScore = scores[1].replace("\\", "/"); // Format scores
+    } else {
+      homeScore = game.scores[0] ?? 0;
+      awayScore = game.scores[1] ?? 0;
+    }
+
+    const winner = game.status.includes("won by")
+      ? game.status.split(" ")[0] // Extract winning team name
+      : null;
+
+
+    return (
+      <Paper
+        elevation={3}
+        onClick={() => handleMatchClick(game, sport)}
+        sx={{
+          p: 2,
+          m: 1,
+          minWidth: "250px",
+          position: "relative",
+          cursor: "pointer",
+          "&:hover": {
+            transform: "scale(1.02)",
+            transition: "transform 0.2s ease-in-out",
+            boxShadow: 6,
+          },
+        }}
+      >
+        <Typography variant="h6">Match {index + 1}</Typography>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ gap: 2 }}
+        >
+          <Typography
+            sx={{
+              textAlign: "left",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              flex: 1,
+            }}
+          >
+            {game.teams.split(" vs ")[0]} {/* Team 1 */}
+          </Typography>
+          <Box display="flex" alignItems="center" sx={{ flexShrink: 0 }}>
+            <Typography>{homeScore}</Typography>
+            <Box
+              sx={{
+                bgcolor:
+                  game.teams.split(" vs ")[0].split(" ")[0] === winner
+                    ? green[500]
+                    : "transparent",
+                width: 12,
+                height: 12,
+                borderRadius: "50%",
+                ml: 1,
+              }}
+            />
+          </Box>
+        </Box>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ gap: 2 }}
+        >
+          <Typography
+            sx={{
+              textAlign: "left",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              flex: 1,
+            }}
+          >
+            {game.teams.split(" vs ")[1]} {/* Team 2 */}
+          </Typography>
+          <Box display="flex" alignItems="center" sx={{ flexShrink: 0 }}>
+            <Typography>{awayScore}</Typography>
+            <Box
+              sx={{
+                bgcolor:
+                  game.teams.split(" vs ")[1].split(" ")[0] === winner
+                    ? green[500]
+                    : "transparent",
+                width: 12,
+                height: 12,
+                borderRadius: "50%",
+                ml: 1,
+              }}
+            />
+          </Box>
+        </Box>
+        {game.status && (
+          <Typography
+            variant="caption"
+            sx={{
+              position: "absolute",
+              bottom: 3,
+              right: 8,
+              color: game.status.includes("Over Time")
+                ? "warning.main"
+                : "#1aa64b",
+            }}
+          >
+            {game.status}
+          </Typography>
+        )}
+      </Paper>
+    );
+  };
+
+
+  const renderCricketLiveMatch = (game, index, sport) => {
+    // Extract and format scores
+    let homeScore, awayScore;
+    if (sport === "cricket") {
+      const scores = game.score.split(" vs "); // Split "104\\7 vs 110\\2"
+      homeScore = scores[0].replace("\\", "/"); // Format scores
+      awayScore = scores[1].replace("\\", "/"); // Format scores
+    } else {
+      homeScore = game.scores[0] ?? 0;
+      awayScore = game.scores[1] ?? 0;
+    }
+
+    // Determine the winner
+    const winner = game.status.includes("won by")
+      ? game.status.split(" ")[0] // Extract winning team name
+      : null;
+
+    return (
+      <Paper
+        elevation={3}
+        onClick={() => handleMatchClick(game, sport)}
+        sx={{
+          p: 2,
+          m: 1,
+          minWidth: "250px",
+          position: "relative",
+          cursor: "pointer",
+          "&:hover": {
+            transform: "scale(1.02)",
+            transition: "transform 0.2s ease-in-out",
+            boxShadow: 6,
+          },
+        }}
+      >
+        <Typography variant="h6">Match {index + 1}</Typography>
+
+        {/* Live status indicator */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            width: 12,
+            height: 12,
+            bgcolor: "red",
+            borderRadius: "50%",
+            animation: "vibrate 1s infinite",
+          }}
+        />
+
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ gap: 2 }}
+        >
+          <Typography
+            sx={{
+              textAlign: "left",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              flex: 1,
+            }}
+          >
+            {game.teams.split(" vs ")[0]} {/* Team 1 */}
+          </Typography>
+          <Box display="flex" alignItems="center" sx={{ flexShrink: 0 }}>
+            <Typography>{homeScore}</Typography>
+            <Box
+              sx={{
+                bgcolor:
+                  game.teams.split(" vs ")[0].split(" ")[0] === winner
+                    ? green[500]
+                    : "transparent",
+                width: 12,
+                height: 12,
+                borderRadius: "50%",
+                ml: 1,
+              }}
+            />
+          </Box>
+        </Box>
+
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ gap: 2 }}
+        >
+          <Typography
+            sx={{
+              textAlign: "left",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              flex: 1,
+            }}
+          >
+            {game.teams.split(" vs ")[1]} {/* Team 2 */}
+          </Typography>
+          <Box display="flex" alignItems="center" sx={{ flexShrink: 0 }}>
+            <Typography>{awayScore}</Typography>
+            <Box
+              sx={{
+                bgcolor:
+                  game.teams.split(" vs ")[1].split(" ")[0] === winner
+                    ? green[500]
+                    : "transparent",
+                width: 12,
+                height: 12,
+                borderRadius: "50%",
+                ml: 1,
+              }}
+            />
+          </Box>
+        </Box>
+
+        {/* Live match status */}
+        {game.in_game_time && (
+          <Typography
+            variant="caption"
+            sx={{
+              position: "absolute",
+              bottom: 3,
+              right: 8,
+              color: "error.main",
+            }}
+          >
+            {game.in_game_time}
+          </Typography>
+        )}
+      </Paper>
+    );
+  };
+
+
   const renderMatch = (game, index, sport) => {
 
     // Handle case where scores might be null (upcoming games)
@@ -1074,7 +1383,7 @@ function Sports() {
               position: 'absolute',
               bottom: 3,
               right: 8,
-              color: game.status.includes('Over Time') ? 'warning.main' : 'text.secondary'
+              color: game.status.includes('Over Time') ? 'warning.main' : '#1aa64b'
             }}
           >
             {game.status}
@@ -1279,7 +1588,182 @@ function Sports() {
                 >
                   Basketball
                 </Button>
+                <Button
+                  variant={page === 'cricket' ? 'contained' : 'outlined'}
+                  onClick={() => setPage('cricket')}
+                  sx={{ borderRadius: '20px', mx: 1 }}
+                >
+                  Cricket
+                </Button>
               </Box>
+
+              {page === 'cricket' && (
+                <Box mt={4} sx={{ boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', borderRadius: 2, padding: 2 }}>
+                  {/* Domestic Section */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="h4" align="center">Domestic</Typography>
+                  </Box>
+
+                  {/* Live Matches Section */}
+                  <Typography
+                    variant="h6"
+                    align="left"
+                    sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}
+                  >
+                    Live Matches:
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      overflowX: 'auto',
+                      p: 1,
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 1,
+                      backgroundColor: '#fff',
+                      '&::-webkit-scrollbar': { display: 'none' },
+                      mb: 2,
+                    }}
+                  >
+                    {domesticLiveMatches.length > 0 ? (
+                      domesticLiveMatches.map((game, index) => (
+                        <div key={index}>{renderCricketLiveMatch(game, index, 'cricket')}</div>
+                      ))
+                    ) : (
+                      <Typography
+                        variant="body1"
+                        fontStyle="italic"
+                        fontFamily="Open Sans, sans-serif"
+                      >
+                        No Live Domestic Matches Available
+                      </Typography>
+                    )}
+                  </Box>
+
+                  {/* Recent Matches Section */}
+                  <Typography
+                    variant="h6"
+                    align="left"
+                    sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}
+                  >
+                    Recent Matches:
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      overflowX: 'auto',
+                      p: 1,
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 1,
+                      backgroundColor: '#fff',
+                      '&::-webkit-scrollbar': { display: 'none' },
+                      mb: 2,
+                    }}
+                  >
+                    {domesticMatches.length > 0 ? (
+                      domesticMatches.map((game, index) => (
+                        <div key={index}>{renderCricketMatch(game, index, 'cricket')}</div>
+                      ))
+                    ) : (
+                      <Typography
+                        variant="body1"
+                        fontStyle="italic"
+                        fontFamily="Open Sans, sans-serif"
+                      >
+                        No Recent Domestic Matches Available
+                      </Typography>
+                    )}
+                  </Box>
+
+                  {/* International Section */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="h4" align="center">International</Typography>
+                  </Box>
+
+                  {/* Live Matches Section */}
+                  <Typography
+                    variant="h6"
+                    align="left"
+                    sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}
+                  >
+                    Live Matches:
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      overflowX: 'auto',
+                      p: 1,
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 1,
+                      backgroundColor: '#fff',
+                      '&::-webkit-scrollbar': { display: 'none' },
+                      mb: 2,
+                    }}
+                  >
+                    {internationalLiveMatches.length > 0 ? (
+                      internationalLiveMatches.map((game, index) => (
+                        <div key={index}>{renderCricketLiveMatch(game, index, 'cricket')}</div>
+                      ))
+                    ) : (
+                      <Typography
+                        variant="body1"
+                        fontStyle="italic"
+                        fontFamily="Open Sans, sans-serif"
+                      >
+                        No Live International Matches Available
+                      </Typography>
+                    )}
+                  </Box>
+
+                  {/* Recent Matches Section */}
+                  <Typography
+                    variant="h6"
+                    align="left"
+                    sx={{ mt: 2, fontWeight: 'bold', fontFamily: 'Open Sans, sans-serif' }}
+                  >
+                    Recent Matches:
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      overflowX: 'auto',
+                      p: 1,
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 1,
+                      backgroundColor: '#fff',
+                      '&::-webkit-scrollbar': { display: 'none' },
+                      mb: 2,
+                    }}
+                  >
+                    {internationalMatches.length > 0 ? (
+                      internationalMatches.map((game, index) => (
+                        <div key={index}>{renderCricketMatch(game, index, 'cricket')}</div>
+                      ))
+                    ) : (
+                      <Typography
+                        variant="body1"
+                        fontStyle="italic"
+                        fontFamily="Open Sans, sans-serif"
+                      >
+                        No Recent International Matches Available
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+              )}
 
               {page === 'soccer' && (
                 <Box mt={4} sx={{ boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)', borderRadius: 2, padding: 2 }}>
@@ -1615,7 +2099,20 @@ function Sports() {
                       mb: 2
                     }}
                   >
-                    {euroleagueGames.map((game, index) => renderMatch(game, index, 'basketball'))}
+                    {/* Check if 'euroleagueGamesLive' is a message or contains game data */}
+                    {euroleagueGames.message ? (
+                      <Typography
+                        variant="body1"
+                        fontStyle="italic"
+                        fontFamily='Open Sans, sans-serif'
+                      >
+                        {euroleagueGames.message}
+                      </Typography>
+                    ) : (
+                      euroleagueGames.map((game, index) =>
+                        renderMatch(game, index, 'basketball')
+                      )
+                    )}
                   </Box>
 
                   {/* Live Matches Section */}

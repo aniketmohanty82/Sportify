@@ -37,6 +37,10 @@ const LogIn = () => {
       localStorage.setItem('userId', res.data.user.id);  // Store the user ID
       localStorage.setItem('userName', res.data.user.userName);
       localStorage.setItem('timeZone', res.data.user.timeZone);
+      localStorage.setItem('favoriteSoccerTeam', res.data.user.favoriteSoccerTeam);
+      localStorage.setItem('favoriteSoccerTeamId', res.data.user.favoriteSoccerTeamId);
+      localStorage.setItem('favoriteBasketballTeam', res.data.user.favoriteBasketballTeam);
+      localStorage.setItem('favoriteBasketballTeamId', res.data.user.favoriteBasketballTeamId);
       console.log(res.data.user)
       console.log(localStorage.getItem('userName'))
 

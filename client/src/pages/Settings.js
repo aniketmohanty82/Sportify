@@ -13,6 +13,10 @@ const Settings = () => {
     email: '',
     timeZoneUser: '',
   });
+  const [favoriteSoccerTeam, setFavoriteSoccerTeam] = useState(''); // Tracks the user's favorite soccer team
+  const [favoriteSoccerTeamId, setFavoriteSoccerTeamId] = useState('');
+  const [favoriteBasketballTeam, setFavoriteBasketballTeam] = useState(''); // Tracks the user's favorite basketball team
+  const [favoriteBasketballTeamId, setFavoriteBasketballTeamId] = useState('');
   const [userTimeZone, setUserTimeZone] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -43,6 +47,11 @@ const Settings = () => {
             timeZoneUser: data.timezone,
           });
           setUserTimeZone(data.timezone);
+          setFavoriteSoccerTeam(data.favoriteSoccerTeam ?? 'Arsenal');
+          setFavoriteSoccerTeamId(data.favoriteSoccerTeamId ?? 42);
+          setFavoriteBasketballTeam(data.favoriteBasketballTeam ?? 'Los Angeles Lakers');
+          setFavoriteBasketballTeamId(data.favoriteBasketballTeamId ?? 145);
+
         } else {
           setError('Failed to fetch user profile information');
         }
@@ -109,7 +118,7 @@ const Settings = () => {
         },
         body: JSON.stringify({ userId, timezone: timeZone }),
       });
-  
+
       if (response.ok) {
         setMessage('Time zone updated successfully!');
         console.log("before removal", localStorage.getItem('timeZone'))
@@ -126,6 +135,80 @@ const Settings = () => {
       console.error(error);
     }
   };
+  const handleFavoriteBasketballTeamSave = async (team, teamId) => {
+    try {
+      // Update the state locally before API call
+      setFavoriteBasketballTeam(team);
+  
+      const response = await fetch('http://localhost:5001/users/update-favoriteBasketballTeam', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+        body: JSON.stringify({ userId, favoriteBasketballTeam: team, favoriteBasketballTeamId: teamId }),
+      });
+  
+      if (response.ok) {
+        // Store updated values in localStorage
+        localStorage.setItem('favoriteBasketballTeam', team);
+        localStorage.setItem('favoriteBasketballTeamId', teamId);
+  
+        // Show success message
+        setMessage('Favorite Basketball Team updated successfully!');
+  
+        // Reload the page to ensure the updates reflect throughout the app
+        window.location.reload();
+      } else {
+        // Handle errors from the server response
+        const errorData = await response.json();
+        setError(errorData.message || 'Failed to update favorite basketball team');
+      }
+    } catch (error) {
+      // Handle unexpected errors
+      setError('Error updating favorite basketball team');
+      console.error(error);
+    }
+  };
+
+
+  const handleFavoriteSoccerTeamSave = async (team, teamId) => {
+    try {
+      // Update the state locally before API call
+      setFavoriteSoccerTeam(team);
+  
+      const response = await fetch('http://localhost:5001/users/update-favoriteSoccerTeam', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+        body: JSON.stringify({ userId, favoriteSoccerTeam: team, favoriteSoccerTeamId: teamId }),
+      });
+  
+      if (response.ok) {
+        // Store updated values in localStorage
+        localStorage.setItem('favoriteSoccerTeam', team);
+        localStorage.setItem('favoriteSoccerTeamId', teamId);
+  
+        // Show success message
+        setMessage('Favorite Soccer Team updated successfully!');
+  
+        // Reload the page to ensure the updates reflect throughout the app
+        window.location.reload();
+      } else {
+        // Handle errors from the server response
+        const errorData = await response.json();
+        setError(errorData.message || 'Failed to update favorite soccer team');
+      }
+    } catch (error) {
+      // Handle unexpected errors
+      setError('Error updating favorite soccer team');
+      console.error(error);
+    }
+  };
+  
+
 
   const handleCancel = () => {
     setMessage('');
@@ -180,6 +263,62 @@ const Settings = () => {
     'Africa/Cairo',
   ];
 
+  const favoriteSoccerTeams = [
+    ['Arsenal', 42],
+    ['Aston Villa', 66],
+    ['Bournemouth', 35],
+    ['Brentford', 55],
+    ['Brighton', 51],
+    ['Ipswich', 57],
+    ['Chelsea', 49],
+    ['Crystal Palace', 52],
+    ['Everton', 45],
+    ['Fulham', 36],
+    ['Liverpool', 40],
+    ['Southampton', 41],
+    ['Manchester City', 50],
+    ['Manchester United', 33],
+    ['Newcastle United', 34],
+    ['Nottingham Forest', 65],
+    ['Leicester City', 46],
+    ['Tottenham', 47],
+    ['West Ham', 48],
+    ['Wolves', 39],
+  ];
+
+  const favoriteBasketballTeams = [
+    ['Atlanta Hawks', 132],
+    ['Boston Celtics', 133],
+    ['Brooklyn Nets', 134],
+    ['Charlotte Hornets', 135],
+    ['Chicago Bulls', 136],
+    ['Cleveland Cavaliers', 137],
+    ['Dallas Mavericks', 138],
+    ['Denver Nuggets', 139],
+    ['Detroit Pistons', 140],
+    ['Golden State Warriors', 141],
+    ['Houston Rockets', 142],
+    ['Indiana Pacers', 143],
+    ['Los Angeles Clippers', 144],
+    ['Los Angeles Lakers', 145],
+    ['Memphis Grizzlies', 146],
+    ['Miami Heat', 147],
+    ['Milwaukee Bucks', 148],
+    ['Minnesota Timberwolves', 149],
+    ['New Orleans Pelicans', 150],
+    ['New York Knicks', 151],
+    ['Oklahoma City Thunder', 152],
+    ['Orlando Magic', 153],
+    ['Philadelphia 76ers', 154],
+    ['Phoenix Suns', 155],
+    ['Portland Trail Blazers', 156],
+    ['Sacramento Kings', 157],
+    ['San Antonio Spurs', 158],
+    ['Toronto Raptors', 159],
+    ['Utah Jazz', 160],
+    ['Washington Wizards', 161],
+  ];
+  
   return (
     <div className={`settings-container ${darkMode ? 'dark-mode' : ''}`}>
       <h2>Account Settings</h2>
@@ -208,6 +347,15 @@ const Settings = () => {
           <label>Time Zone:</label>
           <span>{userData.timeZoneUser}</span>
         </div>
+        <div className="profile-item">
+          <label>Favorite Soccer Team:</label>
+          <span>{favoriteSoccerTeam}</span>
+        </div>
+        <div className="profile-item">
+          <label>Favorite Basketball Team:</label>
+          <span>{favoriteBasketballTeam}</span>
+        </div>
+
       </div>
 
       {/* Dark Mode Toggle Button */}
@@ -276,6 +424,86 @@ const Settings = () => {
           Delete Account
         </button>
       </div>
+
+      <div className="timezone-form">
+        <h3>Select Your Favorite Soccer Team</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <select
+            value={favoriteSoccerTeam}
+            onChange={(e) => {
+              const selectedTeam = favoriteSoccerTeams.find(
+                ([teamName]) => teamName === e.target.value
+              );
+              if (selectedTeam) {
+                setFavoriteSoccerTeam(selectedTeam[0]); // Set team name
+                setFavoriteSoccerTeamId(selectedTeam[1]); // Set team ID
+              }
+            }}
+            className="button"
+          >
+            {favoriteSoccerTeams.map(([teamName, teamId]) => (
+              <option key={teamId} value={teamName}>
+                {teamName}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => handleFavoriteSoccerTeamSave(favoriteSoccerTeam, favoriteSoccerTeamId)}
+            className="button save-button"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="button cancel-button"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+
+      <div className="timezone-form">
+        <h3>Select Your Favorite Basketball Team</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <select
+            value={favoriteBasketballTeam}
+            onChange={(e) => {
+              const selectedTeam = favoriteBasketballTeams.find(
+                ([teamName]) => teamName === e.target.value
+              );
+              if (selectedTeam) {
+                setFavoriteBasketballTeam(selectedTeam[0]); // Set team name
+                setFavoriteBasketballTeamId(selectedTeam[1]); // Set team ID
+              }
+            }}
+            className="button"
+          >
+            {favoriteBasketballTeams.map(([teamName, teamId]) => (
+              <option key={teamId} value={teamName}>
+                {teamName}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => handleFavoriteBasketballTeamSave(favoriteBasketballTeam, favoriteBasketballTeamId)}
+            className="button save-button"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="button cancel-button"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+
+
 
       {showModal && (
         <div className="modal-overlay">

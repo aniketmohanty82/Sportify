@@ -67,9 +67,8 @@ const AppContent = () => {
           <Route
             path="/runs"
             element={
-              <ProtectedRoute>
+              
                 <RunPage />
-              </ProtectedRoute>
             }
           />
           <Route

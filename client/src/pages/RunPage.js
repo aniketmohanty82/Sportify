@@ -56,7 +56,7 @@ const RunPage = () => {
         throw new Error("No token found. Please log in again.");
       }
 
-      const response = await fetch('http://localhost:5001/api/runs', {
+      const response = await fetch('https://sportifyapp.onrender.com/api/runs', {
         headers: { 'x-auth-token': token },
       });
       

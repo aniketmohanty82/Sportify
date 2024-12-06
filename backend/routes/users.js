@@ -608,6 +608,7 @@ router.get('/:userId', async (req, res) => {
       favoriteBasketballTeamId: user.favoriteBasketballTeamId,
       workoutGoal: user.workoutGoal,
       calorieGoal: user.calorieGoal,
+      weeklySummaryEmail: user.weeklySummaryEmail,
     });
   } catch (error) {
     console.error('Error fetching user data:', error);

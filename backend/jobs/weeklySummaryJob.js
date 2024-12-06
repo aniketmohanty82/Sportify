@@ -3,7 +3,7 @@ const User = require('../models/User');
 const { generateWeeklySummary, sendWeeklyEmail } = require('../utils/emailSummary');
 
 const scheduleWeeklySummary = () => {
-  cron.schedule('0 9 * * 1', async () => { // Runs every Monday at 9:00 AM
+  cron.schedule('* * * * *', async () => { // Runs every Monday at 9:00 AM
     console.log('Starting weekly summary job...');
     try {
       const users = await User.find({ weeklySummaryEmail: true });

@@ -1,25 +1,69 @@
 const User = require('../models/User');
+const Run = require('../models/Run');
+const Meal = require('../models/MealLog');
+const Workout = require('../models/Workout');
 const nodemailer = require('nodemailer');
 
 const generateWeeklySummary = async (userId) => {
   const user = await User.findById(userId);
   if (!user) return null;
 
-  // Replace with logic to calculate data from workouts, runs, etc.
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  // Fetch and aggregate workouts
+  const workouts = await Workout.find({
+    userId,
+    date: { $gte: sevenDaysAgo },
+  });
+
+  const totalWorkouts = workouts.length;
+  const totalCaloriesBurnedFromWorkouts = workouts.reduce((sum, workout) => {
+    const workoutCalories = workout.sets * workout.reps * workout.weight * 0.1; // Example formula for calories
+    return sum + workoutCalories;
+  }, 0);
+
+  // Fetch and aggregate meals
+  const meals = await Meal.find({
+    userId,
+    date: { $gte: sevenDaysAgo },
+  });
+
+  const totalCaloriesFromMeals = meals.reduce((sum, meal) => {
+    return sum + meal.nutrients;
+  }, 0);
+
+  // Fetch and aggregate runs
+  const runs = await Run.find({
+    userId,
+    date: { $gte: sevenDaysAgo },
+  });
+
+  const totalDistance = runs.reduce((sum, run) => {
+    return sum + run.distance;
+  }, 0);
+
+  const totalRunDuration = runs.reduce((sum, run) => {
+    return sum + run.duration;
+  }, 0);
+
+  // Summary
   return {
     userName: user.username,
-    workoutsCompleted: 5,
-    totalCalories: 2500,
-    totalDistance: 10,
+    workoutsCompleted: totalWorkouts,
+    totalCalories: totalCaloriesBurnedFromWorkouts + totalCaloriesFromMeals,
+    totalDistance: totalDistance,
+    totalRunDuration: totalRunDuration,
   };
 };
+
 
 const sendWeeklyEmail = async (user, summary) => {
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: 'sai38281@gmail.com',
+      pass: 'damewsgosgeqnids',
     },
   });
 

@@ -13,9 +13,9 @@ const Settings = () => {
     email: '',
     timeZoneUser: '',
   });
-  const [favoriteSoccerTeam, setFavoriteSoccerTeam] = useState(''); // Tracks the user's favorite soccer team
+  const [favoriteSoccerTeam, setFavoriteSoccerTeam] = useState('');
   const [favoriteSoccerTeamId, setFavoriteSoccerTeamId] = useState('');
-  const [favoriteBasketballTeam, setFavoriteBasketballTeam] = useState(''); // Tracks the user's favorite basketball team
+  const [favoriteBasketballTeam, setFavoriteBasketballTeam] = useState('');
   const [favoriteBasketballTeamId, setFavoriteBasketballTeamId] = useState('');
   const [userTimeZone, setUserTimeZone] = useState('');
   const [workoutGoal, setWorkoutGoal] = useState('');
@@ -30,8 +30,11 @@ const Settings = () => {
   // State for controlling the delete confirmation modal
   const [showModal, setShowModal] = useState(false);
 
-  // In Settings.js
+  // Weekly summary emails state
   const [weeklySummaryEmail, setWeeklySummaryEmail] = useState(false);
+
+  // Daily calorie notifications state
+  const [calorieNotificationsEnabled, setCalorieNotificationsEnabled] = useState(true);
 
   useEffect(() => {
     // Fetch initial setting for weekly summary emails
@@ -39,11 +42,11 @@ const Settings = () => {
       try {
         const response = await axios.get(`http://localhost:5001/users/${userId}`);
         setWeeklySummaryEmail(response.data.weeklySummaryEmail);
+        setCalorieNotificationsEnabled(response.data.calorieNotificationsEnabled);
       } catch (error) {
         console.error('Error fetching weekly summary email setting:', error);
       }
     };
-
     fetchWeeklySummaryEmail();
   }, [userId]);
 
@@ -64,6 +67,22 @@ const Settings = () => {
     }
   };
 
+  const toggleCalorieNotifications = async () => {
+    try {
+      const updatedPreference = !calorieNotificationsEnabled;
+      setCalorieNotificationsEnabled(updatedPreference);
+
+      await axios.put('http://localhost:5001/users/update-calorieNotifications', {
+        userId,
+        calorieNotificationsEnabled: updatedPreference,
+      });
+
+      setMessage('Daily calorie notification preference updated.');
+    } catch (error) {
+      console.error('Error updating calorie notification preference:', error);
+      setError('Failed to update preference.');
+    }
+  };
 
   useEffect(() => {
     // Fetch the user's profile information and time zone from the backend
@@ -102,7 +121,7 @@ const Settings = () => {
       }
     };
     fetchUserProfile();
-    fetchDarkModeSetting()
+    fetchDarkModeSetting();
   }, [userId, token]);
 
   const fetchDarkModeSetting = async () => {
@@ -111,7 +130,7 @@ const Settings = () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'x-auth-token': token, // Include token if authentication is needed
+          'x-auth-token': token,
         },
       });
 
@@ -121,7 +140,6 @@ const Settings = () => {
 
       const data = await response.json();
       setDarkMode(data.darkMode);
-      console.log(darkMode)
     } catch (error) {
       console.error('Error fetching dark mode setting:', error);
     }
@@ -129,19 +147,17 @@ const Settings = () => {
 
   const toggleDarkMode = async () => {
     try {
-      // Toggle dark mode locally
-      console.log(darkMode)
       const updatedDarkMode = !darkMode; // Toggle from the previous state
-      setDarkMode(updatedDarkMode)
-      console.log(updatedDarkMode)
+      setDarkMode(updatedDarkMode);
 
       // Save the updated dark mode setting on the server
       fetch(`http://localhost:5001/users/update-darkMode`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'x-auth-token': token, // Include the token in headers
-        }, body: JSON.stringify({ userId, darkMode: updatedDarkMode }),
+          'x-auth-token': token,
+        }, 
+        body: JSON.stringify({ userId, darkMode: updatedDarkMode }),
       });
     } catch (error) {
       console.error('Error updating dark mode:', error);
@@ -162,10 +178,8 @@ const Settings = () => {
 
       if (response.ok) {
         setMessage('Time zone updated successfully!');
-        console.log("before removal", localStorage.getItem('timeZone'))
-        localStorage.removeItem('timeZone')
-        localStorage.setItem('timeZone', timeZone)
-        console.log("after removal", localStorage.getItem('timeZone'))
+        localStorage.removeItem('timeZone');
+        localStorage.setItem('timeZone', timeZone);
         window.location.reload();
       } else {
         const errorData = await response.json();
@@ -184,13 +198,13 @@ const Settings = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId, workoutGoal }), // Replace USER_ID dynamically
+        body: JSON.stringify({ userId, workoutGoal }),
       });
 
       if (response.ok) {
         const data = await response.json();
         setMessage(data.message);
-        localStorage.removeItem('workoutGoal')
+        localStorage.removeItem('workoutGoal');
         localStorage.setItem('workoutGoal', workoutGoal);
       } else {
         const errorData = await response.json();
@@ -208,13 +222,13 @@ const Settings = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId , calorieGoal }), // Replace USER_ID dynamically
+        body: JSON.stringify({ userId , calorieGoal }),
       });
 
       if (response.ok) {
         const data = await response.json();
         setMessage(data.message);
-        localStorage.removeItem('calorieGoal')
+        localStorage.removeItem('calorieGoal');
         localStorage.setItem('calorieGoal', calorieGoal);
       } else {
         const errorData = await response.json();
@@ -227,9 +241,8 @@ const Settings = () => {
 
   const handleFavoriteBasketballTeamSave = async (team, teamId) => {
     try {
-      // Update the state locally before API call
       setFavoriteBasketballTeam(team);
-  
+
       const response = await fetch('http://localhost:5001/users/update-favoriteBasketballTeam', {
         method: 'PUT',
         headers: {
@@ -238,24 +251,16 @@ const Settings = () => {
         },
         body: JSON.stringify({ userId, favoriteBasketballTeam: team, favoriteBasketballTeamId: teamId }),
       });
-  
+
       if (response.ok) {
-        // Store updated values in localStorage
         localStorage.setItem('favoriteBasketballTeam', team);
         localStorage.setItem('favoriteBasketballTeamId', teamId);
-  
-        // Show success message
         setMessage('Favorite Basketball Team updated successfully!');
-  
-        // Reload the page to ensure the updates reflect throughout the app
-        // window.location.reload();
       } else {
-        // Handle errors from the server response
         const errorData = await response.json();
         setError(errorData.message || 'Failed to update favorite basketball team');
       }
     } catch (error) {
-      // Handle unexpected errors
       setError('Error updating favorite basketball team');
       console.error(error);
     }
@@ -264,9 +269,8 @@ const Settings = () => {
 
   const handleFavoriteSoccerTeamSave = async (team, teamId) => {
     try {
-      // Update the state locally before API call
       setFavoriteSoccerTeam(team);
-  
+
       const response = await fetch('http://localhost:5001/users/update-favoriteSoccerTeam', {
         method: 'PUT',
         headers: {
@@ -275,30 +279,20 @@ const Settings = () => {
         },
         body: JSON.stringify({ userId, favoriteSoccerTeam: team, favoriteSoccerTeamId: teamId }),
       });
-  
+
       if (response.ok) {
-        // Store updated values in localStorage
         localStorage.setItem('favoriteSoccerTeam', team);
         localStorage.setItem('favoriteSoccerTeamId', teamId);
-  
-        // Show success message
         setMessage('Favorite Soccer Team updated successfully!');
-  
-        // Reload the page to ensure the updates reflect throughout the app
-        // window.location.reload();
       } else {
-        // Handle errors from the server response
         const errorData = await response.json();
         setError(errorData.message || 'Failed to update favorite soccer team');
       }
     } catch (error) {
-      // Handle unexpected errors
       setError('Error updating favorite soccer team');
       console.error(error);
     }
   };
-  
-
 
   const handleCancel = () => {
     setMessage('');
@@ -474,6 +468,7 @@ const Settings = () => {
         </button>
       </div>
 
+      {/* Weekly Summary Emails Toggle */}
       <div className="weekly-summary-toggle">
         <h3>Receive Weekly Summary Emails</h3>
         <label className="switch">
@@ -486,6 +481,18 @@ const Settings = () => {
         </label>
       </div>
 
+      {/* Daily Calorie Notification Toggle */}
+      <div className="weekly-summary-toggle">
+        <h3>Receive Daily Calorie Limit Notifications</h3>
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={calorieNotificationsEnabled}
+            onChange={toggleCalorieNotifications}
+          />
+          <span className="slider round"></span>
+        </label>
+      </div>
 
       {/* Time Zone Selector */}
       <div className="timezone-form">
@@ -546,8 +553,8 @@ const Settings = () => {
                 ([teamName]) => teamName === e.target.value
               );
               if (selectedTeam) {
-                setFavoriteSoccerTeam(selectedTeam[0]); // Set team name
-                setFavoriteSoccerTeamId(selectedTeam[1]); // Set team ID
+                setFavoriteSoccerTeam(selectedTeam[0]);
+                setFavoriteSoccerTeamId(selectedTeam[1]);
               }
             }}
             className="button"
@@ -585,8 +592,8 @@ const Settings = () => {
                 ([teamName]) => teamName === e.target.value
               );
               if (selectedTeam) {
-                setFavoriteBasketballTeam(selectedTeam[0]); // Set team name
-                setFavoriteBasketballTeamId(selectedTeam[1]); // Set team ID
+                setFavoriteBasketballTeam(selectedTeam[0]);
+                setFavoriteBasketballTeamId(selectedTeam[1]);
               }
             }}
             className="button"
@@ -657,8 +664,6 @@ const Settings = () => {
           </button>
         </div>
       </div>
-
-
 
       {showModal && (
         <div className="modal-overlay">

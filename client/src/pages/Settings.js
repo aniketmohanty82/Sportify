@@ -471,23 +471,6 @@ const Settings = () => {
         </div>
       </div>
 
-      <div className="edit-delete-buttons">
-        <button
-          type="button"
-          onClick={handleEditAccount}
-          className="button edit-account"
-        >
-          Edit Account
-        </button>
-        <button
-          type="button"
-          onClick={handleDeleteAccountClick}
-          className="button delete-account"
-        >
-          Delete Account
-        </button>
-      </div>
-
       <div className="timezone-form">
         <h3>Select Your Favorite Soccer Team</h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -610,7 +593,22 @@ const Settings = () => {
         </div>
       </div>
 
-
+      <div className="edit-delete-buttons">
+        <button
+          type="button"
+          onClick={handleEditAccount}
+          className="button edit-account"
+        >
+          Edit Account
+        </button>
+        <button
+          type="button"
+          onClick={handleDeleteAccountClick}
+          className="button delete-account"
+        >
+          Delete Account
+        </button>
+      </div>
 
       {showModal && (
         <div className="modal-overlay">

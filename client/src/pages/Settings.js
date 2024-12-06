@@ -54,18 +54,23 @@ const Settings = () => {
     try {
       const updatedPreference = !weeklySummaryEmail;
       setWeeklySummaryEmail(updatedPreference);
-
+  
       await axios.put('http://localhost:5001/users/update-weeklySummaryEmail', {
         userId,
         weeklySummaryEmail: updatedPreference,
+      }, {
+        headers: {
+          'x-auth-token': token,
+        },
       });
-
+  
       setMessage('Weekly summary email preference updated.');
     } catch (error) {
       console.error('Error updating weekly summary email preference:', error);
       setError('Failed to update preference.');
     }
   };
+  
 
   const toggleCalorieNotifications = async () => {
     try {

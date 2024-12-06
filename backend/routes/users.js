@@ -644,6 +644,29 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
+router.put('/update-weeklySummaryEmail', async (req, res) => {
+  const { userId, weeklySummaryEmail } = req.body;
+
+  if (!userId || weeklySummaryEmail === undefined) {
+    return res.status(400).json({ message: 'User ID and preference are required.' });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    user.weeklySummaryEmail = weeklySummaryEmail;
+    await user.save();
+
+    res.status(200).json({ message: 'Weekly summary email preference updated.', weeklySummaryEmail });
+  } catch (error) {
+    console.error('Error updating weekly summary email preference:', error);
+    res.status(500).json({ message: 'Server error.' });
+  }
+});
+
 router.delete('/:userId', auth, async (req, res) => {
   const { userId } = req.params;
 

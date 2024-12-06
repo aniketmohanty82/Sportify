@@ -44,7 +44,7 @@ router.post(
 // @route   GET api/runs
 // @desc    Get all runs for a user
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const runs = await Run.find({ userId: req.user.id }).sort({ date: -1 });
     res.json(runs);

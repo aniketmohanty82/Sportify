@@ -506,12 +506,90 @@ const HomePage = () => {
         </Card>
 
         {/* Shortcuts Section */}
-        <Card elevation={3} style={{ flex: 1, padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '15px', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
-          <Typography variant="h6" style={{ textAlign: 'center', color: '#1aa64b' }}>Shortcuts</Typography>
-          <button onClick={handleOpenModal} style={{ width: '100%', marginBottom: '10px' }}>Add a Meal</button>
-          <button onClick={handleOpenModalWorkout} style={{ width: '100%', marginBottom: '10px' }}>Add an Exercise</button>
-          <button onClick={() => setIsFormOpen(true)} style={{ width: '100%' }}>Add a Run</button>
-        </Card>
+        <Card
+              elevation={3}
+              style={{
+                flex: 1,
+                padding: '15px',
+                backgroundColor: '#f9f9f9',
+                borderRadius: '15px',
+                boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+              }}
+            >
+              <Typography
+                variant="h6"
+                style={{
+                  textAlign: 'center',
+                  color: '#1aa64b',
+                  marginBottom: '10px',
+                  fontSize: '18px',
+                }}
+              >
+                Shortcuts
+              </Typography>
+              <button
+                onClick={handleOpenModal}
+                style={{
+                  width: '90%',
+                  margin: '5px auto',
+                  padding: '10px',
+                  backgroundColor: '#1aa64b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'block',
+                  transition: 'background-color 0.3s ease',
+                }}
+                onMouseEnter={(e) => (e.target.style.backgroundColor = '#148a39')}
+                onMouseLeave={(e) => (e.target.style.backgroundColor = '#1aa64b')}
+              >
+                Add a Meal
+              </button>
+              <button
+                onClick={handleOpenModalWorkout}
+                style={{
+                  width: '90%',
+                  margin: '5px auto',
+                  padding: '10px',
+                  backgroundColor: '#1aa64b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'block',
+                  transition: 'background-color 0.3s ease',
+                }}
+                onMouseEnter={(e) => (e.target.style.backgroundColor = '#148a39')}
+                onMouseLeave={(e) => (e.target.style.backgroundColor = '#1aa64b')}
+              >
+                Add an Exercise
+              </button>
+              <button
+                onClick={() => setIsFormOpen(true)}
+                style={{
+                  width: '90%',
+                  margin: '5px auto',
+                  padding: '10px',
+                  backgroundColor: '#1aa64b',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'block',
+                  transition: 'background-color 0.3s ease',
+                }}
+                onMouseEnter={(e) => (e.target.style.backgroundColor = '#148a39')}
+                onMouseLeave={(e) => (e.target.style.backgroundColor = '#1aa64b')}
+              >
+                Add a Run
+              </button>
+            </Card>
+
+
       </div>
       <MealLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} onError={handleCloseModal} />
       <WorkoutLogForm isOpen={isWorkoutModalOpen} onClose={handleCloseModalWorkout} onSubmit={handleWorkoutSubmit} />

@@ -28,7 +28,7 @@ const LogIn = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/users/login', {
+      const res = await axios.post('http://localhost:5001/users/login', {
         email,
         password,
       });

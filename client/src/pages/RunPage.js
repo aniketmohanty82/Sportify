@@ -25,23 +25,27 @@ const RunPage = () => {
 
   const fetchDarkModeSetting = async () => {
     try {
-      const response = await fetch(`https://sportifyapp.onrender.com/users/darkMode?userId=${userId}`, {
+      const response = await fetch(`http://localhost:5001/users/darkMode?userId=${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          // Remove 'x-auth-token' if authentication is removed
+          'x-auth-token': token, // Include token if authentication is needed
         },
       });
+
       if (!response.ok) {
         throw new Error('Failed to fetch dark mode setting');
       }
+
       const data = await response.json();
       setDarkMode(data.darkMode);
+      console.log(darkMode)
     } catch (error) {
       console.error('Error fetching dark mode setting:', error);
     }
   };
-  
+
+
   // Fetch runs data from the backend
   const fetchRuns = async () => {
     setIsLoading(true);
@@ -52,7 +56,7 @@ const RunPage = () => {
         throw new Error("No token found. Please log in again.");
       }
 
-      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs', {
+      const response = await fetch('http://localhost:5001/api/runs', {
         headers: { 'x-auth-token': token },
       });
       

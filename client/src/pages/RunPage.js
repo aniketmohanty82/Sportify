@@ -53,7 +53,7 @@ const RunPage = () => {
       }
 
       const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs', {
-        headers: { 'x-auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjcyMTdjYzRhZjZkOTg0NGVkZjEwMDkyIn0sImlhdCI6MTczMzQ3OTU0MywiZXhwIjoxNzMzNDgzMTQzfQ.Bsc1W4K1MsS6Cmw6316cHN32w2HH42Ug6bENKurFEz0' },
+        headers: { 'x-auth-token': eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjcyMTdjYzRhZjZkOTg0NGVkZjEwMDkyIn0sImlhdCI6MTczMzQ3OTU0MywiZXhwIjoxNzMzNDgzMTQzfQ.Bsc1W4K1MsS6Cmw6316cHN32w2HH42Ug6bENKurFEz0 },
       });
       
       if (!response.ok) {

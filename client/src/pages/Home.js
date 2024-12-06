@@ -458,7 +458,7 @@ const HomePage = () => {
           >
             <CircularProgressbar
               value={caloriePercentage}
-              text={`${Math.round(caloriePercentage)}%`}
+              text={`${caloriePercentage.toFixed(2)}%`}
               styles={buildStyles({
                 textSize: '12px', // Slightly smaller text to fit the resized progress bar
                 pathColor: `rgba(26, 166, 75, 1)`,

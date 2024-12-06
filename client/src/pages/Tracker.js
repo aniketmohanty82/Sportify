@@ -754,6 +754,32 @@ const TrackerPage = () => {
     marginBottom: '10px',
   };
 
+  const calculateDailyAverage = (calories) => {
+    const totalDays = calories.length;
+    const totalCalories = calories.reduce((sum, day) => sum + day.totalCalories, 0);
+    return (totalCalories / totalDays).toFixed(2); // 2 decimal places
+  };
+
+  const analyzePattern = (calories) => {
+    const threshold = 1.1; // Change threshold for defining spikes or drops
+    let pattern = 'Consistent';
+  
+    const dailyChanges = calories.map((day, index, arr) => {
+      if (index === 0) return null; // Skip first day as no previous data
+      const prevDay = arr[index - 1].totalCalories;
+      return day.totalCalories / prevDay;
+    }).filter(Boolean); // Remove null values
+  
+    if (dailyChanges.some((change) => change > threshold)) {
+      pattern = 'Inconsistent - Spikes detected';
+    } else if (dailyChanges.some((change) => change < 1 / threshold)) {
+      pattern = 'Inconsistent - Drops detected';
+    }
+  
+    return pattern;
+  };
+  
+
   return (
     <div className="tracker-page">
       {successMessage && (
@@ -817,7 +843,7 @@ const TrackerPage = () => {
             fontWeight: 'bold',
           }}
         >
-          <span style={{ marginRight: '8px' }}>Export</span>
+          <span>Export Calorie Summary</span>
         </button>
 
         {/* Dropdown Menu */}
@@ -925,82 +951,102 @@ const TrackerPage = () => {
         </div>
       </div>
 
-      {/* Monthly Summary Section */}
-      <div
-        style={{
-          padding: '20px',
-          borderRadius: '15px',
-          backgroundColor: '#f9f9f9',
-          boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
-          marginBottom: '20px',
+{/* Monthly Summary Section */}
+<div
+  style={{
+    padding: '20px',
+    borderRadius: '15px',
+    backgroundColor: '#f9f9f9',
+    boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+    marginBottom: '20px',
+  }}
+>
+  <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
+    Monthly Calorie Summary
+  </h2>
+
+  {/* Month Selector */}
+  <div style={{ marginBottom: '15px' }}>
+    <label htmlFor="month"></label>
+    <select
+      id="month"
+      value={selectedMonth}
+      onChange={(e) => {
+        const selectedMonth = parseInt(e.target.value, 10);
+        setSelectedMonth(selectedMonth);
+      }}
+      style={{
+        backgroundColor: '#f9f9f9',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        padding: '10px',
+        fontSize: '14px',
+        color: '#333',
+        outline: 'none',
+        transition: 'box-shadow 0.3s',
+      }}
+      onMouseOver={(e) => (e.target.style.boxShadow = '0 0 8px rgba(26, 166, 75, 0.4)')}
+      onMouseOut={(e) => (e.target.style.boxShadow = 'none')}
+    >
+      <option value="1">January</option>
+      <option value="2">February</option>
+      <option value="3">March</option>
+      <option value="4">April</option>
+      <option value="5">May</option>
+      <option value="6">June</option>
+      <option value="7">July</option>
+      <option value="8">August</option>
+      <option value="9">September</option>
+      <option value="10">October</option>
+      <option value="11">November</option>
+      <option value="12">December</option>
+    </select>
+  </div>
+
+  {/* Daily Average Section */}
+  <div
+    style={{
+      textAlign: 'center',
+      marginBottom: '20px',
+      fontSize: '16px',
+      fontWeight: 'bold',
+      color: '#1aa64b',
+    }}
+  >
+    {monthlyCalories.length > 0 ? (
+      <>
+        <p>Daily Average Calories: {calculateDailyAverage(monthlyCalories)} kcal</p>
+        <p>Pattern: {analyzePattern(monthlyCalories)}</p>
+      </>
+    ) : (
+      <p>No data available for this month.</p>
+    )}
+  </div>
+
+  {/* Monthly Summary Graph */}
+  <div
+    style={{
+      width: '100%',
+      maxWidth: '1200px',
+      height: '300px',
+      margin: '0 auto',
+      overflow: 'hidden',
+    }}
+  >
+    {monthlyCalories.length > 0 ? (
+      <Line
+        data={chartData}
+        options={{
+          ...chartOptions,
+          maintainAspectRatio: false,
         }}
-      >
+      />
+    ) : (
+      <p>No data available for this month.</p>
+    )}
+  </div>
+</div>
 
-      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
-          Monthly Calorie Summary
-      </h2>
-
-      <div style={{ marginBottom: '15px' }}>
-      <label htmlFor="month"></label>
-        <select
-          id="month"
-          value={selectedMonth}
-          onChange={(e) => {
-            const selectedMonth = parseInt(e.target.value, 10);
-            setSelectedMonth(selectedMonth);
-          }}
-          style={{
-            backgroundColor: '#f9f9f9',
-            border: '1px solid #ccc',
-            borderRadius: '8px',
-            padding: '10px',
-            fontSize: '14px',
-            color: '#333',
-            outline: 'none',
-            transition: 'box-shadow 0.3s',
-          }}
-          onMouseOver={(e) => (e.target.style.boxShadow = '0 0 8px rgba(26, 166, 75, 0.4)')}
-          onMouseOut={(e) => (e.target.style.boxShadow = 'none')}
-        >
-          <option value="1">January</option>
-          <option value="2">February</option>
-          <option value="3">March</option>
-          <option value="4">April</option>
-          <option value="5">May</option>
-          <option value="6">June</option>
-          <option value="7">July</option>
-          <option value="8">August</option>
-          <option value="9">September</option>
-          <option value="10">October</option>
-          <option value="11">November</option>
-          <option value="12">December</option>
-        </select>
-      </div>
-
-      {/* Monthly Summary Graph */}
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '1200px', // Restrict graph width
-          height: '300px',   // Set explicit height
-          margin: '0 auto',  // Center the graph
-          overflow: 'hidden', // Prevent overflow issues
-        }}
-      >
-        
-        {monthlyCalories.length > 0 ? (
-          <Line
-            data={chartData}
-            options={{
-              ...chartOptions,
-              maintainAspectRatio: false, // Allow the chart to scale dynamically
-            }}
-          />
-        ) : (
-          <p>No data available for this month.</p>
-        )}
-      </div>
-    </div>
   
       {/* Meal Log Tables for Breakfast, Lunch, Dinner, Snacks */}
       <div style={{

@@ -6,6 +6,13 @@ const fetch = require('node-fetch')
 const auth = require('./middleware/auth'); // Import the auth middleware
 const QuizResult = require('./models/QuizResult');
 
+const scheduleWeeklySummary = require('./jobs/weeklySummaryJob');
+scheduleWeeklySummary();
+
+const scheduleCalorieThreshold = require('./jobs/calorieThresholdJob');
+scheduleCalorieThreshold();
+
+
 dotenv.config();
 
 const app = express();

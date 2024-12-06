@@ -23,6 +23,9 @@ const userSchema = new mongoose.Schema({
   favoriteBasketballTeamId: {type: Number, default: '145'}, 
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+  weeklySummaryEmail: {type: Boolean, default: false},
+  calorieNotificationsEnabled: {type: Boolean, default: false},
+  lastCalorieNotificationDate: {type: Date},
 });
 
 userSchema.pre('save', async function (next) {

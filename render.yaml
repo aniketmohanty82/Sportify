@@ -20,9 +20,3 @@ services:
     envVars:
       - key: REACT_APP_GOOGLE_CLIENT_ID
         value: <your_google_client_id_here>
-
-  - name: sportify-db
-    type: database
-    plan: free
-    database: mongodb
-

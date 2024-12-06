@@ -47,7 +47,7 @@ const RunPage = () => {
     setIsLoading(true);
     setFetchError(null);
     try {
-      const response = await fetch('https://sportifyapp.onrender.com/api/runs');
+      const response = await fetch('https://gastric-annaliese-purdueuniversitycollegeofscience-b16501fc.koyeb.app/api/runs');
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error fetching runs: ${errorText}`);

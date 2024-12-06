@@ -16,5 +16,7 @@ COPY . .
 # Expose port 5001 for the backend service
 EXPOSE 5001
 
+RUN ls -l /usr/src/app
+
 # Command to run the app
-CMD ["node", "server.js"]
+CMD ["node", "backend/server.js"]

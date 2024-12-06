@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'; // Import useState and useEffect
 import { Link, useNavigate } from 'react-router-dom'; 
 import { FaHome, FaTasks, FaChartPie, FaCog, FaSignOutAlt, FaRunning, FaFutbol, FaDumbbell } from 'react-icons/fa';
+import { MdOutlineQuiz } from "react-icons/md";
 import '../Navbar.css';
 import logo from '../assets/logo-no-background.png';
 
@@ -61,6 +62,10 @@ const Navbar = () => {
           <Link to="/tracker" className="navbar__link">
             <FaChartPie className="navbar__icon" />
             Calorie Tracking
+          </Link>
+          <Link to="/quiz" className="navbar__link">
+            <MdOutlineQuiz className="navbar__icon" />
+            Quiz
           </Link>
           <Link to="/settings" className="navbar__link">
           <FaCog className="navbar__icon" />

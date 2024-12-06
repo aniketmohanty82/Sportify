@@ -30,6 +30,41 @@ const Settings = () => {
   // State for controlling the delete confirmation modal
   const [showModal, setShowModal] = useState(false);
 
+  // In Settings.js
+  const [weeklySummaryEmail, setWeeklySummaryEmail] = useState(false);
+
+  useEffect(() => {
+    // Fetch initial setting for weekly summary emails
+    const fetchWeeklySummaryEmail = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5001/users/${userId}`);
+        setWeeklySummaryEmail(response.data.weeklySummaryEmail);
+      } catch (error) {
+        console.error('Error fetching weekly summary email setting:', error);
+      }
+    };
+
+    fetchWeeklySummaryEmail();
+  }, [userId]);
+
+  const toggleWeeklySummaryEmail = async () => {
+    try {
+      const updatedPreference = !weeklySummaryEmail;
+      setWeeklySummaryEmail(updatedPreference);
+
+      await axios.put('http://localhost:5001/users/update-weeklySummaryEmail', {
+        userId,
+        weeklySummaryEmail: updatedPreference,
+      });
+
+      setMessage('Weekly summary email preference updated.');
+    } catch (error) {
+      console.error('Error updating weekly summary email preference:', error);
+      setError('Failed to update preference.');
+    }
+  };
+
+
   useEffect(() => {
     // Fetch the user's profile information and time zone from the backend
     const fetchUserProfile = async () => {
@@ -438,6 +473,19 @@ const Settings = () => {
           {darkMode ? 'Light Mode' : 'Dark Mode'}
         </button>
       </div>
+
+      <div className="weekly-summary-toggle">
+        <h3>Receive Weekly Summary Emails</h3>
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={weeklySummaryEmail}
+            onChange={toggleWeeklySummaryEmail}
+          />
+          <span className="slider round"></span>
+        </label>
+      </div>
+
 
       {/* Time Zone Selector */}
       <div className="timezone-form">

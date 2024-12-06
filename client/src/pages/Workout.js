@@ -15,7 +15,13 @@ import {
   Legend,
   BarElement,
 } from 'chart.js';
-
+import { Button, Box, Typography, Paper, Avatar, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, Modal, IconButton, LinearProgress } from '@mui/material';
+import RunLogForm from '../components/RunLogForm';
+import ConfirmDeleteRunModal from '../components/ConfirmDeleteRunModal';
+import EditRunModal from '../components/EditRunModal';
+import RunDistanceChart from '../components/RunDistanceChart';
+import SpeedGraph from '../components/SpeedGraph';
+import '../RunLogStyles.css';
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -48,6 +54,172 @@ const Workout = () => {
   const [workoutFormat, setWorkoutFormat] = useState('');
   const [runTimeframe, setRunTimeframe] = useState('');
   const [runFormat, setRunFormat] = useState('');
+  const [page, setPage] = useState('workout'); // Default to "workout"
+
+  
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [runs, setRuns] = useState([]);
+  const [currentRun, setCurrentRun] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
+  const [timeFrame, setTimeFrame] = useState('week');
+  const [darkMode, setDarkMode] = useState(false);
+  const userId = localStorage.getItem('userId');
+  const token = localStorage.getItem('token');
+
+  const fetchDarkModeSetting = async () => {
+    try {
+      const response = await fetch(`http://localhost:5001/users/darkMode?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token, // Include token if authentication is needed
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch dark mode setting');
+      }
+
+      const data = await response.json();
+      setDarkMode(data.darkMode);
+      console.log(darkMode)
+    } catch (error) {
+      console.error('Error fetching dark mode setting:', error);
+    }
+  };
+
+
+  // Fetch runs data from the backend
+  const fetchRuns = async () => {
+    setIsLoading(true);
+    setFetchError(null);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("No token found. Please log in again.");
+      }
+
+      const response = await fetch('http://localhost:5001/api/runs', {
+        headers: { 'x-auth-token': token },
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error fetching runs: ${errorText}`);
+      }
+
+      const runData = await response.json();
+      setRuns(runData);
+    } catch (error) {
+      console.error('Error fetching runs:', error.message);
+      setFetchError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Log a new run
+  const logRun = async (data) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("No token found. Please log in again.");
+      }
+
+      const response = await fetch('http://localhost:5001/api/runs/logrun', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error logging run: ${errorText}`);
+      }
+
+      fetchRuns(); // Refresh data
+      setIsFormOpen(false);
+    } catch (error) {
+      console.error('Error logging run:', error.message);
+      alert(error.message);
+    }
+  };
+
+  // Edit a run
+  const editRun = async (updatedRun) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5001/api/runs/${updatedRun._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+        body: JSON.stringify(updatedRun),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error updating run: ${errorText}`);
+      }
+
+      fetchRuns(); // Refresh data after successful edit
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error('Error updating run:', error.message);
+      alert(error.message);
+    }
+  };
+
+  const deleteRun = async (runId) => {
+    console.log("Attempting to delete run with ID:", runId); // Check if the correct ID is being passed
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5001/api/runs/${runId}`, {
+        method: 'DELETE',
+        headers: { 'x-auth-token': token },
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error deleting run: ${errorText}`);
+      }
+  
+      fetchRuns(); // Refresh the list of runs
+      setIsEditModalOpen(false); // Close the edit modal after deletion
+    } catch (error) {
+      console.error('Error deleting run:', error.message);
+      alert(error.message);
+    }
+  };  
+
+  useEffect(() => {
+    fetchRuns();
+    fetchDarkModeSetting()
+  }, []);
+
+  const filterRunsByTimeFrame = (runs, timeFrame) => {
+    const now = new Date();
+    let startDate;
+
+    switch (timeFrame) {
+      case 'week':
+        startDate = new Date(now.setDate(now.getDate() - 7));
+        break;
+      case 'month':
+        startDate = new Date(now.setMonth(now.getMonth() - 1));
+        break;
+      default:
+        return runs;
+    }
+
+    return runs.filter(run => new Date(run.date) >= startDate);
+  };
+
+  const filteredRuns = filterRunsByTimeFrame(runs, timeFrame);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -427,7 +599,84 @@ const chartOptions = {
       textAlign: 'center',
     }}
   >
+    <Box
+            sx={{
+              backgroundColor: '#f9f9f9',
+              color: '#1aa64b',
+              padding: '2rem',
+              position: 'relative',
+              overflow: 'hidden',
+              borderRadius: '0 0 20px 20px',
+              boxShadow: '0 4px 20px rgba(134, 220, 61, 0.15)',
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                position: 'relative',
+                zIndex: 2,
+              }}
+            >
+              <Typography
+                variant="h3"
+                component="h1"
+                sx={{
+                  fontWeight: 'bold',
+                  fontFamily: 'Open Sans, sans-serif',
+                  marginBottom: '0.5rem',
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+                }}
+              >
+                Welcome!
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 'normal',
+                  fontFamily: 'Open Sans, sans-serif',
+                  opacity: 0.9,
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                }}
+              >
+                Browse Your Exercise Dashboard
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: '50%',
+                height: '100%',
+                background: 'linear-gradient(135deg, rgba(134,220,61,0.1) 0%, rgba(249,249,249,0) 100%)',
+                clipPath: 'polygon(100% 0, 0% 100%, 100% 100%)',
+                zIndex: 1,
+              }}
+            />
+          </Box>
+
+          <Box display="flex" justifyContent="center" mt={4}>
+                <Button
+                  variant={page === 'workout' ? 'contained' : 'outlined'}
+                  onClick={() => setPage('workout')}
+                  sx={{ borderRadius: '20px', mx: 1 }}
+                >
+                  Workouts
+                </Button>
+                <Button
+                  variant={page === 'runs' ? 'contained' : 'outlined'}
+                  onClick={() => setPage('runs')}
+                  sx={{ borderRadius: '20px', mx: 1 }}
+                >
+                  Runs
+                </Button>
+              </Box>
     {/* Top row with Add Exercise and Export buttons */}
+    {page === 'workout' && (
+      <div>
     <div
       style={{
         display: 'flex',
@@ -719,7 +968,120 @@ const chartOptions = {
           <p style={{ color: 'red', fontSize: '16px', textAlign: 'center' }}>No workout data available for the selected date</p>
         )}
       </div>
-  
+      </div>
+    )}
+
+{page === 'runs' && (
+        <div>
+          <div className={`tracker-page ${darkMode ? 'dark-mode' : ''}`}>
+      {/* Date and Add Run Button */}
+      <div className="header-section">
+        <h2 className="current-date">{new Date().toLocaleDateString()}</h2>
+        <button
+          title="Add New"
+          onClick={() => setIsFormOpen(true)}
+          className="add-run-button"
+        >
+          <AiOutlinePlus size={24} />
+          <span>Add a run</span>
+        </button>
+      </div>
+
+      {/* Graph Container */}
+      <div className="graph-container">
+        {/* Time Frame Selector */}
+        <div className="time-frame-selector">
+          <label htmlFor="timeFrame">Select Time Frame:</label>
+          <select
+            id="timeFrame"
+            value={timeFrame}
+            onChange={(e) => setTimeFrame(e.target.value)}
+          >
+            <option value="week">Past Week</option>
+            <option value="month">Past Month</option>
+            <option value="all">All Time</option>
+          </select>
+        </div>
+
+        {/* Graphs Section */}
+        <div className="graphs-section">
+          <div className="graph">
+            <RunDistanceChart runs={filteredRuns} darkMode={darkMode} />
+          </div>
+          <div className="graph">
+            <SpeedGraph runs={filteredRuns} darkMode={darkMode} />
+          </div>
+        </div>
+      </div>
+
+      {/* Run Logs Table */}
+      <div className="run-logs-section">
+        <h2>Run Logs</h2>
+
+        {isLoading ? (
+          <p>Loading runs...</p>
+        ) : fetchError ? (
+          <p className="error-message">{fetchError}</p>
+        ) : (
+          <table className="run-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Duration (min)</th>
+                <th>Distance (km)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {runs.length > 0 ? (
+                runs.map((run) => (
+                  <tr
+                    key={run._id}
+                    className="run-row"
+                    onClick={() => {
+                      setCurrentRun(run);
+                      setIsEditModalOpen(true);
+                    }}
+                  >
+                    <td>{new Date(run.date).toLocaleDateString()}</td>
+                    <td>{run.duration}</td>
+                    <td>{run.distance}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" style={{ textAlign: 'center' }}>
+                    No runs logged yet
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Modals */}
+      <RunLogForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={logRun}
+        darkMode={darkMode}
+      />
+      <EditRunModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSubmit={editRun}
+        onDelete={deleteRun}
+        run={currentRun}
+      />
+      <ConfirmDeleteRunModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => deleteRun(currentRun._id)}
+      />
+    </div>
+        </div>
+      )}
+        
       {/* Modal for adding workouts */}
       <WorkoutLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleWorkoutSubmit} />
     </div>

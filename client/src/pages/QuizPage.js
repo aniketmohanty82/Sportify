@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../QuizPage.css'; // Adjust the path as needed
 import axios from 'axios';
-import athleteData from '../assets/athletes.json'; // Import athletes JSON
+import athleteData from '../athletes.json'; // Import athletes JSON
 
 const QuizPage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [hasTakenQuizBefore, setHasTakenQuizBefore] = useState(false);
+  const [previousResult, setPreviousResult] = useState(null);
   const [result, setResult] = useState('');
   const [resultDescription, setResultDescription] = useState('');
   const [resultImage, setResultImage] = useState('');
   const [darkMode, setDarkMode] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const quizData = [
     {
@@ -125,8 +128,6 @@ const QuizPage = () => {
     },
   ];
 
-  const currentQuestion = quizData[currentQuestionIndex];
-
   const weights = {
     1: {
       a: { "Cristiano Ronaldo": 5, "Serena Williams": 4, "Michael Jordan": 4 },
@@ -200,6 +201,35 @@ const QuizPage = () => {
     },
   };
 
+  const currentQuestion = quizData[currentQuestionIndex];
+
+  useEffect(() => {
+    const fetchPreviousResult = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5001/api/quiz/result', {
+          headers: { 'x-auth-token': token }
+        });
+
+        if (response.data && response.data.result) {
+          const { result, answers, description, image } = response.data;
+          setPreviousResult({ result, description, image });
+          setHasTakenQuizBefore(true);
+        } else {
+          setHasTakenQuizBefore(false);
+        }
+      } catch (error) {
+        console.error('Error fetching previous result:', error);
+        setHasTakenQuizBefore(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPreviousResult();
+  }, []);
+
   const handleOptionChange = (e) => {
     setAnswers({ ...answers, [currentQuestion.id]: e.target.value });
   };
@@ -214,6 +244,14 @@ const QuizPage = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
+  };
+
+  const handleRetake = () => {
+    setIsSubmitted(false);
+    setAnswers({});
+    setCurrentQuestionIndex(0);
+    setHasTakenQuizBefore(false);
+    setPreviousResult(null);
   };
 
   const handleSubmit = async () => {
@@ -253,79 +291,110 @@ const QuizPage = () => {
     }
   };
 
-  if (isSubmitted) {
+  if (loading) {
+    return <div className={`quiz-container ${darkMode ? 'dark-mode' : ''}`}>Loading...</div>;
+  }
+
+  // If user has taken quiz before and not retaking yet
+  if (hasTakenQuizBefore && previousResult && !isSubmitted) {
     return (
       <div className={`quiz-container ${darkMode ? 'dark-mode' : ''}`}>
-        <h2>Your Result:</h2>
-        <p>
-          You are most similar to <strong>{result}</strong>!
-        </p>
-        {resultImage && (
-            <img 
-                src={resultImage} 
-                alt={result} 
-                style={{ 
-                width: '300px', 
-                height: 'auto', 
-                display: 'block', 
-                margin: '20px auto 0 auto' 
-                }} 
-            />
-        )}
-
-        <p>{resultDescription}</p>
+        <div className="result-card">
+          <h2 className="result-title">Your Previous Result</h2>
+          <p className="result-text">
+            You are most similar to <strong>{previousResult.result}</strong>!
+          </p>
+          {previousResult.image && (
+            <div className="result-image-container">
+              <img
+                src={previousResult.image}
+                alt={previousResult.result}
+                className="result-image"
+              />
+            </div>
+          )}
+          <p className="result-description">{previousResult.description}</p>
+          <button onClick={handleRetake} className="button retake-button">Retake Quiz</button>
+        </div>
       </div>
     );
   }
   
 
-  return (
-    <div className={`quiz-container ${darkMode ? 'dark-mode' : ''}`}>
-      <h2>{`Question ${currentQuestionIndex + 1} of ${quizData.length}`}</h2>
-      <p className="question-text">{currentQuestion.question}</p>
-      <form className="options-form">
-        {Object.entries(currentQuestion.options).map(([key, option]) => (
-          <div key={key} className="option-item">
-            <label>
-              <input
-                type="radio"
-                name={`question-${currentQuestion.id}`}
-                value={key}
-                checked={answers[currentQuestion.id] === key}
-                onChange={handleOptionChange}
+  // If quiz is submitted now (either first time or after retake)
+  if (isSubmitted) {
+    return (
+      <div className={`quiz-container ${darkMode ? 'dark-mode' : ''}`}>
+        <div className="result-card">
+          <h2 className="result-title">Your Result</h2>
+          <p className="result-text">
+            You are most similar to <strong>{result}</strong>!
+          </p>
+          {resultImage && (
+            <div className="result-image-container">
+              <img
+                src={resultImage}
+                alt={result}
+                className="result-image"
               />
-              {option}
-            </label>
-          </div>
-        ))}
-      </form>
-      <div className="navigation-buttons">
-        {currentQuestionIndex > 0 && (
-          <button onClick={handlePreviousQuestion} className="button previous-button">
-            Previous
-          </button>
-        )}
-        {currentQuestionIndex < quizData.length - 1 && (
-          <button
-            onClick={handleNextQuestion}
-            className="button next-button"
-            disabled={!answers[currentQuestion.id]}
-          >
-            Next
-          </button>
-        )}
-        {currentQuestionIndex === quizData.length - 1 && (
-          <button
-            onClick={handleSubmit}
-            className="button submit-button"
-            disabled={!answers[currentQuestion.id]}
-          >
-            Submit
-          </button>
-        )}
+            </div>
+          )}
+          <p className="result-description">{resultDescription}</p>
+          <button onClick={handleRetake} className="button retake-button">Retake Quiz</button>
+        </div>
       </div>
+    );
+  }
+  
+
+    return (
+    <div className={`quiz-container ${darkMode ? 'dark-mode' : ''}`}>
+        <div className="quiz-card">
+        <h2 className="quiz-title">Question {currentQuestionIndex + 1} of {quizData.length}</h2>
+        <p className="question-text">{currentQuestion.question}</p>
+        <form className="options-form">
+            {Object.entries(currentQuestion.options).map(([key, option]) => (
+            <div key={key} className="option-item">
+                <label>
+                <input
+                    type="radio"
+                    name={`question-${currentQuestion.id}`}
+                    value={key}
+                    checked={answers[currentQuestion.id] === key}
+                    onChange={handleOptionChange}
+                />
+                {option}
+                </label>
+            </div>
+            ))}
+        </form>
+        <div className="navigation-buttons">
+            {currentQuestionIndex > 0 && (
+            <button onClick={handlePreviousQuestion} className="button previous-button">Previous</button>
+            )}
+            {currentQuestionIndex < quizData.length - 1 && (
+            <button
+                onClick={handleNextQuestion}
+                className="button next-button"
+                disabled={!answers[currentQuestion.id]}
+            >
+                Next
+            </button>
+            )}
+            {currentQuestionIndex === quizData.length - 1 && (
+            <button
+                onClick={handleSubmit}
+                className="button submit-button"
+                disabled={!answers[currentQuestion.id]}
+            >
+                Submit
+            </button>
+            )}
+        </div>
+        </div>
     </div>
-  );
+    );
+
 };
 
 export default QuizPage;

@@ -158,7 +158,7 @@ const Settings = () => {
         setMessage('Favorite Basketball Team updated successfully!');
   
         // Reload the page to ensure the updates reflect throughout the app
-        window.location.reload();
+        // window.location.reload();
       } else {
         // Handle errors from the server response
         const errorData = await response.json();
@@ -195,7 +195,7 @@ const Settings = () => {
         setMessage('Favorite Soccer Team updated successfully!');
   
         // Reload the page to ensure the updates reflect throughout the app
-        window.location.reload();
+        // window.location.reload();
       } else {
         // Handle errors from the server response
         const errorData = await response.json();

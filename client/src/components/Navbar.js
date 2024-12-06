@@ -45,14 +45,14 @@ const Navbar = () => {
             <FaDumbbell className="navbar__icon" />
             Workout
           </Link>
+          <Link to="/workoutplans" className="navbar__link">
+            <FaTasks className="navbar__icon" />
+            Workout Plans
+          </Link>
           <Link to="/runs" className="navbar__link">
             <FaRunning className="navbar__icon" />
             Runs
           </Link>
-          {/* <Link to="/tasks" className="navbar__link">
-            <FaTasks className="navbar__icon" />
-            Tasks
-          </Link> */}
           <Link to="/tracker" className="navbar__link">
             <FaChartPie className="navbar__icon" />
             Calorie Tracking
@@ -67,16 +67,6 @@ const Navbar = () => {
         </button>
         </nav>
       </div>
-      {/* <div className="navbar__bottom">
-        <Link to="/settings" className="navbar__link">
-          <FaCog className="navbar__icon" />
-          Settings
-        </Link>
-        <button onClick={handleLogout} className="navbar__link">
-          <FaSignOutAlt className="navbar__icon" />
-          Log out
-        </button>
-      </div> */}
     </div>
   );
 };

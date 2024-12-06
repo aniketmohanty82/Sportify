@@ -556,7 +556,7 @@ const TrackerPage = () => {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch(`http://localhost:5001/api/exports/calories?format=${format}&timeframe=${timeframe}`, {
+      const response = await fetch(`http://localhost:5001/api/calories/export?format=${format}&timeframe=${timeframe}`, {
         headers: {
           'x-auth-token': token,
         },

@@ -4,41 +4,44 @@ const OpenAI = require("openai");
 
 // Initialize OpenAI client
 const openai = new OpenAI({
- // apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Helper function to parse exercises from AI response
 const parseExercises = (description) => {
   const exercises = [];
-  const sections = description.split("\n"); // Split by newlines
+  const lines = description.split("\n"); // Split AI response into lines
 
   let currentCategory = null;
 
-  sections.forEach((line) => {
-    // Match categories like "Warm-up (10 minutes):"
-    const categoryMatch = line.match(/^(.+?)\s\((\d+)\sminutes?\):$/);
+  lines.forEach((line) => {
+    line = line.trim(); // Clean up whitespace
+
+    // Match categories like "Warm-up (10):"
+    const categoryMatch = line.match(/^(.+?)\s\((\d+)\):$/);
     if (categoryMatch) {
       currentCategory = {
-        name: categoryMatch[1].trim(),
-        duration: parseInt(categoryMatch[2], 10),
+        name: categoryMatch[1].trim(), // Category name (e.g., "Warm-up")
+        duration: parseInt(categoryMatch[2], 10), // Duration in minutes
         exercises: [],
       };
-      exercises.push(currentCategory); // Add category to exercises
+      return; // Skip to the next line after finding a category
     }
 
-    // Match exercises like "- Jogging in place: 3 minutes"
-    const exerciseMatch = line.match(/-\s(.+?):\s(\d+)\sminutes?/);
+    // Match exercises like "- Jogging: 5 minutes of jogging to get the heart rate up"
+    const exerciseMatch = line.match(/-\s(.+?):\s(.+)/);
     if (exerciseMatch && currentCategory) {
-      currentCategory.exercises.push({
-        name: exerciseMatch[1].trim(),
-        focus: currentCategory.name, // Use category name as the focus
-        duration: parseInt(exerciseMatch[2], 10),
-      });
+      const exercise = {
+        name: exerciseMatch[1].trim(), // Exercise name (e.g., "Jogging")
+        details: exerciseMatch[2].trim(), // Exercise details
+        focus: currentCategory.name, // Attach the current category name
+        duration: currentCategory.duration, // Use category duration if available
+      };
+      exercises.push(exercise); // Add to the exercises list
     }
   });
 
-  // Flatten categories and their exercises into a single array
-  return exercises.flatMap((category) => category.exercises);
+  console.log("Parsed Exercises:", exercises);
+  return exercises;
 };
 
 // AI endpoint
@@ -56,16 +59,33 @@ router.post("/workout", async (req, res) => {
         { role: "system", content: "You are a fitness coach." },
         {
           role: "user",
-          content: `Generate a workout plan based on this input: ${prompt}`,
+          content: `Generate a workout plan based on this input: ${prompt}.
+                    Format the response exactly like this:
+    
+                    Category (Duration in minutes):
+                    - Exercise name: Details
+                    - Exercise name: Details
+    
+                    Example:
+                    Warm-up (10):
+                    - Jogging: 5 minutes of jogging to get the heart rate up
+                    - Dynamic stretches: Focus on lower body mobility
+    
+                    Strength Training (20):
+                    - Push-ups: 3 sets of 12 reps
+                    - Squats: 3 sets of 15 reps`,
         },
       ],
-      max_tokens: 100, // Allow more detailed responses
-    });
+      max_tokens: 300, // Increase the token limit for detailed responses
+    });    
 
     const aiWorkoutPlan = aiResponse.choices[0].message.content;
+    console.log("Raw AI Response:", aiWorkoutPlan);
 
     // Parse exercises from AI response
     const exercises = parseExercises(aiWorkoutPlan);
+    console.log("Parsed Exercises:", exercises);
+
 
     // Send structured data back to frontend
     res.json({

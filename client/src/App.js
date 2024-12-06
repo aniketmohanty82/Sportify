@@ -16,6 +16,7 @@ import Workout from './pages/Workout';
 import RunPage from './pages/RunPage';
 import EditAccount from './pages/EditAccount';
 import AccountDeleted from './pages/AccountDeleted'; // Import the AccountDeleted component
+import WorkoutPlans from './pages/WorkoutPlans';
 
 const App = () => {
   return (
@@ -89,6 +90,14 @@ const AppContent = () => {
           <Route
             path="/account-deleted" // Added route for account deletion confirmation
             element={<AccountDeleted />}
+          />
+          <Route
+            path="/workoutplans"
+            element={
+              <ProtectedRoute>
+                <WorkoutPlans />
+              </ProtectedRoute>
+            }
           />
           <Route path="/login" element={<LogIn />} />
           <Route path="/register" element={<Registration />} />

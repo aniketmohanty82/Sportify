@@ -1,3 +1,5 @@
+/*Sportify/client/src/pages/RunPage.js*/
+
 import React, { useState, useEffect } from 'react';
 import RunLogForm from '../components/RunLogForm';
 import ConfirmDeleteRunModal from '../components/ConfirmDeleteRunModal';

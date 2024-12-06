@@ -1002,6 +1002,13 @@ const runsRouter = require('./routes/runs');
 app.use('/api/runs', runsRouter); // Run routes
 const usersRouter = require('./routes/users');
 app.use('/users', usersRouter);
+const workoutPlansRouter = require('./routes/workoutplans');
+app.use('/api/workoutplans', workoutPlansRouter);
+
+
+const aiRoutes = require('./routes/ai');
+app.use('/api/ai', aiRoutes);
+
 
 app.get('/tracker', auth, (req, res) => {
     res.json({ message: 'Welcome to the protected tracker route' });

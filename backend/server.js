@@ -30,7 +30,7 @@ app.get('/api/basketball_team_statistics/:teamId', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-basketball.p.rapidapi.com', // Match the host value
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -58,7 +58,7 @@ app.get('/api/team_statistics/:teamId', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -105,7 +105,7 @@ app.get('/api/cricket_live', async (req, res) => {
                 method: 'GET',
                 headers: {
                     'x-rapidapi-host': 'cricbuzz-cricket.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49',
+                    'x-rapidapi-key': 'replaced',
                 }
             }
         );
@@ -195,7 +195,7 @@ app.get('/api/cricket', async (req, res) => {
                 method: 'GET',
                 headers: {
                     'x-rapidapi-host': 'cricbuzz-cricket.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -291,7 +291,7 @@ app.get('/api/basketball_fixtures/:leagueId', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -343,7 +343,7 @@ app.get('/api/fixtures/:leagueId', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -386,7 +386,7 @@ app.get('/api/fixture_details/:id', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -407,7 +407,7 @@ app.get('/api/basketball_fixture_details/:id', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -433,7 +433,7 @@ app.get('/api/premier_league', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -495,7 +495,7 @@ app.get('/api/test_live', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -548,7 +548,7 @@ app.get('/api/ucl_live', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -601,7 +601,7 @@ app.get('/api/ucl', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -665,7 +665,7 @@ app.get('/api/premier_league_live', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -713,7 +713,7 @@ app.get('/api/bundesliga_live', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -765,7 +765,7 @@ app.get('/api/bundesliga', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -837,7 +837,7 @@ app.get('/api/nba', async (req, res) => {
                 {
                     headers: {
                         'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
-                        'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                        'x-rapidapi-key': 'replaced'
                     }
                 }
             );
@@ -891,7 +891,7 @@ app.get('/api/nba_live', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -949,7 +949,7 @@ app.get('/api/euroleague', async (req, res) => {
                 {
                     headers: {
                         'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
-                        'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                        'x-rapidapi-key': 'replaced'
                     }
                 }
             );
@@ -1003,7 +1003,7 @@ app.get('/api/euroleague_live', async (req, res) => {
             {
                 headers: {
                     'x-rapidapi-host': 'api-basketball.p.rapidapi.com',
-                    'x-rapidapi-key': 'c2f4da85c5msh9a6dd13288bb6a2p1c8975jsn66b2172f7f49'
+                    'x-rapidapi-key': 'replaced'
                 }
             }
         );
@@ -1246,6 +1246,71 @@ app.get('/api/calories/export', auth, async (req, res) => {
   }
 });
 
+//monthly calories
+app.get('/api/calories/monthly', auth, async (req, res) => {
+    try {
+      const { month, year } = req.query;
+  
+      if (!month || !year) {
+        return res.status(400).json({ message: 'Please provide both month and year.' });
+      }
+  
+      // Ensure month and year are numbers
+      const numericMonth = parseInt(month);
+      const numericYear = parseInt(year);
+  
+      if (isNaN(numericMonth) || isNaN(numericYear)) {
+        return res.status(400).json({ message: 'Month and year must be valid numbers.' });
+      }
+  
+      // Define the start and end of the month
+      const startDate = new Date(numericYear, numericMonth - 1, 1); // First day of the month
+      const endDate = new Date(numericYear, numericMonth, 0, 23, 59, 59, 999); // Last day of the month
+  
+      // Fetch meals for the specified month
+      const mealLogs = await MealLog.find({
+        userId: req.user.id,
+        date: { $gte: startDate, $lte: endDate },
+      }).sort({ date: 1 }); // Sort by date in ascending order
+  
+      // Group data by date
+      const groupedData = mealLogs.reduce((acc, meal) => {
+        const date = meal.date.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+        if (!acc[date]) {
+          acc[date] = {
+            date,
+            totalCalories: 0,
+            totalProtein: 0,
+            totalCarbs: 0,
+            totalFats: 0,
+            totalFiber: 0,
+          };
+        }
+        acc[date].totalCalories += meal.nutrients;
+        acc[date].totalProtein += meal.protein;
+        acc[date].totalCarbs += meal.carbs;
+        acc[date].totalFats += meal.fats;
+        acc[date].totalFiber += meal.fiber;
+        return acc;
+      }, {});
+  
+      const summary = Object.values(groupedData);
+  
+      // Highlight trends: Find high-calorie days
+      const trends = summary
+        .filter((day) => day.totalCalories > 2200) // Example threshold for "high calorie days"
+        .map((day) => ({
+          date: day.date,
+          totalCalories: day.totalCalories,
+          message: 'High calorie intake',
+        }));
+  
+      res.status(200).json({ summary, trends });
+    } catch (error) {
+      console.error('Error fetching monthly calorie data:', error);
+      res.status(500).json({ message: 'Error fetching monthly calorie data' });
+    }
+  });  
 
 // User routes and protected routes
 const workoutsRouter = require('./routes/workouts');

@@ -11,6 +11,19 @@ import '../MealLogs.css';
 import CaloriesChart from '../components/CalorieChart'; // Adjust the path as need
 import { AiOutlinePlus, AiOutlineInfoCircle } from 'react-icons/ai';
 import RecommendedExercises from '../components/RecommendedExercises';
+import { Line } from 'react-chartjs-2';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 
 const TrackerPage = () => {
@@ -38,6 +51,93 @@ const TrackerPage = () => {
   const [timeframe, setTimeframe] = useState(''); // Initialize as empty to ensure selection
   const [format, setFormat] = useState(''); // Initialize as empty to ensure selection
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const [monthlyCalories, setMonthlyCalories] = useState([]);
+  const today = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1); // Default to the current month
+  const [selectedYear, setSelectedYear] = useState(today.getFullYear());   // Default to the current year
+
+
+  // Function to fill missing days in the dataset
+  const fillMissingDays = (data, month, year) => {
+    const daysInMonth = new Date(year, month, 0).getDate(); // Get the total number of days in the month
+    const filledData = [];
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month - 1, day).toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+      const existingEntry = data.find((entry) => entry.date === date);
+      filledData.push({
+        date,
+        totalCalories: existingEntry ? existingEntry.totalCalories : 0, // Use existing or default to 0
+      });
+    }
+
+    return filledData;
+  };
+
+  const fetchMonthlySummary = async (month, year) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(
+        `http://localhost:5001/api/calories/monthly?month=${month}&year=${year}`,
+        { headers: { 'x-auth-token': token } }
+      );
+  
+      if (response.ok) {
+        const data = await response.json();
+        const filledData = fillMissingDays(data.summary, month, year);
+        setMonthlyCalories(filledData);
+      } else {
+        console.error('Error fetching monthly data');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };  
+
+  // Prepare chart data
+  const chartData = {
+    labels: monthlyCalories.map((entry) => entry.date), // Dates
+    datasets: [
+        {
+            label: 'Calories',
+            data: monthlyCalories.map((entry) => entry.totalCalories), // Calorie data
+            borderColor: 'rgba(26, 166, 75, 1)', // Line color
+            backgroundColor: 'rgba(26, 166, 75, 0.2)', // Fill under the line
+            fill: true,
+        },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: false,
+        text: '',
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Date',
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Calories',
+        },
+        beginAtZero: true,
+      },
+    },
+  };
+
 
   const exercises = [
     // Beginner Exercises
@@ -532,6 +632,21 @@ const TrackerPage = () => {
     getLastSevenDaysCalories();
   }, [mealLogs, mealLogsPast]);
 
+  useEffect(() => {
+    const today = new Date();
+    const currentMonth = today.getMonth() + 1; // Months are 0-indexed
+    const currentYear = today.getFullYear();
+
+    fetchMonthlySummary(currentMonth, currentYear);
+  }, []);
+
+  useEffect(() => {
+    if (selectedMonth && selectedYear) {
+      fetchMonthlySummary(selectedMonth, selectedYear);
+    }
+  }, [selectedMonth, selectedYear]);
+  
+  
 
   const getMealsByCategory = (category) => {
     return mealLogs.filter((log) => log.mealCategory === category);
@@ -610,7 +725,7 @@ const TrackerPage = () => {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '15px',
+        marginBottom: '20px',
         padding: '10px 20px',
         borderRadius: '15px',
         backgroundColor: '#f9f9f9',
@@ -735,7 +850,7 @@ const TrackerPage = () => {
         borderRadius: '15px', 
         backgroundColor: '#f9f9f9', 
         boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
-        marginBottom: '50px',
+        marginBottom: '20px',
       }}>
         <h2 style={{ marginBottom: '15px' }}>Calorie Tracking</h2>
         <div className="nutrient-calorie-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -762,6 +877,83 @@ const TrackerPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Monthly Summary Section */}
+      <div
+        style={{
+          padding: '20px',
+          borderRadius: '15px',
+          backgroundColor: '#f9f9f9',
+          boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+          marginBottom: '20px',
+        }}
+      >
+
+      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
+          Monthly Calorie Summary
+      </h2>
+
+      <div style={{ marginBottom: '15px' }}>
+      <label htmlFor="month"></label>
+        <select
+          id="month"
+          value={selectedMonth}
+          onChange={(e) => {
+            const selectedMonth = parseInt(e.target.value, 10);
+            setSelectedMonth(selectedMonth);
+          }}
+          style={{
+            backgroundColor: '#f9f9f9',
+            border: '1px solid #ccc',
+            borderRadius: '8px',
+            padding: '10px',
+            fontSize: '14px',
+            color: '#333',
+            outline: 'none',
+            transition: 'box-shadow 0.3s',
+          }}
+          onMouseOver={(e) => (e.target.style.boxShadow = '0 0 8px rgba(26, 166, 75, 0.4)')}
+          onMouseOut={(e) => (e.target.style.boxShadow = 'none')}
+        >
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+      </div>
+
+      {/* Monthly Summary Graph */}
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '1200px', // Restrict graph width
+          height: '300px',   // Set explicit height
+          margin: '0 auto',  // Center the graph
+          overflow: 'hidden', // Prevent overflow issues
+        }}
+      >
+        
+        {monthlyCalories.length > 0 ? (
+          <Line
+            data={chartData}
+            options={{
+              ...chartOptions,
+              maintainAspectRatio: false, // Allow the chart to scale dynamically
+            }}
+          />
+        ) : (
+          <p>No data available for this month.</p>
+        )}
+      </div>
+    </div>
   
       {/* Meal Log Tables for Breakfast, Lunch, Dinner, Snacks */}
       <div style={{

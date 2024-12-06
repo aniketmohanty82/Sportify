@@ -1,0 +1,322 @@
+[
+    {
+      "name": "Cristiano Ronaldo",
+      "workoutPlan": {
+        "Monday": [
+          { "exercise": "Treadmill Sprints", "sets": 10, "reps": "30 seconds on, 30 seconds off" },
+          { "exercise": "Leg Press", "sets": 4, "reps": 12 },
+          { "exercise": "Bulgarian Split Squats", "sets": 3, "reps": 10 },
+          { "exercise": "Plank Holds", "sets": 4, "reps": "1 minute" }
+        ],
+        "Tuesday": [
+          { "exercise": "Interval Running", "sets": 8, "reps": "400 meters at max effort, 200 meters jog" },
+          { "exercise": "Deadlifts", "sets": 4, "reps": 8 },
+          { "exercise": "Lunges", "sets": 3, "reps": 12 },
+          { "exercise": "Russian Twists", "sets": 4, "reps": 20 }
+        ],
+        "Wednesday": [
+          { "exercise": "Agility Ladder Drills", "sets": 5, "reps": "30 seconds per drill" },
+          { "exercise": "Squats", "sets": 4, "reps": 10 },
+          { "exercise": "Box Jumps", "sets": 3, "reps": 12 },
+          { "exercise": "Side Planks", "sets": 3, "reps": "30 seconds per side" }
+        ],
+        "Thursday": [
+          { "exercise": "Ball Control Drills", "sets": "10 minutes each drill", "reps": null },
+          { "exercise": "Pull-Ups", "sets": 4, "reps": 10 },
+          { "exercise": "Push-Ups", "sets": 3, "reps": 15 },
+          { "exercise": "Leg Raises", "sets": 3, "reps": 15 }
+        ],
+        "Friday": [
+          { "exercise": "Strength Circuit", "sets": 5, "reps": "12 reps each exercise" },
+          { "exercise": "Speed Drills", "sets": "10 minutes", "reps": null },
+          { "exercise": "Foam Rolling", "sets": null, "reps": null }
+        ]
+      },
+      "description": "Cristiano Ronaldo focuses on explosive leg power, agility, and core strength to enhance his football performance."
+    },
+    {
+      "name": "Serena Williams",
+      "workoutPlan": {
+        "Monday": [
+          { "exercise": "Dynamic Stretching", "sets": null, "reps": "10 minutes" },
+          { "exercise": "Serve Practice", "sets": "5 sets of 10 serves", "reps": null },
+          { "exercise": "Bench Press", "sets": 4, "reps": 8 },
+          { "exercise": "Bent Over Rows", "sets": 4, "reps": 12 }
+        ],
+        "Tuesday": [
+          { "exercise": "Cardio Tennis Drills", "sets": "10 minutes each drill", "reps": null },
+          { "exercise": "Shoulder Press", "sets": 3, "reps": 10 },
+          { "exercise": "Medicine Ball Slams", "sets": 3, "reps": 15 },
+          { "exercise": "Plank with Shoulder Taps", "sets": 3, "reps": 20 }
+        ],
+        "Wednesday": [
+          { "exercise": "Footwork Drills", "sets": "10 minutes each drill", "reps": null },
+          { "exercise": "Dumbbell Bench Press", "sets": 3, "reps": 10 },
+          { "exercise": "Lat Pulldowns", "sets": 3, "reps": 12 },
+          { "exercise": "Hanging Leg Raises", "sets": 3, "reps": 15 }
+        ],
+        "Thursday": [
+          { "exercise": "Match Practice", "sets": "90 minutes", "reps": null },
+          { "exercise": "Push-Ups", "sets": 3, "reps": 15 },
+          { "exercise": "Cable Rotations", "sets": 3, "reps": 20 },
+          { "exercise": "Hamstring Curls", "sets": 3, "reps": 12 }
+        ],
+        "Friday": [
+          { "exercise": "Full-Body Strength Circuit", "sets": 3, "reps": "12 reps each" },
+          { "exercise": "Agility Drills", "sets": "15 minutes", "reps": null }
+        ]
+      },
+      "description": "Serena Williams incorporates strength, agility, and match-specific drills to dominate tennis."
+    },
+    {
+      "name": "Michael Jordan",
+      "workoutPlan": {
+        "Monday": [
+          { "exercise": "Basketball Shooting Drills", "sets": "60 minutes", "reps": null },
+          { "exercise": "Squats", "sets": 4, "reps": 10 },
+          { "exercise": "Pull-Ups", "sets": 4, "reps": 8 },
+          { "exercise": "Plank Holds", "sets": 4, "reps": "1 minute" }
+        ],
+        "Tuesday": [
+          { "exercise": "Defensive Drills", "sets": "60 minutes", "reps": null },
+          { "exercise": "Deadlifts", "sets": 3, "reps": 10 },
+          { "exercise": "Lunges", "sets": 3, "reps": 12 },
+          { "exercise": "Russian Twists", "sets": 3, "reps": 20 }
+        ],
+        "Wednesday": [
+          { "exercise": "Speed and Agility Drills", "sets": "45 minutes", "reps": null },
+          { "exercise": "Dumbbell Bench Press", "sets": 3, "reps": 10 },
+          { "exercise": "Cable Rows", "sets": 3, "reps": 12 },
+          { "exercise": "Hanging Leg Raises", "sets": 3, "reps": 15 }
+        ],
+        "Thursday": [
+          { "exercise": "One-on-One Basketball Matches", "sets": "30 minutes", "reps": null },
+          { "exercise": "Push-Ups", "sets": 3, "reps": 15 },
+          { "exercise": "Medicine Ball Slams", "sets": 3, "reps": 12 },
+          { "exercise": "Side Planks", "sets": 3, "reps": "30 seconds per side" }
+        ],
+        "Friday": [
+          { "exercise": "Full-Court Practice", "sets": "90 minutes", "reps": null },
+          { "exercise": "Core Stability Drills", "sets": 5, "reps": "30 seconds each" }
+        ]
+      },
+      "description": "Michael Jordan's routine emphasizes basketball drills, strength training, and speed work to remain dominant on the court."
+    },
+    {
+      "name": "Lionel Messi",
+      "workoutPlan": {
+        "Monday": [
+          { "exercise": "Ball Control Drills", "sets": "20 minutes each drill", "reps": null },
+          { "exercise": "Squats", "sets": 3, "reps": 12 },
+          { "exercise": "Calf Raises", "sets": 3, "reps": 15 },
+          { "exercise": "Plank Holds", "sets": 4, "reps": "1 minute" }
+        ],
+        "Tuesday": [
+          { "exercise": "Agility Ladder Drills", "sets": "20 minutes", "reps": null },
+          { "exercise": "Lunges", "sets": 3, "reps": 12 },
+          { "exercise": "Deadlifts", "sets": 4, "reps": 8 },
+          { "exercise": "Side Planks", "sets": 3, "reps": "30 seconds per side" }
+        ],
+        "Wednesday": [
+          { "exercise": "Short Sprints", "sets": 10, "reps": "30 meters" },
+          { "exercise": "Push-Ups", "sets": 3, "reps": 15 },
+          { "exercise": "Pull-Ups", "sets": 4, "reps": 8 },
+          { "exercise": "Russian Twists", "sets": 3, "reps": 20 }
+        ],
+        "Thursday": [
+          { "exercise": "Match Simulation", "sets": "90 minutes", "reps": null },
+          { "exercise": "Cable Rotations", "sets": 3, "reps": 20 },
+          { "exercise": "Medicine Ball Throws", "sets": 3, "reps": 15 },
+          { "exercise": "Leg Press", "sets": 4, "reps": 12 }
+        ],
+        "Friday": [
+          { "exercise": "Recovery Drills", "sets": "45 minutes", "reps": null },
+          { "exercise": "Core Stability", "sets": 3, "reps": "15 reps" }
+        ]
+      },
+      "description": "Lionel Messi's training focuses on ball control, agility, and lower-body strength to excel in football."
+    },
+    {
+      "name": "Tom Brady",
+      "workoutPlan": {
+        "Monday": [
+          { "exercise": "Resistance Band Warm-Up", "sets": 2, "reps": "15 reps per movement" },
+          { "exercise": "Medicine Ball Rotations", "sets": 3, "reps": 10 },
+          { "exercise": "Dynamic Stretching", "sets": null, "reps": "10 minutes" }
+        ],
+        "Tuesday": [
+          { "exercise": "TB12 Resistance Training", "sets": "4 circuits", "reps": "12 reps each" },
+          { "exercise": "Plank Variations", "sets": 4, "reps": "30 seconds each" },
+          { "exercise": "Single-Leg Balances", "sets": 3, "reps": "30 seconds per leg" }
+        ],
+        "Wednesday": [
+          { "exercise": "Core Stabilization", "sets": 4, "reps": "20 seconds each" },
+          { "exercise": "Speed Drills", "sets": 3, "reps": "15 seconds max effort" },
+          { "exercise": "Recovery Stretching", "sets": null, "reps": "10 minutes" }
+        ],
+        "Thursday": [
+          { "exercise": "Game Simulation Throws", "sets": "50 passes", "reps": null },
+          { "exercise": "Medicine Ball Slams", "sets": 3, "reps": 15 },
+          { "exercise": "Agility Ladder Drills", "sets": 4, "reps": null }
+        ],
+        "Friday": [
+          { "exercise": "Resistance Band Training", "sets": 4, "reps": "15 reps" },
+          { "exercise": "Foam Rolling", "sets": null, "reps": null }
+        ]
+      },
+      "description": "Tom Brady uses his TB12 method focusing on functional longevity and resistance work."
+    },
+    {
+      "name": "Roger Federer",
+      "workoutPlan": {
+        "Monday": [
+          { "exercise": "Dynamic Stretching", "sets": null, "reps": "15 minutes" },
+          { "exercise": "On-Court Movement Drills", "sets": 5, "reps": "3 minutes each" },
+          { "exercise": "Dumbbell Rows", "sets": 3, "reps": 12 }
+        ],
+        "Tuesday": [
+          { "exercise": "Interval Sprint Training", "sets": 10, "reps": "30 seconds sprint, 1-minute rest" },
+          { "exercise": "Medicine Ball Slams", "sets": 3, "reps": 15 },
+          { "exercise": "Plank Holds", "sets": 3, "reps": "1 minute" }
+        ],
+        "Wednesday": [
+          { "exercise": "Shadow Drills", "sets": "30 minutes", "reps": null },
+          { "exercise": "Lunges", "sets": 3, "reps": 12 },
+          { "exercise": "Pull-Ups", "sets": 3, "reps": 10 }
+        ],
+        "Thursday": [
+          { "exercise": "Match Simulation", "sets": "60 minutes", "reps": null },
+          { "exercise": "Core Rotations", "sets": 3, "reps": 20 },
+          { "exercise": "Dumbbell Press", "sets": 3, "reps": 8 }
+        ],
+        "Friday": [
+          { "exercise": "Yoga", "sets": null, "reps": "60 minutes" },
+          { "exercise": "Recovery Foam Rolling", "sets": null, "reps": null }
+        ]
+      },
+      "description": "Roger Federer combines endurance, strength, and flexibility to maintain peak performance in tennis."
+    },
+    {
+    "name": "Usain Bolt",
+    "workoutPlan": {
+      "Monday": [
+        { "exercise": "Sprint Training", "sets": 8, "reps": "100 meters" },
+        { "exercise": "Squat Jumps", "sets": 3, "reps": 12 },
+        { "exercise": "Plank Holds", "sets": 3, "reps": "1 minute" }
+      ],
+      "Tuesday": [
+        { "exercise": "Plyometric Drills", "sets": 5, "reps": "20 jumps" },
+        { "exercise": "Deadlifts", "sets": 4, "reps": 8 },
+        { "exercise": "Side Planks", "sets": 3, "reps": "30 seconds each" }
+      ],
+      "Wednesday": [
+        { "exercise": "Interval Sprints", "sets": 6, "reps": "200 meters fast, 200 meters jog" },
+        { "exercise": "Calf Raises", "sets": 3, "reps": 15 },
+        { "exercise": "Medicine Ball Slams", "sets": 3, "reps": 15 }
+      ],
+      "Thursday": [
+        { "exercise": "Long Jumps", "sets": 5, "reps": "10 meters each" },
+        { "exercise": "Agility Ladder Drills", "sets": 4, "reps": "20 seconds each" },
+        { "exercise": "Foam Rolling", "sets": null, "reps": null }
+      ],
+      "Friday": [
+        { "exercise": "Flexibility and Recovery", "sets": null, "reps": "30 minutes" },
+        { "exercise": "Yoga", "sets": null, "reps": "60 minutes" }
+      ]
+    },
+    "description": "Usain Bolt focuses on explosive speed, flexibility, and recovery."
+  },
+  {
+    "name": "Simone Biles",
+    "workoutPlan": {
+      "Monday": [
+        { "exercise": "Floor Routine Practice", "sets": "60 minutes", "reps": null },
+        { "exercise": "Core Stability Drills", "sets": 5, "reps": "15 seconds each" },
+        { "exercise": "Pull-Ups", "sets": 4, "reps": 10 }
+      ],
+      "Tuesday": [
+        { "exercise": "Beam Drills", "sets": "45 minutes", "reps": null },
+        { "exercise": "Box Jumps", "sets": 3, "reps": 12 },
+        { "exercise": "Plank Holds", "sets": 4, "reps": "1 minute" }
+      ],
+      "Wednesday": [
+        { "exercise": "Vault Practice", "sets": "30 minutes", "reps": null },
+        { "exercise": "Lunges", "sets": 3, "reps": 12 },
+        { "exercise": "Cable Rotations", "sets": 3, "reps": 20 }
+      ],
+      "Thursday": [
+        { "exercise": "Bar Drills", "sets": "45 minutes", "reps": null },
+        { "exercise": "Core Variations", "sets": 3, "reps": "20 reps each" },
+        { "exercise": "Flexibility Stretches", "sets": null, "reps": "15 minutes" }
+      ],
+      "Friday": [
+        { "exercise": "Full Routine Simulation", "sets": "90 minutes", "reps": null },
+        { "exercise": "Foam Rolling", "sets": null, "reps": null }
+      ]
+    },
+    "description": "Simone Biles prioritizes power, precision, and resilience to dominate gymnastics."
+  },
+  {
+    "name": "Eliud Kipchoge",
+    "workoutPlan": {
+      "Monday": [
+        { "exercise": "Long-Distance Running", "sets": "2 hours", "reps": null },
+        { "exercise": "Dynamic Stretching", "sets": null, "reps": "15 minutes" }
+      ],
+      "Tuesday": [
+        { "exercise": "Interval Runs", "sets": 6, "reps": "1 mile at race pace" },
+        { "exercise": "Plank Variations", "sets": 3, "reps": "1 minute each" }
+      ],
+      "Wednesday": [
+        { "exercise": "Hill Sprints", "sets": 8, "reps": "100 meters each" },
+        { "exercise": "Lunges", "sets": 3, "reps": 12 },
+        { "exercise": "Core Rotations", "sets": 3, "reps": 20 }
+      ],
+      "Thursday": [
+        { "exercise": "Recovery Run", "sets": "60 minutes", "reps": null },
+        { "exercise": "Yoga", "sets": null, "reps": "45 minutes" }
+      ],
+      "Friday": [
+        { "exercise": "Marathon Simulation", "sets": "2 hours at race pace", "reps": null },
+        { "exercise": "Foam Rolling", "sets": null, "reps": null }
+      ]
+    },
+    "description": "Eliud Kipchoge focuses on endurance, pace, and mental strength for marathons."
+  },
+  {
+    "name": "LeBron James",
+    "workoutPlan": {
+      "Monday": [
+        { "exercise": "Dynamic Stretching", "sets": null, "reps": "15 minutes" },
+        { "exercise": "Weighted Squats", "sets": 4, "reps": 12 },
+        { "exercise": "Bench Press", "sets": 4, "reps": 10 },
+        { "exercise": "Plank Holds", "sets": 4, "reps": "1 minute" }
+      ],
+      "Tuesday": [
+        { "exercise": "High-Intensity Interval Training (HIIT)", "sets": 6, "reps": "1 minute on, 1 minute off" },
+        { "exercise": "Dumbbell Lunges", "sets": 3, "reps": 12 },
+        { "exercise": "Pull-Ups", "sets": 4, "reps": 8 },
+        { "exercise": "Russian Twists", "sets": 4, "reps": 20 }
+      ],
+      "Wednesday": [
+        { "exercise": "Full-Court Basketball Drills", "sets": "60 minutes", "reps": null },
+        { "exercise": "Deadlifts", "sets": 4, "reps": 10 },
+        { "exercise": "Box Jumps", "sets": 3, "reps": 12 },
+        { "exercise": "Side Planks", "sets": 3, "reps": "30 seconds per side" }
+      ],
+      "Thursday": [
+        { "exercise": "Agility Ladder Drills", "sets": 5, "reps": "20 seconds each" },
+        { "exercise": "Medicine Ball Slams", "sets": 3, "reps": 15 },
+        { "exercise": "Dumbbell Rows", "sets": 3, "reps": 12 },
+        { "exercise": "Foam Rolling", "sets": null, "reps": null }
+      ],
+      "Friday": [
+        { "exercise": "Game Simulation", "sets": "90 minutes", "reps": null },
+        { "exercise": "Core Stability Drills", "sets": 4, "reps": "15 seconds each" },
+        { "exercise": "Recovery Stretching", "sets": null, "reps": "30 minutes" }
+      ]
+    },
+    "description": "LeBron James, a basketball phenomenon, is renowned for his versatility, strength, and endurance. His training combines functional strength exercises, agility drills, and endurance work to maintain peak performance. LeBron invests heavily in recovery, including cryotherapy, hyperbaric chambers, and yoga. His focus on all-around fitness and relentless pursuit of improvement have made him one of the greatest athletes of all time."
+  }  
+]
+  

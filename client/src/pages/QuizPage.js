@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import '../QuizPage.css'; // Adjust the path as needed
 import axios from 'axios';
 import athleteData from '../athletes.json'; // Import athletes JSON
+import athleteWorkouts from '../athleteWorkouts.json'
+console.log(athleteWorkouts);
 
 const QuizPage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -14,6 +16,8 @@ const QuizPage = () => {
   const [resultImage, setResultImage] = useState('');
   const [darkMode, setDarkMode] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [resultWorkouts, setResultWorkouts] = useState({});
+
 
   const quizData = [
     {
@@ -209,12 +213,17 @@ const QuizPage = () => {
       try {
         const token = localStorage.getItem('token');
         const response = await axios.get('http://localhost:5001/api/quiz/result', {
-          headers: { 'x-auth-token': token }
+          headers: { 'x-auth-token': token },
         });
-
+  
         if (response.data && response.data.result) {
           const { result, answers, description, image } = response.data;
+  
+          // Find the workout for the athlete
+          const athleteWorkout = athleteWorkouts.find((workout) => workout.name === result);
+  
           setPreviousResult({ result, description, image });
+          setResultWorkouts(athleteWorkout ? athleteWorkout.workoutPlan : {});
           setHasTakenQuizBefore(true);
         } else {
           setHasTakenQuizBefore(false);
@@ -226,9 +235,10 @@ const QuizPage = () => {
         setLoading(false);
       }
     };
-
+  
     fetchPreviousResult();
   }, []);
+  
 
   const handleOptionChange = (e) => {
     setAnswers({ ...answers, [currentQuestion.id]: e.target.value });
@@ -263,7 +273,7 @@ const QuizPage = () => {
         totalScores[athlete] = (totalScores[athlete] || 0) + athleteScores[athlete];
       }
     });
-
+  
     let maxScore = 0;
     let bestAthlete = '';
     for (const athlete in totalScores) {
@@ -272,13 +282,22 @@ const QuizPage = () => {
         bestAthlete = athlete;
       }
     }
-
+  
     setResult(bestAthlete);
+    console.log("BEST ATHLETE:");
+    console.log(bestAthlete);
+
     const athleteInfo = athleteData.find((athlete) => athlete.name === bestAthlete);
+    const athleteWorkout = athleteWorkouts.find((workout) => workout.name === bestAthlete);
+    
+    console.log("ATHLETE WORKOUT:");
+    console.log(athleteWorkouts);
+
     setResultDescription(athleteInfo ? athleteInfo.description : 'Description not found.');
     setResultImage(athleteInfo ? athleteInfo.image : '');
+    setResultWorkouts(athleteWorkout ? athleteWorkout.workoutPlan : {});
     setIsSubmitted(true);
-
+  
     try {
       const token = localStorage.getItem('token');
       await axios.post(
@@ -290,6 +309,7 @@ const QuizPage = () => {
       console.error('Error saving result:', error);
     }
   };
+  
 
   if (loading) {
     return <div className={`quiz-container ${darkMode ? 'dark-mode' : ''}`}>Loading...</div>;
@@ -314,11 +334,27 @@ const QuizPage = () => {
             </div>
           )}
           <p className="result-description">{previousResult.description}</p>
+          <div className="workout-plan">
+            <h3>Workout Plan</h3>
+            {Object.entries(resultWorkouts).map(([day, exercises]) => (
+              <div key={day}>
+                <h4>{day}</h4>
+                <ul>
+                  {exercises.map((exercise, index) => (
+                    <li key={index}>
+                      {exercise.exercise} - {exercise.sets && `Sets: ${exercise.sets}`} {exercise.reps && `Reps: ${exercise.reps}`}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
           <button onClick={handleRetake} className="button retake-button">Retake Quiz</button>
         </div>
       </div>
     );
   }
+  
   
 
   // If quiz is submitted now (either first time or after retake)
@@ -340,11 +376,27 @@ const QuizPage = () => {
             </div>
           )}
           <p className="result-description">{resultDescription}</p>
+          <div className="workout-plan">
+            <h3>Workout Plan</h3>
+            {Object.entries(resultWorkouts).map(([day, exercises]) => (
+              <div key={day}>
+                <h4>{day}</h4>
+                <ul>
+                  {exercises.map((exercise, index) => (
+                    <li key={index}>
+                      {exercise.exercise} - {exercise.sets && `Sets: ${exercise.sets}`} {exercise.reps && `Reps: ${exercise.reps}`}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
           <button onClick={handleRetake} className="button retake-button">Retake Quiz</button>
         </div>
       </div>
     );
   }
+  
   
 
     return (

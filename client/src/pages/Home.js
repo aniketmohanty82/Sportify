@@ -278,14 +278,14 @@ const HomePage = () => {
       </Paper>
     );
   };
-  
+
   return (
     <div className="homepage-container" style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
       {/* Header */}
       <header className="header" style={{ textAlign: 'center', marginBottom: '20px' }}>
         <h1 style={{ fontSize: '28px', color: '#ffffff' }}>Hey, {username}! Welcome Back!</h1>
       </header>
-  
+
       {/* Soccer Section */}
       <Card
         elevation={3}
@@ -309,11 +309,18 @@ const HomePage = () => {
               />
               <Typography variant="h6" style={{ fontWeight: 'bold', color: '#1aa64b' }}>{soccerTeamData.team.name}</Typography>
               <Typography>Games Played: {soccerTeamData.fixtures.played.total}</Typography>
-              <Typography>Wins: {soccerTeamData.fixtures.wins.total}</Typography>
-              <Typography>Losses: {soccerTeamData.fixtures.loses.total}</Typography>
-              <Typography>Draws: {soccerTeamData.fixtures.draws.total}</Typography>
+              <Typography>
+                Wins: <Typography component="span" sx={{ color: 'green', fontWeight: 'bold' }}>{soccerTeamData.fixtures.wins.total}</Typography>
+              </Typography>
+              <Typography>
+                Losses: <Typography component="span" sx={{ color: 'red', fontWeight: 'bold' }}>{soccerTeamData.fixtures.loses.total}</Typography>
+              </Typography>
+              <Typography>
+                Draws: <Typography component="span" sx={{ color: 'orange', fontWeight: 'bold' }}>{soccerTeamData.fixtures.draws.total}</Typography>
+              </Typography>
+
             </Box>
-  
+
             {/* Goals Section */}
             <Box style={{ flex: 1 }}>
               <Typography variant="h6" style={{ fontWeight: 'bold', marginBottom: '10px' }}>Goals</Typography>
@@ -326,7 +333,7 @@ const HomePage = () => {
                 soccerTeamData.goals.against.total.total / soccerTeamData.fixtures.played.total
               ).toFixed(2)}</Typography>
             </Box>
-  
+
             {/* Lineups Section */}
             <Box style={{ flex: 1 }}>
               <Typography variant="h6" style={{ fontWeight: 'bold', marginBottom: '10px' }}>Common Lineups</Typography>
@@ -338,7 +345,7 @@ const HomePage = () => {
                 <Typography>No lineups data available.</Typography>
               )}
             </Box>
-  
+
             {/* Form Section */}
             <Box style={{ flex: 1 }}>
               <Typography variant="h6" style={{ fontWeight: 'bold', marginBottom: '10px' }}>Form</Typography>
@@ -361,7 +368,7 @@ const HomePage = () => {
           <Typography>No soccer data available.</Typography>
         )}
       </Card>
-  
+
       {/* Basketball Section */}
       <Card
         elevation={3}
@@ -384,16 +391,25 @@ const HomePage = () => {
                 style={{ width: '80px', height: '80px', marginBottom: '10px' }}
               />
               <Typography variant="h6" style={{ fontWeight: 'bold', color: '#1aa64b' }}>{basketballTeamData.team.name}</Typography>
-              <Typography>Record: {basketballTeamData.games.wins.all.total} - {basketballTeamData.games.loses.all.total}</Typography>
+              <Typography>
+                Record:
+                <Box component="span" sx={{ color: 'green' }}>
+                  {basketballTeamData.games.wins.all.total}
+                </Box>
+                -
+                <Box component="span" sx={{ color: 'red' }}>
+                  {basketballTeamData.games.loses.all.total}
+                </Box>
+              </Typography>
             </Box>
-  
+
             {/* Win Percentage */}
             <Box style={{ flex: 1 }}>
               <Typography variant="h6" style={{ fontWeight: 'bold', marginBottom: '10px' }}>Win Percentage</Typography>
-              <Typography>Home: {basketballTeamData.games.wins.home.percentage}</Typography>
-              <Typography>Away: {basketballTeamData.games.wins.away.percentage}</Typography>
+              <Typography>Home: {basketballTeamData.games.wins.home.percentage}%</Typography>
+              <Typography>Away: {basketballTeamData.games.wins.away.percentage}%</Typography>
             </Box>
-  
+
             {/* Points Section */}
             <Box style={{ flex: 1 }}>
               <Typography variant="h6" style={{ fontWeight: 'bold', marginBottom: '10px' }}>Points</Typography>
@@ -405,64 +421,64 @@ const HomePage = () => {
           <Typography>No basketball data available.</Typography>
         )}
       </Card>
-  
+
       {/* Bottom Widgets Section */}
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', height: '200px' }}>
-{/* Calories Widget */}
-<Card
-  elevation={3}
-  style={{
-    flex: 1,
-    padding: '20px',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '15px',
-    boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }}
->
-  <Typography
-    variant="h6"
-    style={{
-      textAlign: 'center',
-      color: '#1aa64b',
-      marginBottom: '10px',
-    }}
-  >
-    Calories
-  </Typography>
-  <div
-    style={{
-      width: '80px', // Adjusted size to fit the widget while keeping proportions
-      height: '80px', // Ensures a square progress bar
-      margin: '10px 0',
-    }}
-  >
-    <CircularProgressbar
-      value={caloriePercentage}
-      text={`${Math.round(caloriePercentage)}%`}
-      styles={buildStyles({
-        textSize: '12px', // Slightly smaller text to fit the resized progress bar
-        pathColor: `rgba(26, 166, 75, 1)`,
-        textColor: '#1aa64b',
-        trailColor: '#d6d6d6',
-      })}
-    />
-  </div>
-  <Typography
-    style={{
-      textAlign: 'center',
-      fontSize: '14px', // Reduced font size to maintain balance
-      marginTop: '10px',
-    }}
-  >
-    {totalCalories} / {dailyCalorieGoal} Calories
-  </Typography>
-</Card>
+        {/* Calories Widget */}
+        <Card
+          elevation={3}
+          style={{
+            flex: 1,
+            padding: '20px',
+            backgroundColor: '#f9f9f9',
+            borderRadius: '15px',
+            boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Typography
+            variant="h6"
+            style={{
+              textAlign: 'center',
+              color: '#1aa64b',
+              marginBottom: '10px',
+            }}
+          >
+            Calories
+          </Typography>
+          <div
+            style={{
+              width: '80px', // Adjusted size to fit the widget while keeping proportions
+              height: '80px', // Ensures a square progress bar
+              margin: '10px 0',
+            }}
+          >
+            <CircularProgressbar
+              value={caloriePercentage}
+              text={`${Math.round(caloriePercentage)}%`}
+              styles={buildStyles({
+                textSize: '12px', // Slightly smaller text to fit the resized progress bar
+                pathColor: `rgba(26, 166, 75, 1)`,
+                textColor: '#1aa64b',
+                trailColor: '#d6d6d6',
+              })}
+            />
+          </div>
+          <Typography
+            style={{
+              textAlign: 'center',
+              fontSize: '14px', // Reduced font size to maintain balance
+              marginTop: '10px',
+            }}
+          >
+            {totalCalories} / {dailyCalorieGoal} Calories
+          </Typography>
+        </Card>
 
-  
+
         {/* Workouts Widget */}
         <Card
           elevation={3}
@@ -488,7 +504,7 @@ const HomePage = () => {
             <Typography style={{ textAlign: 'center', color: '#666' }}>No workout data available.</Typography>
           )}
         </Card>
-  
+
         {/* Shortcuts Section */}
         <Card elevation={3} style={{ flex: 1, padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '15px', boxShadow: '0 0 8px rgba(26, 166, 75, 0.4)' }}>
           <Typography variant="h6" style={{ textAlign: 'center', color: '#1aa64b' }}>Shortcuts</Typography>
@@ -498,17 +514,17 @@ const HomePage = () => {
         </Card>
       </div>
       <MealLogForm isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleFormSubmit} onError={handleCloseModal} />
-        <WorkoutLogForm isOpen={isWorkoutModalOpen} onClose={handleCloseModalWorkout} onSubmit={handleWorkoutSubmit} />
-        <RunLogForm
-          isOpen={isFormOpen}
-          onClose={() => setIsFormOpen(false)}
-          onSubmit={logRun}
-          darkMode={false}
-        />
+      <WorkoutLogForm isOpen={isWorkoutModalOpen} onClose={handleCloseModalWorkout} onSubmit={handleWorkoutSubmit} />
+      <RunLogForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={logRun}
+        darkMode={false}
+      />
     </div>
   );
-  
-  
+
+
 };
 
 export default HomePage;

@@ -9,6 +9,7 @@ import {
   MDBInput,
 } from 'mdb-react-ui-kit';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // Import the local image
 import registerImage from '../assets/register.jpg';
@@ -20,6 +21,8 @@ function Registration() {
   const [password, setPassword]   = useState('');
   const [message, setMessage]     = useState('');
   const [username, setUsername]   = useState('');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     import('mdb-react-ui-kit/dist/css/mdb.min.css');
@@ -38,6 +41,7 @@ function Registration() {
       });
       setMessage(res.data.message);
       // Optionally redirect to login page
+      navigate('/login');
     } catch (err) {
       setMessage(err.response.data.message || 'Registration failed');
     }

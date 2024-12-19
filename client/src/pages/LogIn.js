@@ -46,7 +46,7 @@ const LogIn = () => {
       console.log(res.data.user)
       console.log(localStorage.getItem('userName'))
 
-      navigate('/runs');
+      navigate('/');
 
     } catch (err) {
       console.error(err.response.data);
